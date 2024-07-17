@@ -1,0 +1,73 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/line.svg" id="1_01cuk"]
+[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/visual/ConveyorBelt.tres" id="1_iucw0"]
+[ext_resource type="Script" path="res://Factory/FactoryBlocks/ConveyorBelt.gd" id="1_kb8ux"]
+
+[sub_resource type="GDScript" id="GDScript_smjxm"]
+resource_name = "FactoryBlockSettings"
+script/source = "extends PhysicsBody3D
+
+### FactoryBlock external info
+
+# for WorldEditorUI: must be on first child of root node
+@export var ui_name : String
+@export var ui_icon : Texture2D
+
+# for Builder3D: must be on first child of root node
+# (and this must be PhysicsBody3D node used to place element in world)
+# NOTE: parent (root) node name will be used as block identifier in UI
+#       (as button name) AND should be equal to `object_subtype` value
+#       for the correct operation of the block number limiter
+const object_type := \"FactoryBlock\"
+const object_subtype := \"ConveyorBelt\"
+@onready var physics_rids = [get_rid()]
+
+# optional functions for Builder3D:
+func on_transform_update():
+	FAG_FactoryBlocksUtils.on_block_transform_updated($\"../Area3D\")
+"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_45hpx"]
+size = Vector3(1, 0.5, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_ptakl"]
+left_to_right = 1.0
+size = Vector3(1, 1, 0.5)
+
+[sub_resource type="PrismMesh" id="PrismMesh_j1jdh"]
+left_to_right = 0.7
+size = Vector3(1, 1, 0.5)
+
+[node name="ConveyorBelt" type="Node3D"]
+
+[node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+script = SubResource("GDScript_smjxm")
+ui_name = "FACTORY_BLOCK_NAME_ConveyorBelt"
+ui_icon = ExtResource("1_01cuk")
+
+[node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
+shape = SubResource("BoxShape3D_45hpx")
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+script = ExtResource("1_kb8ux")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_45hpx")
+
+[node name="FactoryElementVisual" type="MeshInstance3D" parent="."]
+visible = false
+mesh = ExtResource("1_iucw0")
+skeleton = NodePath("")
+
+[node name="FactoryElementVisual-DebugOnly" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.91069e-15, 1, 4.37114e-08, 4.37114e-08, -4.37114e-08, 1, 1, 0, -4.37114e-08, 0, 0.25, 0)
+mesh = SubResource("PrismMesh_ptakl")
+skeleton = NodePath("")
+
+[node name="FactoryElementVisual-DebugOnly" type="MeshInstance3D" parent="FactoryElementVisual-DebugOnly"]
+transform = Transform3D(-1, 4.37114e-08, 4.37114e-08, 4.37114e-08, 1, -6.87827e-36, 4.37114e-08, -1.91069e-15, 1, 0, 0, 0)
+mesh = SubResource("PrismMesh_j1jdh")
+skeleton = NodePath("")

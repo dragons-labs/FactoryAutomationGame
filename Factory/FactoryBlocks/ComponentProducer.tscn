@@ -1,0 +1,49 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Factory/FactoryBlocks/ComponentProducer.gd" id="2_7os0x"]
+[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/GND.svg" id="2_fhwat"]
+
+[sub_resource type="GDScript" id="GDScript_ccjjk"]
+resource_name = "FactoryBlockSettings"
+script/source = "extends PhysicsBody3D
+
+### FactoryBlock external info
+
+# for WorldEditorUI: must be on first child of root node
+@export var ui_name : String
+@export var ui_icon : Texture2D
+
+# for Builder3D: must be on first child of root node
+# (and this must be PhysicsBody3D node used to place element in world)
+# NOTE: parent (root) node name will be used as block identifier in UI
+#       (as button name) AND should be equal to `object_subtype` value
+#       for the correct operation of the block number limiter
+const object_type := \"FactoryStaticBlock\"
+const object_subtype := \"ProducerBlock\"
+@onready var physics_rids = [get_rid()]
+"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uwn0y"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_rb6np"]
+
+[node name="ProducerBlock" type="Node3D"]
+script = ExtResource("2_7os0x")
+
+[node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+script = SubResource("GDScript_ccjjk")
+ui_name = "FACTORY_BLOCK_NAME_ProducerBlock"
+ui_icon = ExtResource("2_fhwat")
+
+[node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
+shape = SubResource("BoxShape3D_uwn0y")
+
+[node name="FactoryElementVisual" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("BoxMesh_rb6np")
+skeleton = NodePath("")
+
+[node name="Timer" type="Timer" parent="."]
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

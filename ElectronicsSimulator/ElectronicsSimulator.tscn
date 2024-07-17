@@ -1,0 +1,31 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Script" path="res://ElectronicsSimulator/ElectronicsSimulator.gd" id="1_agd56"]
+[ext_resource type="PackedScene" path="res://Base/2DGridSystem/GridEditor.tscn" id="1_jcjma"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/GND.tscn" id="3_d4gdo"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/PNP.tscn" id="4_di5qe"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/NetConnector.tscn" id="4_x8v0y"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/Resistor.tscn" id="5_eft1k"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/Capacitor.tscn" id="6_fqb8f"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/NPN.tscn" id="6_tt38r"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/Diode.tscn" id="7_1q1jv"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/Inductor.tscn" id="7_g24hs"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/Voltmeter.tscn" id="11_s3taf"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/Ammeter.tscn" id="12_r8def"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/AND.tscn" id="13_3rhkm"]
+[ext_resource type="Script" path="res://ElectronicsSimulator/GdSpiceUI.gd" id="13_bt7c4"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/OR.tscn" id="14_684op"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/XOR.tscn" id="15_orxfd"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/NOT.tscn" id="16_2iter"]
+
+[node name="ElectronicsSimulator" type="Node2D"]
+script = ExtResource("1_agd56")
+
+[node name="GridEditor" parent="." instance=ExtResource("1_jcjma")]
+unique_name_in_owner = true
+elements = Array[PackedScene]([ExtResource("3_d4gdo"), ExtResource("4_x8v0y"), ExtResource("5_eft1k"), ExtResource("6_fqb8f"), ExtResource("7_g24hs"), ExtResource("7_1q1jv"), ExtResource("6_tt38r"), ExtResource("4_di5qe"), ExtResource("11_s3taf"), ExtResource("12_r8def"), ExtResource("13_3rhkm"), ExtResource("14_684op"), ExtResource("15_orxfd"), ExtResource("16_2iter")])
+
+[node name="GdSpice+UI" type="GdSpice" parent="."]
+verbose = 1
+unique_name_in_owner = true
+script = ExtResource("13_bt7c4")

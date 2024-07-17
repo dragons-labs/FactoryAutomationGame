@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+SPDX-FileCopyrightText: Filip Dominec and contributors (https://commons.wikimedia.org/wiki/User:FDominec)
+SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+
+SPDX-License-Identifier: 0BSD OR MIT
+
+Based-On: https://commons.wikimedia.org/wiki/File:Electrical_symbols_library.svg UNDER Public Domain BY Filip Dominec and contributors
+-->
+
+<svg
+   width="48"
+   height="48"
+   viewBox="0 0 12.699999 12.699999"
+   version="1.1"
+   id="svg1840"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="ammeter.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1842"
+     pagecolor="#8b8b8b"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="13.455443"
+     inkscape:cx="10.813468"
+     inkscape:cy="27.646804"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="text3277" />
+  <defs
+     id="defs1837" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3096"
+       transform="matrix(0.12656589,0,0,0.12816999,-67.159019,-60.785382)"
+       style="stroke:#ffffff;stroke-width:2.07736;stroke-dasharray:none;stroke-opacity:1">
+      <rect
+         rx="12.125669"
+         ry="11.973902"
+         y="477.66403"
+         x="545.26715"
+         height="92.271019"
+         width="71.058578"
+         id="rect3269"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#999999;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:2.07736;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none" />
+      <rect
+         rx="12.125659"
+         ry="11.973926"
+         y="484.75101"
+         x="552.95233"
+         height="44.359825"
+         width="56.329552"
+         id="rect3271"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#cccccc;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:2.07736;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none" />
+      <path
+         inkscape:connector-curvature="0"
+         transform="matrix(2,0,0,2,-103.159,-22.5719)"
+         d="m 350.7874,292.63779 a 1.7716535,1.7716535 0 0 1 -1.77165,1.77165 1.7716535,1.7716535 0 0 1 -1.77166,-1.77165 1.7716535,1.7716535 0 0 1 1.77166,-1.77166 1.7716535,1.7716535 0 0 1 1.77165,1.77166 z"
+         id="path3273"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#ff0000;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1.03868;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none" />
+      <path
+         inkscape:connector-curvature="0"
+         d="m 608.75087,562.70368 a 3.543307,3.543307 0 0 1 -3.5433,3.5433 3.543307,3.543307 0 0 1 -3.54332,-3.5433 3.543307,3.543307 0 0 1 3.54332,-3.54332 3.543307,3.543307 0 0 1 3.5433,3.54332 z"
+         id="path3275"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#5599ff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:2.07736;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path2449"
+         d="m 587.72926,527.27004 7.3366,-27.38058"
+         style="display:inline;fill:none;stroke:#404040;stroke-width:2.07736;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1" />
+      <g
+         aria-label="A"
+         transform="scale(0.973857,1.02684)"
+         id="text3277"
+         style="font-weight:bold;font-size:37.7089px;line-height:125%;font-family:'Bitstream Vera Sans';display:inline;fill:#37c837">
+        <path
+           d="m 593.804,547.27669 c -1.6969,-0.11312 -2.14941,-0.4525 -3.3938,-3.28067 l -9.38951,-21.41865 h -0.75418 l -7.84345,18.51507 c -2.33796,5.5432 -2.86588,6.10884 -4.67591,6.18425 v 0.71647 h 7.46636 v -0.71647 c -1.81002,0 -2.5642,-0.49021 -2.5642,-1.54606 0,-0.45251 0.11313,-0.98043 0.30167,-1.47065 l 1.73461,-4.41194 h 9.87973 l 1.54607,3.62006 c 0.4525,1.01814 0.71647,1.99857 0.71647,2.52649 0,0.94272 -0.64106,1.2444 -2.63963,1.2821 v 0.71647 h 9.61577 z m -18.47736,-8.97471 4.33652,-10.36995 4.37424,10.36995 z"
+           style="font-weight:normal;font-family:FreeSerif;-inkscape-font-specification:FreeSerif"
+           id="path1066" />
+      </g>
+    </g>
+  </g>
+</svg>

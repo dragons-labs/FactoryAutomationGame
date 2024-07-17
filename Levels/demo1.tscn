@@ -1,0 +1,61 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://Levels/demo1.gd" id="1_7y1sa"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ComponentConsumer.tscn" id="2_gbgwv"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ComponentProducer.tscn" id="3_3l6sj"]
+[ext_resource type="Script" path="res://Levels/demo1_product.gd" id="4_b36je"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vt021"]
+size = Vector3(100, 0.4, 100)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_sogtm"]
+size = Vector2(100, 100)
+
+[sub_resource type="BoxMesh" id="BoxMesh_qro3m"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6rctr"]
+size = Vector3(0.5, 0.2, 0.5)
+
+[node name="StaticWorld" type="Node3D"]
+script = ExtResource("1_7y1sa")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.895409, 0.445245, 0, -0.445245, 0.895409, 0, 5.35788, 0)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+shape = SubResource("BoxShape3D_vt021")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
+mesh = SubResource("PlaneMesh_sogtm")
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="."]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -50, 50, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+shape = SubResource("BoxShape3D_vt021")
+
+[node name="Consumer" parent="." instance=ExtResource("2_gbgwv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -3)
+
+[node name="Producer" parent="." node_paths=PackedStringArray("product") instance=ExtResource("3_3l6sj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, -2)
+product = NodePath("../ComponentsTemplates/Demo1Product")
+timer_period = 0.7
+
+[node name="ComponentsTemplates" type="Node3D" parent="."]
+visible = false
+
+[node name="Demo1Product" type="RigidBody3D" parent="ComponentsTemplates"]
+script = ExtResource("4_b36je")
+
+[node name="FactoryElementVisual" type="MeshInstance3D" parent="ComponentsTemplates/Demo1Product"]
+transform = Transform3D(0.5, 0, 0, 0, 0.2, 0, 0, 0, 0.5, 0, 0, 0)
+mesh = SubResource("BoxMesh_qro3m")
+skeleton = NodePath("")
+
+[node name="FactoryElementCollision" type="CollisionShape3D" parent="ComponentsTemplates/Demo1Product"]
+shape = SubResource("BoxShape3D_6rctr")

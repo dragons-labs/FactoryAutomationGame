@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+SPDX-FileCopyrightText: zest (https://www.svgrepo.com/author/zest/)
+SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+
+SPDX-License-Identifier: MIT
+
+Based-On: https://www.svgrepo.com/svg/509932/flip-vertical (https://zesticons.com/icons?p=zest-free) UNDER MIT BY zest
+-->
+
+<svg
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
+   fill="none"
+   version="1.1"
+   id="svg261"
+   sodipodi:docname="mirror.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs265" />
+  <sodipodi:namedview
+     id="namedview263"
+     pagecolor="#8b8b8b"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="6.675088"
+     inkscape:cx="8.7639294"
+     inkscape:cy="41.49758"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg261" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M 8.5540221,2.2334917 C 7.792781,1.8906997 6.8887119,1.9273255 6.1647003,2.3303202 5.4406888,2.7333148 5,3.445174 5,4.2117065 V 19.693637 c 0,1.221525 1.0994996,2.211705 2.455775,2.211705 h 34.380851 c 1.138989,0 2.12842,-0.705313 2.38996,-1.703455 0.261785,-0.998408 -0.273082,-2.027735 -1.291738,-2.486464 z M 9.91155,17.481933 V 7.7903327 L 31.433717,17.481933 Z M 5,28.540455 C 5,27.318931 6.0994996,26.32875 7.455775,26.32875 h 34.380851 c 1.138989,0 2.12842,0.705313 2.38996,1.703455 0.261785,0.998364 -0.273082,2.027691 -1.291738,2.486398 L 8.5540221,46.000534 C 7.792781,46.343348 6.8887119,46.306855 6.1647003,45.903883 5.4406888,45.500689 5,44.788962 5,44.022386 Z"
+     fill="#000000"
+     id="path259"
+     style="stroke-width:1;fill:#fdfdfd;fill-opacity:1" />
+</svg>

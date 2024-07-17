@@ -1,0 +1,30 @@
+{
+	"electronics" : {
+		"title": {
+			"en": "Electronics",
+		},
+		"subtopics" : {
+			"basic" : {
+				"title": {
+					"en": "Intro",
+				},
+				"guide": "electronics/intro/guide",
+				"trivia": "electronics/intro/trivia",
+			},
+		}
+	},
+	"game": {
+		"title": {
+			"en": "Game",
+		},
+		"guide": "game/about",
+		"subtopics" : {
+			"credits" : {
+				"title": {
+					"en": "Credits",
+				},
+				"guide": "game/credits",
+			},
+		}
+	},
+}

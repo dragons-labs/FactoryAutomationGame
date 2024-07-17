@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Base/2DGridSystem/GridEditor.gd" id="1_ekobs"]
+[ext_resource type="Script" path="res://Base/Camera/Camera2DControl.gd" id="4_fpxj2"]
+[ext_resource type="Script" path="res://Base/VisualGrid.gd" id="8_d3qpe"]
+[ext_resource type="PackedScene" path="res://Base/WorldEditorUI/WorldEditorUI.tscn" id="9_sp5h3"]
+
+[node name="GridEditor" type="Node2D"]
+script = ExtResource("1_ekobs")
+elements = null
+grid_size = null
+grid_color = null
+orthogonal_lines = null
+
+[node name="VisualGrid" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("8_d3qpe")
+
+[node name="Nodes" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="WorldEditorUI" parent="." instance=ExtResource("9_sp5h3")]
+unique_name_in_owner = true
+line_tool_enabled = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("4_fpxj2")
+
+[connection signal="active_ui_tool_changed" from="WorldEditorUI" to="." method="_on_active_ui_tool_changed"]
+[connection signal="do_import" from="WorldEditorUI" to="." method="_on_do_import"]
+[connection signal="do_move_cancel" from="WorldEditorUI" to="." method="_on_do_move_cancel"]
+[connection signal="do_move_finish" from="WorldEditorUI" to="." method="_on_do_move_finish"]
+[connection signal="do_move_step" from="WorldEditorUI" to="." method="_on_do_move_step"]
+[connection signal="do_on_raycast_result" from="WorldEditorUI" to="." method="_on_do_on_raycast_result"]
+[connection signal="do_on_selection" from="WorldEditorUI" to="." method="_on_do_on_selection"]
+[connection signal="do_save" from="WorldEditorUI" to="." method="_on_do_save"]
+[connection signal="mouse_enter_exit_gui_area" from="WorldEditorUI" to="." method="_on_mouse_enter_exit_gui_area"]
+[connection signal="redo" from="WorldEditorUI" to="." method="redo"]
+[connection signal="selection_box_has_been_hidden" from="WorldEditorUI" to="." method="_on_selection_box_has_been_hidden"]
+[connection signal="undo" from="WorldEditorUI" to="." method="undo"]
+[connection signal="camera_updated" from="Camera2D" to="VisualGrid" method="queue_redraw"]

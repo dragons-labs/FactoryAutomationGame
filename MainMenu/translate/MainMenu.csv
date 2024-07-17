@@ -1,0 +1,29 @@
+keys,en
+MAIN_MENU_RESUME_GAME,Resume Game
+MAIN_MENU_TASK_INFO,Show Task Info
+MAIN_MENU_MANUAL,Show Manual
+MAIN_MENU_SAVE_GAME,Save Game
+MAIN_MENU_START_LEVEL,Open Factory
+MAIN_MENU_LOAD_SAVE,Load Save
+MAIN_MENU_SETTINGS,Settings
+MAIN_MENU_QUIT,Quit
+MAIN_MENU_CANCEL,Cancel
+MAIN_MENU_LOAD,Load
+MAIN_MENU_SAVE,Save
+MAIN_MENU_OK,OK
+MAIN_MENU_ADD_SAVE_SLOT_TEXT,+
+MAIN_MENU_ADD_SAVE_SLOT_TOOLTIP,Add new save slot
+MAIN_MENU_SAVE_OVERWRITE_CONFIRM_TITLE,Confirm save overwrite?
+MAIN_MENU_SAVE_%s_OVERWRITE_CONFIRM_TEXT,Overwrite save: '%s'?\n\n⚠️ This action can NOT be undone ⚠️\n
+MAIN_MENU_LOADING_PLESE_WAIT,Loading ... please wait!
+MAIN_MENU_RESET_TO_DEFAULT,Reset to defaults
+MAIN_MENU_SETTINGS_PRIMARY_KEY_TOOLTIP,Primary action shortcut. Click to change.
+MAIN_MENU_SETTINGS_SECONDARY_KEY_TOOLTIP,Secondary action shortcut. Click to change.
+MAIN_MENU_SETTINGS_KEY_REMAP_TITLE,Changing key/button mapping
+MAIN_MENU_SETTINGS_UPDATE_KEY_MAPPING_FOR_%s,"Updating key/button mapping for:\n\n    %s\n\nPlease press key/button or keys/buttons combination and press OK or press Remove to remove current mapping."
+MAIN_MENU_SETTINGS_REMOVE_MAPPING,Remove
+
+MAIN_MENU_UI_SETTINGS_GROUP_NAME,Main Menu
+
+ACTION_GLOBAL_ESCAPE,Open main menu
+ACTION_GLOBAL_BREAK,Force open main menu (also when window blocking default shortcut is focused)

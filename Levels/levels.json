@@ -1,0 +1,28 @@
+{
+  "demo1" : {
+    "locked": false,
+    "unlocks": ["demo2"],
+    "name": {
+      "en": "Demo Level",
+      "pl": "Demo fabryki",
+    },
+    "description": {
+      "en": "Factory Automation Game [b]alpha-1 sample / demo level[/b]
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent volutpat, massa id interdum placerat, urna sem faucibus neque, sit amet aliquet elit mi in felis. Aenean fermentum tellus mattis aliquam volutpat. Integer justo diam, condimentum at lobortis ac, commodo eget felis.
+
+Nullam molestie tincidunt lectus, a molestie diam imperdiet non. Nunc finibus felis eget consequat tristique. Proin a tincidunt magna. Quisque fermentum eros vel ex ultrices auctor. Mauris et enim pharetra nibh convallis pellentesque sed et felis.",
+      "pl": "Demo wersji alpha-1",
+    }
+  },
+  "demo2" : {
+    "locked": true,
+    "unlocks": [],
+    "name": {
+      "en": "Fake locked level for testing",
+    },
+    "description": {
+      "en": "Nullam molestie tincidunt lectus, a molestie diam imperdiet non. Nunc finibus felis eget consequat tristique. Proin a tincidunt magna. Quisque fermentum eros vel ex ultrices auctor. Mauris et enim pharetra nibh convallis pellentesque sed et felis.",
+    }
+  },
+}

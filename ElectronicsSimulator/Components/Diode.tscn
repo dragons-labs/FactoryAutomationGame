@@ -1,0 +1,47 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Base/2DGridSystem/BaseElement.gd" id="1_pwpfx"]
+[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/diode.svg" id="2_kecim"]
+[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/diode-icon.svg" id="3_r031r"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mpsrt"]
+
+[sub_resource type="GDScript" id="GDScript_04h3j"]
+resource_name = "NetListSettings"
+script/source = "extends LineEdit
+
+func get_netlist_entry(nets_on_element, id):
+	return [
+		[\"%s%d \" % [get_parent().type, id] + \\
+			\" \".join(nets_on_element) + \" \" + \\
+			get_parent().get_value()
+		]
+	]
+"
+
+[node name="Diode" type="Node2D"]
+
+[node name="Element" type="Node2D" parent="."]
+script = ExtResource("1_pwpfx")
+connections = PackedVector2Array(-40, 0, 40, 0)
+image_texture = ExtResource("2_kecim")
+ui_name = "ELECTRONIC_COMPONENT_NAME_DIODE"
+ui_icon = ExtResource("3_r031r")
+type = "D"
+subtype = "Diode"
+metadata/_edit_lock_ = true
+
+[node name="Value" type="LineEdit" parent="Element"]
+visible = false
+offset_left = -34.0
+offset_top = -40.0
+offset_right = 34.0
+offset_bottom = -9.0
+tooltip_text = "ELECTRONIC_COMPONENT_ATTRIBUTE_VALUE"
+theme_override_styles/normal = SubResource("StyleBoxEmpty_mpsrt")
+alignment = 1
+max_length = 12
+caret_blink = true
+script = SubResource("GDScript_04h3j")
+
+[connection signal="text_submitted" from="Element/Value" to="Element/Value" method="release_focus" unbinds=1]

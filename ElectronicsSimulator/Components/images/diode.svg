@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+SPDX-FileCopyrightText: Filip Dominec and contributors (https://commons.wikimedia.org/wiki/User:FDominec)
+SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+
+SPDX-License-Identifier: 0BSD OR MIT
+
+Based-On: https://commons.wikimedia.org/wiki/File:Electrical_symbols_library.svg UNDER Public Domain BY Filip Dominec and contributors
+-->
+
+<svg
+   width="80"
+   height="32"
+   viewBox="0 0 21.166665 8.466666"
+   version="1.1"
+   id="svg1840"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="diode.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1842"
+     pagecolor="#8b8b8b"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="6.7277217"
+     inkscape:cx="-0.81751301"
+     inkscape:cy="39.835179"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1837" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3019"
+       transform="matrix(0.22596897,0,0,0.22215627,-178.43971,-57.174359)"
+       style="stroke:#ffffff;stroke-width:3.54267;stroke-dasharray:none;stroke-opacity:1">
+      <path
+         stroke="#000000"
+         style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.54267;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 795.63293,276.41665 H 826"
+         id="path3001"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <path
+         stroke="#000000"
+         style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.54267;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 854.00002,276.41665 h 23.36705"
+         id="path3003"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <path
+         stroke="#000000"
+         style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.54267;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 854,276.41665 -28,14 v -28 z"
+         id="path3005"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cccc" />
+      <path
+         stroke="#000000"
+         style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.54267;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 854,262.41665 v 28"
+         id="path3007"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+    </g>
+  </g>
+</svg>

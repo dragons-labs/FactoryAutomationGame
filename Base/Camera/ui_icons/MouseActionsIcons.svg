@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+SPDX-FileCopyrightText: CrazyTerabyte (https://openclipart.org/artist/CrazyTerabyte)
+SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+
+SPDX-License-Identifier: MIT OR CC0-1.0
+
+Based-On: https://openclipart.org/detail/230394/wii-buttons-mouse-buttons-keyboard-keys UNDER CC-0 (public domain) BY CrazyTerabyte
+-->
+
+<svg
+   viewBox="0 0 88 48"
+   version="1.1"
+   id="svg704"
+   sodipodi:docname="MouseActionsIcons.svg"
+   width="88"
+   height="48"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview706"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="3.9999998"
+     inkscape:cx="99.875004"
+     inkscape:cy="39.500002"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg704" />
+  <style
+     type="text/css"
+     id="style2" />
+  <defs
+     id="defs590">
+    <!-- ** Wii Remote and Classic Controller D-Pad. ** -->
+    <!-- On all buttons and keys in this file, the label is being placed on top of the lighting, which is not accurate, but is good enough and is very easy to implement. -->
+    <!-- ** Wii Remote/Nunchuk/Classic Controller buttons (round shapes). ** -->
+    <!-- Inspired by http://ftpmerou.free.fr/ubuntu/wiimote/wiimote.svg -->
+    <!-- ** Wii Remote B button (custom shape). ** -->
+    <!-- ** Wii Nunchuk Z button (custom shape). ** -->
+    <!-- ** Wii Classic Controller L and R buttons (custom shape). ** -->
+    <!-- ** Analog stick from Wii Nunchuk or Classic Controller. ** -->
+    <!-- Based on http://www.mariowiki.com/File:Def_Stick.svg -->
+    <!-- ** A computer mouse. ** -->
+    <radialGradient
+       id="mouse_gradient"
+       cx="0.5"
+       cy="0.5"
+       r="0.5"
+       fx="0.5"
+       fy="0.75">
+      <stop
+         offset="0"
+         stop-color="#fff"
+         id="stop274" />
+      <stop
+         offset="1"
+         stop-color="#ccc"
+         id="stop276" />
+    </radialGradient>
+    <radialGradient
+       id="mouse_specular_gradient"
+       cx="0.5"
+       cy="0.25"
+       r="1"
+       fx="0.5"
+       fy="-0.0625"
+       gradientTransform="matrix(0.333,0,0,1,0.1665,0)">
+      <stop
+         offset="0"
+         stop-color="#ffffff"
+         stop-opacity="1"
+         id="stop279" />
+      <stop
+         offset="1"
+         stop-color="#ffffff"
+         stop-opacity="0"
+         id="stop281" />
+    </radialGradient>
+    <path
+       id="mouse_shape"
+       d="m 16,0 q 8,0 9,4 4,16 0,24 -2,4 -9,4 Q 9,32 7,28 3,20 7,4 8,0 16,0 Z" />
+    <path
+       id="mouse_left_button"
+       d="m 16,0 v 2 q -2,0 -2,6 0,6 2,6 v 2 Q 7,16 7,12 V 0 Z"
+       clip-path="url(#mouse_clip)" />
+    <use
+       id="mouse_right_button"
+       xlink:href="#mouse_left_button"
+       x="0"
+       y="0"
+       transform="matrix(-1,0,0,1,32,0)" />
+    <clipPath
+       id="mouse_clip"
+       clipPathUnits="userSpaceOnUse">
+      <use
+         xlink:href="#mouse_shape"
+         x="0"
+         y="0"
+         id="use294" />
+    </clipPath>
+    <!-- Inspired by https://openclipart.org/detail/211818/mouse -->
+    <symbol
+       id="mouse"
+       viewBox="2 -2 28 36">
+      <!-- DEBUG: rect x="-5" y="-5" width="50" height="50" fill="lime"/ -->
+      <!-- Shadow. -->
+      <use
+         xlink:href="#mouse_shape"
+         x="1"
+         y="0.5"
+         opacity="0.887"
+         stroke-width="1"
+         stroke="#000000"
+         fill="#000000"
+         id="use297" />
+      <!-- Base. -->
+      <use
+         xlink:href="#mouse_shape"
+         x="0"
+         y="0"
+         stroke="none"
+         fill="url(#mouse_gradient)"
+         id="use299" />
+      <!-- Specular lighting. -->
+      <rect
+         x="3"
+         y="0"
+         width="26"
+         height="32"
+         fill="url(#mouse_specular_gradient)"
+         clip-path="url(#mouse_clip)"
+         id="rect301" />
+      <!-- Buttons. -->
+      <use
+         xlink:href="#mouse_left_button"
+         x="0"
+         y="0"
+         stroke-width="0.25"
+         stroke="#8a8993"
+         fill="none"
+         id="use303" />
+      <use
+         xlink:href="#mouse_right_button"
+         x="0"
+         y="0"
+         stroke-width="0.25"
+         stroke="#8a8993"
+         fill="none"
+         id="use305" />
+      <!-- The dark outline. -->
+      <use
+         xlink:href="#mouse_shape"
+         x="0"
+         y="0"
+         stroke-width="0.5"
+         stroke="#8a8993"
+         fill="none"
+         id="use307" />
+    </symbol>
+    <!-- ** A key from a keyboard. ** -->
+    <!-- Inspired by https://openclipart.org/detail/27549/keyboard-keys -->
+    <!-- ** Symbols for keyboard keys. For an arbitrary reason, they are restricted to 13x13. ** -->
+    <!-- ** Wii Remote LED indicators. ** -->
+    <!-- Colors from http://ftpmerou.free.fr/ubuntu/wiimote/wiimote.svg -->
+    <!-- ** End of definitions. ** -->
+  </defs>
+  <metadata
+     id="metadata6053">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:contributor>
+          <cc:Agent>
+            <dc:title>CrazyTerabyte</dc:title>
+          </cc:Agent>
+        </dc:contributor>
+        <dc:description>edited version by Robert Ryszard Paciorek
+
+based on CC-0 clipart by CrazyTerabyte:
+  https://openclipart.org/detail/230394/wii-buttons-mouse-buttons-keyboard-keys
+</dc:description>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>CC-0</dc:title>
+          </cc:Agent>
+        </dc:rights>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g1249">
+    <use
+       xlink:href="#mouse"
+       x="30"
+       y="25"
+       width="5"
+       height="5"
+       id="use698-9-2"
+       transform="matrix(10.288745,0,0,9.8752908,-316.14389,-248.57725)"
+       style="stroke-width:0.0992073"
+       inkscape:label="mouse1" />
+    <ellipse
+       style="fill:#aaff8b;fill-opacity:0.73254305;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
+       id="path5621-3"
+       ry="8.3906927"
+       rx="3.0157745"
+       cy="12.078443"
+       cx="18.144316" />
+    <path
+       style="fill:#42ff00;fill-opacity:0.732543;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.893691"
+       d="m 21.954459,18.367423 -2.1815,-0.01123 v -4.27623 l -2.985509,-2e-6 v 4.276232 l -2.181502,0.01123 3.575577,4.710584 z"
+       id="to_rejestr_instruckcji-7-3"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:label="arrow" />
+    <path
+       style="fill:#42ff00;fill-opacity:0.732543;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.893691"
+       d="m 14.60595,6.3270124 2.1815,0.011235 v 4.2762296 l 2.985509,2e-6 V 6.3382477 l 2.181502,-0.011235 -3.575576,-4.7105831 z"
+       id="to_rejestr_instruckcji-7-3-6"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:label="arrow" />
+  </g>
+  <g
+     id="g1718">
+    <use
+       xlink:href="#mouse"
+       x="30"
+       y="25"
+       width="5"
+       height="5"
+       id="use698-9"
+       transform="matrix(9.3534045,0,0,8.9775377,-242.22861,-223.41885)"
+       style="stroke-width:0.109128"
+       inkscape:label="mouse2" />
+    <path
+       style="fill:#42ff00;fill-opacity:0.732543;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.893691"
+       d="m 45.853565,45.193631 -1.294702,-1.274472 4.65063,-4.58372 -1.974866,-1.987069 -4.775658,4.583747 -1.313024,-1.256878 -1.215089,5.684684 z"
+       id="to_rejestr_instruckcji-9"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:label="arrow" />
+    <path
+       style="fill:#42ff00;fill-opacity:0.732543;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.893691"
+       d="m 79.147371,2.1356949 1.2947,1.2744737 -4.650627,4.58372 1.974868,1.987068 4.775652,-4.5837468 1.313025,1.2568777 1.21509,-5.68468642 z"
+       id="to_rejestr_instruckcji-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:label="arrow" />
+    <path
+       style="fill:#42ff00;fill-opacity:0.732543;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.893691"
+       d="M 41.145976,6.6541116 42.459005,5.3972288 47.234635,9.9809506 49.209503,7.9938811 44.558844,3.4101356 45.853543,2.1356652 39.930852,0.96940457 Z"
+       id="to_rejestr_instruckcji-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:label="arrow" />
+    <ellipse
+       style="fill:#42ff00;fill-opacity:0.732543;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:0.893691"
+       id="path5621"
+       ry="7.0437999"
+       rx="2.3518329"
+       cy="13.529325"
+       cx="61.723618" />
+    <path
+       style="fill:#42ff00;fill-opacity:0.732543;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.893691"
+       d="m 83.854963,40.675215 -1.313029,1.256882 -4.77563,-4.583722 -1.974868,1.98707 4.650659,4.583746 -1.294699,1.27447 5.922691,1.166261 z"
+       id="to_rejestr_instruckcji-7-36"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:label="arrow" />
+  </g>
+</svg>

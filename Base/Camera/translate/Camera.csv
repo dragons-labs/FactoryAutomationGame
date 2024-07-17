@@ -1,0 +1,63 @@
+keys,en
+CAMERA_2D_RESET_VIEW,Reset View
+CAMERA_2D_RESET_VIEW_2D_TOOLTIP,"Center view to (0,0) and reset zoom"
+CAMERA_2D_ZOOM_COLON,Zoom:
+CAMERA_2D_MOVE_COLON,Move:
+CAMERA_2D_USE_MOUSE_SCROLL,Use mouse scroll
+CAMERA_2D_MOVE_MOUSE_WITH_PRESSED_MIDDLE,Move mouse with pressed middle button
+CAMERA_2D_CENTER_ON_ZOOM,Center on Zoom
+CAMERA_2D_CENTER_ON_ZOOM_TOOLTIP,Center view to mouse pointer while zoom in
+
+CAMERA2D_SETTINGS_GROUP_NAME,Camera (2D)
+
+CAMERA2D_SETTINGS_zoom_step_factor,Zoom speed factor
+CAMERA2D_SETTINGS_center_camera_on_zoom,When zoom out center on mouse position
+CAMERA2D_SETTINGS_show_ui,Show camera 2D UI
+
+ACTION_CAMERA_2D_ZOOM_IN,Zoom in camera
+ACTION_CAMERA_2D_ZOOM_OUT,Zoom out camera
+ACTION_CAMERA_2D_MOUSE_MOVE,Use mouse movement for camera move in screen plane (when pressed)
+ACTION_CAMERA_2D_RESET,Reset view (position and zoom)
+
+CAMERA3D_SETTINGS_GROUP_NAME,Camera (3D)
+
+CAMERA3D_SETTINGS_keyboard_move_step,"Moving speed factor"
+CAMERA3D_SETTINGS_keyboard_move_step_multiplier,"Moving speed factor multiplier (on 'fast' action)"
+CAMERA3D_SETTINGS_keyboard_zoom_step,"FOV zoom speed factor"
+CAMERA3D_SETTINGS_keyboard_rotation_step,"Rotating speed factor"
+
+CAMERA3D_SETTINGS_button_move_step_z,"Zoom speed factor (for zooming via moving 'into / out of screen' with button)"
+CAMERA3D_SETTINGS_button_move_step_z_multiplier,"Zoom speed factor multiplier (on 'fast' action)"
+
+CAMERA3D_SETTINGS_mouse_move_step,"Moving speed factor (when moving with the mouse)"
+CAMERA3D_SETTINGS_mouse_rotation_step,"Rotating speed factor (when rotating with the mouse)"
+CAMERA3D_SETTINGS_mouse_zooming_step,"Zooming speed factor (when zooming with the mouse)"
+
+ACTION_CAMERA_MOVE_FRONT,Move camera forward (on ground plane)
+ACTION_CAMERA_MOVE_FRONT_FAST,Fast move camera forward (on ground plane)
+ACTION_CAMERA_MOVE_BACK,Move camera backward (on ground plane)
+ACTION_CAMERA_MOVE_BACK_FAST,Fast move camera backward (on ground plane)
+ACTION_CAMERA_MOVE_LEFT,Move camera left (on ground plane)
+ACTION_CAMERA_MOVE_LEFT_FAST,Fast move camera left (on ground plane)
+ACTION_CAMERA_MOVE_RIGHT,Move camera right (on ground plane)
+ACTION_CAMERA_MOVE_RIGHT_FAST,Fast move camera right (on ground plane)
+ACTION_CAMERA_MOVE_UP,Move camera up (perpendicularly to ground plane)
+ACTION_CAMERA_MOVE_UP_FAST,Fast move camera up (perpendicularly to ground plane)
+ACTION_CAMERA_MOVE_DOWN,Move camera down (perpendicularly to ground plane)
+ACTION_CAMERA_MOVE_DOWN_FAST,Fast move camera down (perpendicularly to ground plane)
+
+ACTION_CAMERA_ROTATE_LEFT,Rotate camera left (counterclockwise)
+ACTION_CAMERA_ROTATE_RIGHT,Rotate camera right (clockwise)
+ACTION_CAMERA_ROTATE_DOWN,Rotate camera down (look to ground)
+ACTION_CAMERA_ROTATE_UP,Rotate camera up (look to sky)
+ACTION_CAMERA_FOV_ZOOM_IN,Change camera FOV (zoom in)
+ACTION_CAMERA_FOV_ZOOM_OUT,Change camera FOV (zoom out)
+
+ACTION_CAMERA_MOUSE_ROTATE,Use mouse movement for camera rotation (when pressed)
+ACTION_CAMERA_MOUSE_MOVE,Use mouse movement for camera move in screen plane (when pressed)
+ACTION_CAMERA_MOUSE_ZOOM,Use mouse up-down movement for camera zoom via move into / out of screen plane (when pressed)
+
+ACTION_CAMERA_ZOOM_IN,Zoom in camera (move camera 'into screen')
+ACTION_CAMERA_ZOOM_IN_FAST,Zoom in camera (fast move camera 'into screen')
+ACTION_CAMERA_ZOOM_OUT,Zoom out camera (move camera 'out of screen')
+ACTION_CAMERA_ZOOM_OUT_FAST,Zoom out camera (fast move camera 'out of screen')

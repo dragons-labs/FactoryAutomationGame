@@ -1,0 +1,26 @@
+[gd_resource type="Theme" load_steps=4 format=3]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1up2k"]
+bg_color = Color(0.188235, 0.188235, 0.188235, 0.870588)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_myd8m"]
+bg_color = Color(0.154876, 0.154876, 0.154876, 0.984314)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p5k40"]
+content_margin_left = 4.0
+content_margin_right = 4.0
+bg_color = Color(0.0156863, 0.0156863, 0.0156863, 0.941176)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[resource]
+FullScreenBlocker/base_type = &"PanelContainer"
+FullScreenBlocker/styles/panel = SubResource("StyleBoxFlat_1up2k")
+HeaderLarge/colors/font_color = Color(0.768627, 0.831373, 0, 1)
+HeaderMedium/colors/font_color = Color(0.909804, 0.831373, 0, 1)
+MainMenuButton/base_type = &"Button"
+MessageBox/base_type = &"PanelContainer"
+MessageBox/styles/panel = SubResource("StyleBoxFlat_myd8m")
+TooltipPanel/styles/panel = SubResource("StyleBoxFlat_p5k40")

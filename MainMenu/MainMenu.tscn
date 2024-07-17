@@ -1,0 +1,521 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://MainMenu/MainMenu.gd" id="1_w7oy2"]
+[ext_resource type="Script" path="res://Base/SliderWithValue.gd" id="2_lpt12"]
+
+[sub_resource type="GDScript" id="GDScript_2ji10"]
+resource_name = "SettingsGroup"
+script/source = "extends PanelContainer
+
+func setup_and_show(label_text : String, ui_parent : Control) -> void:
+	ui_parent.add_child(self)
+	visible = true
+	$MarginContainer/Group.text = label_text
+"
+
+[sub_resource type="GDScript" id="GDScript_rdwsm"]
+resource_name = "ValueSettings"
+script/source = "extends PanelContainer
+
+@export var default_setting_value_mapped_to := 1.0
+
+func setup_and_show(
+		label_text : String, group_name : String, setting_name : String,
+		default_value : Variant, current_value : Variant, button_callback : Callable,
+		ui_parent : Control
+	) -> void:
+		ui_parent.add_child(self)
+		visible = true
+		var setting_ui = get_node(\"MarginContainer/Setting\")
+		setting_ui.get_node(\"Label\").text = label_text
+		if current_value is bool:
+			setting_ui.get_node(\"BoolValue\").show()
+			setting_ui.get_node(\"BoolValue/HBoxContainer/CheckBox\").button_pressed = current_value
+			setting_ui.get_node(\"BoolValue/HBoxContainer/CheckBox\").toggled.connect(button_callback.bind(group_name, setting_name, default_value))
+		else:
+			setting_ui.get_node(\"FloatValue\").show()
+			setting_ui.set_value( current_value  * default_setting_value_mapped_to / default_value )
+			setting_ui.value_changed.connect(_on_setting_value_changed_float.bind(group_name, setting_name, default_value, button_callback))
+
+func _ready() ->void:
+	$MarginContainer/Setting/FloatValue.hide()
+	$MarginContainer/Setting/BoolValue.hide()
+
+func _on_setting_value_changed_float(value : float, group_name : String, setting_name : String, default_value : float, button_callback : Callable) -> void:
+	value = value * default_value / default_setting_value_mapped_to
+	button_callback.call(value, group_name, setting_name, default_value)
+"
+
+[sub_resource type="GDScript" id="GDScript_ddmgb"]
+resource_name = "ActionSettings"
+script/source = "extends PanelContainer
+
+func setup_and_show(
+		label_text : String, group_name : String, action_name : String,
+		events : Array, button_callback : Callable,
+		ui_parent : Control, ui_remap_info : Control
+	) -> void:
+		ui_parent.add_child(self)
+		visible = true
+		$MarginContainer/Action/Label.text = label_text
+		
+		var button = $MarginContainer/Action/VBoxContainer/HBoxContainer/PrimaryKey
+		if len(events) > 0:
+			button.text = events[0].as_text()
+			button.pressed.connect(button_callback.bind([group_name, action_name, 0, button, ui_remap_info, events[0]]))
+		else:
+			button.pressed.connect(button_callback.bind([group_name, action_name, 0, button, ui_remap_info, null]))
+		
+		button = $MarginContainer/Action/VBoxContainer/HBoxContainer/SecondaryKey
+		if len(events) > 1:
+			button.text = events[1].as_text()
+			button.pressed.connect(button_callback.bind([group_name, action_name, 1, button, ui_remap_info, events[1]]))
+		else:
+			button.pressed.connect(button_callback.bind([group_name, action_name, 1, button, ui_remap_info, null]))
+"
+
+[sub_resource type="GDScript" id="GDScript_loww3"]
+resource_name = "KeyRemapDialog"
+script/source = "extends PanelContainer
+
+func setup_and_show(ui_action_name: String, old_event : InputEvent) -> void:
+	%KeyReampInfo_Info.text=tr(\"MAIN_MENU_SETTINGS_UPDATE_KEY_MAPPING_FOR_%s\") % tr(ui_action_name)
+	if old_event:
+		%KeyReampInfo_Key.text = old_event.as_text()
+	else:
+		%KeyReampInfo_Key.text = \"\"
+	show()
+"
+
+[node name="MainMenu" type="CanvasLayer"]
+layer = 2
+script = ExtResource("1_w7oy2")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"FullScreenBlocker"
+
+[node name="Buttons" type="VBoxContainer" parent="PanelContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Resume" type="Button" parent="PanelContainer/Buttons"]
+layout_mode = 2
+theme_type_variation = &"MainMenuButton"
+text = "MAIN_MENU_RESUME_GAME"
+
+[node name="ShowInfo" type="Button" parent="PanelContainer/Buttons"]
+layout_mode = 2
+theme_type_variation = &"MainMenuButton"
+text = "MAIN_MENU_TASK_INFO"
+
+[node name="SaveGame" type="Button" parent="PanelContainer/Buttons"]
+layout_mode = 2
+theme_type_variation = &"MainMenuButton"
+text = "MAIN_MENU_SAVE_GAME"
+
+[node name="Space" type="Control" parent="PanelContainer/Buttons"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
+
+[node name="StartLevel" type="Button" parent="PanelContainer/Buttons"]
+layout_mode = 2
+theme_type_variation = &"MainMenuButton"
+text = "MAIN_MENU_START_LEVEL"
+
+[node name="LoadSave" type="Button" parent="PanelContainer/Buttons"]
+layout_mode = 2
+theme_type_variation = &"MainMenuButton"
+text = "MAIN_MENU_LOAD_SAVE"
+
+[node name="Space2" type="Control" parent="PanelContainer/Buttons"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
+
+[node name="Settings" type="Button" parent="PanelContainer/Buttons"]
+layout_mode = 2
+theme_type_variation = &"MainMenuButton"
+text = "MAIN_MENU_SETTINGS"
+
+[node name="Quit" type="Button" parent="PanelContainer/Buttons"]
+layout_mode = 2
+theme_type_variation = &"MainMenuButton"
+text = "MAIN_MENU_QUIT"
+
+[node name="LoadDialog" type="VBoxContainer" parent="PanelContainer"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(400, 248)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="HBoxContainer1" type="HBoxContainer" parent="PanelContainer/LoadDialog"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/LoadDialog/HBoxContainer1"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="NewSaveSlot" type="HBoxContainer" parent="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="NewSaveSlotName" type="LineEdit" parent="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/NewSaveSlot"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddSaveSlot" type="Button" parent="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/NewSaveSlot"]
+layout_mode = 2
+tooltip_text = "MAIN_MENU_ADD_SAVE_SLOT_TOOLTIP"
+text = "MAIN_MENU_ADD_SAVE_SLOT_TEXT"
+
+[node name="LoadDialog_ItemList" type="ItemList" parent="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="Control" type="Control" parent="PanelContainer/LoadDialog/HBoxContainer1"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LoadDialog_ItemInfo" type="RichTextLabel" parent="PanelContainer/LoadDialog/HBoxContainer1"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+bbcode_enabled = true
+
+[node name="Buttons" type="HBoxContainer" parent="PanelContainer/LoadDialog"]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="Margin1" type="Control" parent="PanelContainer/LoadDialog/Buttons"]
+layout_mode = 2
+
+[node name="Cancel" type="Button" parent="PanelContainer/LoadDialog/Buttons"]
+layout_mode = 2
+text = "MAIN_MENU_CANCEL"
+
+[node name="Fill" type="Control" parent="PanelContainer/LoadDialog/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Load" type="Button" parent="PanelContainer/LoadDialog/Buttons"]
+layout_mode = 2
+text = "MAIN_MENU_LOAD"
+
+[node name="Save" type="Button" parent="PanelContainer/LoadDialog/Buttons"]
+layout_mode = 2
+text = "MAIN_MENU_SAVE"
+
+[node name="Margin2" type="Control" parent="PanelContainer/LoadDialog/Buttons"]
+layout_mode = 2
+
+[node name="SettingsDialog" type="VBoxContainer" parent="PanelContainer"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(650, 350)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/SettingsDialog"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/SettingsDialog/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="SettingsList" type="VBoxContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 5
+
+[node name="Group" type="PanelContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_2ji10")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Group"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="Group" type="Label" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Group/MarginContainer"]
+layout_mode = 2
+theme_type_variation = &"HeaderMedium"
+horizontal_alignment = 1
+
+[node name="Setting" type="PanelContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_rdwsm")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="Setting" type="HBoxContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer"]
+layout_mode = 2
+script = ExtResource("2_lpt12")
+slider_path = NodePath("FloatValue/HBoxContainer/Slider")
+value_editbox_path = NodePath("FloatValue/HBoxContainer/Value")
+
+[node name="Label" type="Label" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting"]
+custom_minimum_size = Vector2(360, 10)
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="Space" type="Control" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="FloatValue" type="VBoxContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/FloatValue"]
+layout_mode = 2
+
+[node name="Slider" type="HSlider" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/FloatValue/HBoxContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 5.0
+step = 0.05
+allow_greater = true
+allow_lesser = true
+
+[node name="Value" type="LineEdit" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/FloatValue/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "1.0"
+alignment = 1
+
+[node name="BoolValue" type="VBoxContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/BoolValue"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/BoolValue/HBoxContainer"]
+layout_mode = 2
+
+[node name="Action" type="PanelContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_ddmgb")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Action"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="Action" type="HBoxContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action"]
+custom_minimum_size = Vector2(440, 10)
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="Space" type="Control" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action/VBoxContainer"]
+layout_mode = 2
+
+[node name="PrimaryKey" type="Button" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "MAIN_MENU_SETTINGS_PRIMARY_KEY_TOOLTIP"
+text = "..."
+
+[node name="SecondaryKey" type="Button" parent="PanelContainer/SettingsDialog/ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "MAIN_MENU_SETTINGS_SECONDARY_KEY_TOOLTIP"
+text = "..."
+
+[node name="Buttons" type="HBoxContainer" parent="PanelContainer/SettingsDialog"]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="Margin1" type="Control" parent="PanelContainer/SettingsDialog/Buttons"]
+layout_mode = 2
+
+[node name="Cancel" type="Button" parent="PanelContainer/SettingsDialog/Buttons"]
+layout_mode = 2
+text = "MAIN_MENU_CANCEL"
+
+[node name="Fill1" type="Control" parent="PanelContainer/SettingsDialog/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="Reset" type="Button" parent="PanelContainer/SettingsDialog/Buttons"]
+layout_mode = 2
+text = "MAIN_MENU_RESET_TO_DEFAULT"
+
+[node name="Fill2" type="Control" parent="PanelContainer/SettingsDialog/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Ok" type="Button" parent="PanelContainer/SettingsDialog/Buttons"]
+layout_mode = 2
+text = "MAIN_MENU_OK"
+
+[node name="Margin2" type="Control" parent="PanelContainer/SettingsDialog/Buttons"]
+layout_mode = 2
+
+[node name="OverwriteConfirmationDialog" type="ConfirmationDialog" parent="PanelContainer"]
+unique_name_in_owner = true
+auto_translate_mode = 1
+title = "MAIN_MENU_SAVE_OVERWRITE_CONFIRM_TITLE"
+initial_position = 3
+current_screen = 0
+
+[node name="Loading" type="PanelContainer" parent="PanelContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_type_variation = &"FullScreenBlocker"
+
+[node name="Label" type="Label" parent="PanelContainer/Loading"]
+layout_mode = 2
+text = "MAIN_MENU_LOADING_PLESE_WAIT"
+horizontal_alignment = 1
+
+[node name="KeyReampInfo" type="PanelContainer" parent="PanelContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 1
+theme_type_variation = &"MessageBox"
+script = SubResource("GDScript_loww3")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/KeyReampInfo"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/KeyReampInfo/MarginContainer"]
+layout_mode = 2
+
+[node name="KeyReampInfo_Title" type="Label" parent="PanelContainer/KeyReampInfo/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+theme_type_variation = &"HeaderMedium"
+text = "MAIN_MENU_SETTINGS_KEY_REMAP_TITLE"
+horizontal_alignment = 1
+
+[node name="KeyReampInfo_Info" type="Label" parent="PanelContainer/KeyReampInfo/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+text = "---
+
+---
+
+---
+"
+
+[node name="KeyReampInfo_Key" type="Label" parent="PanelContainer/KeyReampInfo/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+text = "---"
+horizontal_alignment = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/KeyReampInfo/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Cancel" type="Button" parent="PanelContainer/KeyReampInfo/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+text = "MAIN_MENU_CANCEL"
+
+[node name="Remove" type="Button" parent="PanelContainer/KeyReampInfo/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+text = "MAIN_MENU_SETTINGS_REMOVE_MAPPING"
+
+[node name="Change" type="Button" parent="PanelContainer/KeyReampInfo/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+text = "MAIN_MENU_OK"
+
+[connection signal="pressed" from="PanelContainer/Buttons/Resume" to="." method="_hide"]
+[connection signal="pressed" from="PanelContainer/Buttons/ShowInfo" to="." method="_on_show_task_info"]
+[connection signal="pressed" from="PanelContainer/Buttons/SaveGame" to="." method="_on_save_game_pressed"]
+[connection signal="pressed" from="PanelContainer/Buttons/StartLevel" to="." method="_on_load_level_pressed"]
+[connection signal="pressed" from="PanelContainer/Buttons/LoadSave" to="." method="_on_load_save_pressed"]
+[connection signal="pressed" from="PanelContainer/Buttons/Settings" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="PanelContainer/Buttons/Quit" to="." method="_on_quit_pressed"]
+[connection signal="text_submitted" from="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/NewSaveSlot/NewSaveSlotName" to="." method="_on_add_save_slot_pressed"]
+[connection signal="pressed" from="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/NewSaveSlot/AddSaveSlot" to="." method="_on_add_save_slot_pressed"]
+[connection signal="item_selected" from="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/LoadDialog_ItemList" to="." method="_on_item_list_item_selected"]
+[connection signal="pressed" from="PanelContainer/LoadDialog/Buttons/Cancel" to="." method="_on_subdialog_cancel_pressed"]
+[connection signal="pressed" from="PanelContainer/LoadDialog/Buttons/Load" to="." method="_on_load_pressed"]
+[connection signal="pressed" from="PanelContainer/LoadDialog/Buttons/Save" to="." method="_on_save_pressed"]
+[connection signal="pressed" from="PanelContainer/SettingsDialog/Buttons/Cancel" to="." method="_on_settings_cancel_pressed"]
+[connection signal="pressed" from="PanelContainer/SettingsDialog/Buttons/Reset" to="." method="_on_settings_reset_pressed"]
+[connection signal="pressed" from="PanelContainer/SettingsDialog/Buttons/Ok" to="." method="_on_settings_ok_pressed"]
+[connection signal="confirmed" from="PanelContainer/OverwriteConfirmationDialog" to="." method="_on_overwrite_confirmation_dialog_confirmed"]
+[connection signal="pressed" from="PanelContainer/KeyReampInfo/MarginContainer/VBoxContainer/HBoxContainer/Cancel" to="." method="_on_action_remap_cancel_pressed"]
+[connection signal="pressed" from="PanelContainer/KeyReampInfo/MarginContainer/VBoxContainer/HBoxContainer/Remove" to="." method="_on_action_remap_remove_pressed"]
+[connection signal="pressed" from="PanelContainer/KeyReampInfo/MarginContainer/VBoxContainer/HBoxContainer/Change" to="." method="_on_action_remap_ok_pressed"]

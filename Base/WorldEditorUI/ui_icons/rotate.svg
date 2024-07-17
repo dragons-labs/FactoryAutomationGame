@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+SPDX-FileCopyrightText: zest (https://www.svgrepo.com/author/zest/)
+SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+
+SPDX-License-Identifier: MIT
+
+Based-On: https://www.svgrepo.com/svg/510172/rotate-left (https://zesticons.com/icons?p=zest-free) UNDER MIT BY zest
+-->
+
+<svg
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
+   fill="none"
+   version="1.1"
+   id="svg639"
+   sodipodi:docname="rotate.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs643" />
+  <sodipodi:namedview
+     id="namedview641"
+     pagecolor="#8b8b8b"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="9.44"
+     inkscape:cx="-2.3834746"
+     inkscape:cy="11.54661"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg639" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="m 10.848251,1.7157158 c 1.346556,0.049943 2.39765,1.1820147 2.347707,2.5285703 l -0.238686,6.4356089 c 3.301233,-2.5602147 7.447569,-4.0862427 11.951458,-4.0862427 10.779812,0 19.51848,8.7387407 19.51848,19.5184557 0,10.779813 -8.738668,19.51848 -19.51848,19.51848 -10.779764,0 -19.5184799,-8.738667 -19.5184799,-19.51848 0,-1.347507 1.0923517,-2.43981 2.43981,-2.43981 1.3474583,0 2.4398099,1.092303 2.4398099,2.43981 0,8.084799 6.554037,14.63886 14.63886,14.63886 8.084798,0 14.63886,-6.554061 14.63886,-14.63886 0,-8.084774 -6.554062,-14.638835 -14.63886,-14.638835 -3.853436,0 -7.360492,1.488113 -9.976432,3.92541 l 8.307846,0.970703 c 1.338236,0.156392 2.296349,1.368099 2.139957,2.706481 -0.156392,1.338358 -1.368001,2.296666 -2.706481,2.140177 L 9.9867301,19.73364 C 8.7227378,19.585958 7.784582,18.491581 7.8317436,17.219879 L 8.3197056,4.0634229 c 0.049943,-1.3465555 1.1820147,-2.39765 2.5285454,-2.3477071 z"
+     fill="#000000"
+     id="path637"
+     style="stroke-width:1;fill:#ffffff;fill-opacity:1" />
+</svg>

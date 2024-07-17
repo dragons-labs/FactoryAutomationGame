@@ -1,0 +1,54 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Base/2DGridSystem/BaseElement.gd" id="1_u44q1"]
+[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/and.svg" id="2_0ucuk"]
+[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/and-icon.svg" id="3_kvrh0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mpsrt"]
+
+[sub_resource type="GDScript" id="GDScript_04h3j"]
+resource_name = "NetListSettings"
+script/source = "extends LineEdit
+
+func get_netlist_entry(nets_on_element, id):
+	return [
+		[
+			\"A%d [ %s ] __output_digital_%d__ AND\" % [id, nets_on_element[0] + \" \" + nets_on_element[1], id],
+			\"V_fuse_%d_ __output_digital_%d__ %s 0\" % [id, id, nets_on_element[2]]
+		],
+		[],
+		[\"V_fuse_%d_#branch\" % id]
+	]
+"
+
+[node name="AND" type="Node2D"]
+
+[node name="Element" type="Node2D" parent="."]
+script = ExtResource("1_u44q1")
+connections = PackedVector2Array(-40, 20, -40, -20, 60, 0)
+image_texture = ExtResource("2_0ucuk")
+image_position = Vector2(10, 0)
+ui_name = "ELECTRONIC_COMPONENT_NAME_AND"
+ui_icon = ExtResource("3_kvrh0")
+type = "AND"
+params = {
+"models": {
+"AND": ".model AND d_and"
+}
+}
+metadata/_edit_lock_ = true
+
+[node name="Value" type="LineEdit" parent="Element"]
+visible = false
+offset_left = -30.0
+offset_top = -64.0
+offset_right = 30.0
+offset_bottom = -40.0
+tooltip_text = "ELECTRONIC_COMPONENT_ATTRIBUTE_VALUE"
+theme_override_styles/normal = SubResource("StyleBoxEmpty_mpsrt")
+alignment = 1
+max_length = 12
+caret_blink = true
+script = SubResource("GDScript_04h3j")
+
+[connection signal="text_submitted" from="Element/Value" to="Element/Value" method="release_focus" unbinds=1]

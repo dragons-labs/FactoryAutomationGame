@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+SPDX-FileCopyrightText: zest (https://www.svgrepo.com/author/zest/)
+SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+
+SPDX-License-Identifier: MIT
+
+Based-On: https://www.svgrepo.com/svg/510048/line-tool (https://zesticons.com/icons?p=zest-free) UNDER MIT BY zest
+-->
+
+<svg
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
+   fill="none"
+   version="1.1"
+   id="svg136"
+   sodipodi:docname="line.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs140" />
+  <sodipodi:namedview
+     id="namedview138"
+     pagecolor="#8b8b8b"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="6.675088"
+     inkscape:cx="-11.460523"
+     inkscape:cy="40.448905"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg136" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="m 38.475954,7.7301271 c -1.306225,0 -2.365064,1.0588863 -2.365064,2.3650639 0,0.653751 0.262049,1.241776 0.692727,1.67236 0.430679,0.430583 1.018633,0.692703 1.672337,0.692703 1.306225,0 2.365063,-1.058886 2.365063,-2.365063 0,-1.3061776 -1.058838,-2.3650639 -2.365063,-2.3650639 z m -7.095191,2.3650639 c 0,-3.9185559 3.176517,-7.0951911 7.095191,-7.0951911 3.918674,0 7.095191,3.1766352 7.095191,7.0951911 0,3.918555 -3.176517,7.09519 -7.095191,7.09519 -1.094552,0 -2.132341,-0.248804 -3.0585,-0.691923 L 16.498458,35.417454 c 0.443119,0.926159 0.691923,1.963948 0.691923,3.0585 0,3.918674 -3.176635,7.095191 -7.09519,7.095191 -3.9185559,0 -7.0951911,-3.176517 -7.0951911,-7.095191 0,-3.918674 3.1766352,-7.095191 7.0951911,-7.095191 1.094504,0 2.13227,0.248805 3.058571,0.692018 L 32.072781,13.153762 C 31.629568,12.227461 31.380763,11.189695 31.380763,10.095191 Z M 10.095191,36.11089 c -1.3061776,0 -2.3650639,1.058839 -2.3650639,2.365064 0,1.306225 1.0588863,2.365063 2.3650639,2.365063 1.306177,0 2.365063,-1.058838 2.365063,-2.365063 0,-0.653704 -0.26212,-1.241658 -0.692703,-1.672337 -0.430584,-0.430678 -1.018609,-0.692727 -1.67236,-0.692727 z"
+     fill="#000000"
+     id="path134"
+     style="stroke-width:1;fill:#ffffff;fill-opacity:1" />
+</svg>

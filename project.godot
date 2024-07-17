@@ -1,0 +1,45 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="FactoryAutomation"
+run/main_scene="res://ApplicationRoot.tscn"
+config/features=PackedStringArray("4.3")
+
+[autoload]
+
+FAG_Settings="*res://Base/Singletons/Settings.gd"
+FAG_WindowManager="*res://Base/Singletons/WindowManager.gd"
+FAG_TCPEcho="*res://Base/Singletons/TCPEcho.gd"
+
+[debug]
+
+gdscript/warnings/static_called_on_instance=0
+
+[display]
+
+mouse_cursor/tooltip_position_offset=Vector2(25, 25)
+
+[dotnet]
+
+project/assembly_name="EduGame"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/3rdparty/godot-filesystem-drawer/addons/filesystem_drawer/plugin.cfg", "res://addons/3rdparty/rrp_main_screen_per_tab/plugin.cfg", "res://addons/godot_xterm/plugin.cfg", "res://addons/repl/plugin.cfg")
+
+[gui]
+
+theme/custom="res://UI_theme.tres"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://Base/Camera/translate/Camera.en.translation", "res://Base/WorldEditorUI/translate/WorldEditorUI.en.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.en.translation", "res://ComputerSimulator/translate/ComputerSystemSimulator.en.translation", "res://MainMenu/translate/MainMenu.en.translation", "res://Manual/translate/Manual.en.translation", "res://Factory/translate/Factory.en.translation")

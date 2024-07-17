@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://Factory/FactoryRoot.tscn" id="1_lan0v"]
+[ext_resource type="PackedScene" path="res://Manual/Manual.tscn" id="3_7xrpt"]
+[ext_resource type="PackedScene" path="res://MainMenu/MainMenu.tscn" id="4_bwojk"]
+
+[node name="ApplicationRoot" type="Node"]
+process_mode = 3
+
+[node name="FactoryRoot" parent="." instance=ExtResource("1_lan0v")]
+unique_name_in_owner = true
+
+[node name="MainMenu" parent="." node_paths=PackedStringArray("_factory_root") instance=ExtResource("4_bwojk")]
+_factory_root = NodePath("../FactoryRoot")
+
+[node name="Manual" parent="." instance=ExtResource("3_7xrpt")]
+unique_name_in_owner = true

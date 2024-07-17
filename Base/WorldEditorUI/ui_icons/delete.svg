@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+SPDX-FileCopyrightText: Taras Shypka (https://www.svgrepo.com/author/Taras%20Shypka/)
+SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+
+SPDX-License-Identifier: CC0-1.0 OR MIT
+
+Based-On: https://www.svgrepo.com/svg/450424/delete UNDER CC0-1.0 (PD License) BY Taras Shypka
+-->
+
+<svg
+   fill="#000000"
+   version="1.1"
+   id="Layer_1"
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
+   enable-background="new 0 0 72 72"
+   xml:space="preserve"
+   sodipodi:docname="delete.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs9" /><sodipodi:namedview
+   id="namedview7"
+   pagecolor="#8b8b8b"
+   bordercolor="#666666"
+   borderopacity="1.0"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   showgrid="false"
+   inkscape:zoom="3.337544"
+   inkscape:cx="-45.692282"
+   inkscape:cy="58.426196"
+   inkscape:window-width="1920"
+   inkscape:window-height="1003"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_1" />
+<g
+   id="g4"
+   transform="matrix(0.80350936,0,0,0.80350936,-4.253219,-4.5999978)"
+   style="stroke-width:1.24454;fill:#ffffff;fill-opacity:1">
+	<path
+   d="m 53.678,61.824 c -2.27,0 -4.404,-0.885 -6.01,-2.49 L 36,47.667 24.332,59.334 c -1.604,1.605 -3.739,2.49 -6.01,2.49 -2.271,0 -4.404,-0.885 -6.01,-2.49 -1.605,-1.604 -2.49,-3.739 -2.49,-6.01 0,-2.271 0.885,-4.405 2.491,-6.011 L 23.979,35.646 13.019,24.685 c -1.605,-1.604 -2.49,-3.739 -2.49,-6.01 0,-2.271 0.885,-4.405 2.49,-6.01 1.605,-1.605 3.739,-2.49 6.011,-2.49 2.271,0 4.405,0.885 6.01,2.49 L 36,23.626 46.96,12.666 c 1.605,-1.605 3.738,-2.49 6.01,-2.49 2.272,0 4.406,0.885 6.01,2.49 1.605,1.604 2.49,3.739 2.49,6.01 0,2.271 -0.885,4.405 -2.49,6.01 l -10.959,10.96 11.666,11.668 c 1.605,1.604 2.49,3.738 2.49,6.01 0,2.271 -0.885,4.405 -2.49,6.01 -1.603,1.605 -3.738,2.49 -6.009,2.49 z M 36,42.839 c 0.511,0 1.023,0.195 1.414,0.586 l 13.082,13.081 c 0.852,0.851 1.98,1.318 3.182,1.318 1.203,0 2.332,-0.468 3.182,-1.318 0.852,-0.851 1.318,-1.98 1.318,-3.182 0,-1.202 -0.467,-2.332 -1.318,-3.181 L 43.78,37.06 c -0.781,-0.781 -0.781,-2.047 0,-2.828 L 56.153,21.857 c 0.852,-0.851 1.318,-1.979 1.318,-3.182 0,-1.203 -0.467,-2.331 -1.318,-3.182 -0.85,-0.851 -1.98,-1.318 -3.182,-1.318 -1.202,0 -2.332,0.468 -3.18,1.318 L 37.414,27.868 c -0.781,0.781 -2.046,0.781 -2.828,0 L 22.21,15.494 c -0.85,-0.851 -1.979,-1.318 -3.181,-1.318 -1.202,0 -2.332,0.468 -3.182,1.318 -0.851,0.851 -1.319,1.979 -1.319,3.182 0,1.203 0.469,2.331 1.318,3.182 L 28.22,34.233 c 0.781,0.781 0.781,2.047 0,2.828 L 15.14,50.143 c -0.85,0.85 -1.318,1.979 -1.318,3.182 0,1.201 0.469,2.331 1.318,3.182 0.851,0.851 1.98,1.318 3.182,1.318 1.202,0 2.332,-0.468 3.182,-1.318 L 34.587,43.426 c 0.39,-0.392 0.902,-0.587 1.413,-0.587 z"
+   id="path2"
+   fill="#000000"
+   style="stroke-width:1.24454;fill:#ffffff;fill-opacity:1" />
+</g>
+</svg>

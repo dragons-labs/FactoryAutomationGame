@@ -1,0 +1,159 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://Manual/Manual.gd" id="1_ylww1"]
+[ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif.ttf" id="2_5vcv6"]
+[ext_resource type="PackedScene" path="res://Manual/WebBrowswer.tscn" id="2_6lhi2"]
+[ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSansMono.ttf" id="3_5mm3n"]
+[ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif-Italic.ttf" id="4_yctyr"]
+[ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif-BoldItalic.ttf" id="5_okvqm"]
+[ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif-Bold.ttf" id="6_atu38"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l5dbs"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1u4wq"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_emoyf"]
+
+[node name="Manual" type="Window"]
+auto_translate_mode = 1
+initial_position = 3
+size = Vector2i(800, 420)
+current_screen = 0
+script = ExtResource("1_ylww1")
+
+[node name="TabContainer" type="TabContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="MANUAL_TASK_INFO_TITLE" type="PanelContainer" parent="TabContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/MANUAL_TASK_INFO_TITLE"]
+auto_translate_mode = 2
+layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("2_5vcv6")
+theme_override_fonts/mono_font = ExtResource("3_5mm3n")
+theme_override_fonts/italics_font = ExtResource("4_yctyr")
+theme_override_fonts/bold_italics_font = ExtResource("5_okvqm")
+theme_override_fonts/bold_font = ExtResource("6_atu38")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_l5dbs")
+bbcode_enabled = true
+selection_enabled = true
+
+[node name="MANUAL_TASK_GUIDE_TITLE" type="HSplitContainer" parent="TabContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="TreeParent" type="MarginContainer" parent="TabContainer/MANUAL_TASK_GUIDE_TITLE"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Tree" type="Tree" parent="TabContainer/MANUAL_TASK_GUIDE_TITLE/TreeParent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/MANUAL_TASK_GUIDE_TITLE/TreeParent"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/MANUAL_TASK_GUIDE_TITLE/TreeParent/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="GoBack" type="Button" parent="TabContainer/MANUAL_TASK_GUIDE_TITLE/TreeParent/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "BUTTON_GO_BACK_TOOLTIP"
+text = "BUTTON_GO_BACK"
+
+[node name="GoNext" type="Button" parent="TabContainer/MANUAL_TASK_GUIDE_TITLE/TreeParent/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "BUTTON_GO_NEXT_TOOLTIP"
+text = "BUTTON_GO_NEXT"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/MANUAL_TASK_GUIDE_TITLE"]
+auto_translate_mode = 2
+layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("2_5vcv6")
+theme_override_fonts/mono_font = ExtResource("3_5mm3n")
+theme_override_fonts/italics_font = ExtResource("4_yctyr")
+theme_override_fonts/bold_italics_font = ExtResource("5_okvqm")
+theme_override_fonts/bold_font = ExtResource("6_atu38")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_1u4wq")
+bbcode_enabled = true
+selection_enabled = true
+
+[node name="MANUAL_TASK_TRIVIA_TITLE" type="HSplitContainer" parent="TabContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="TreeParent" type="MarginContainer" parent="TabContainer/MANUAL_TASK_TRIVIA_TITLE"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/MANUAL_TASK_TRIVIA_TITLE/TreeParent"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/MANUAL_TASK_TRIVIA_TITLE/TreeParent/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="GoBack" type="Button" parent="TabContainer/MANUAL_TASK_TRIVIA_TITLE/TreeParent/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "BUTTON_GO_BACK_TOOLTIP"
+text = "BUTTON_GO_BACK"
+
+[node name="GoNext" type="Button" parent="TabContainer/MANUAL_TASK_TRIVIA_TITLE/TreeParent/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "BUTTON_GO_NEXT_TOOLTIP"
+text = "BUTTON_GO_NEXT"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/MANUAL_TASK_TRIVIA_TITLE"]
+auto_translate_mode = 2
+layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("2_5vcv6")
+theme_override_fonts/mono_font = ExtResource("3_5mm3n")
+theme_override_fonts/italics_font = ExtResource("4_yctyr")
+theme_override_fonts/bold_italics_font = ExtResource("5_okvqm")
+theme_override_fonts/bold_font = ExtResource("6_atu38")
+theme_override_styles/focus = SubResource("StyleBoxLine_emoyf")
+bbcode_enabled = true
+selection_enabled = true
+
+[node name="MANUAL_EXTERNAL_TITLE" parent="TabContainer" instance=ExtResource("2_6lhi2")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[connection signal="meta_clicked" from="TabContainer/MANUAL_TASK_INFO_TITLE/RichTextLabel" to="." method="_on_rich_text_label_meta_clicked"]
+[connection signal="item_selected" from="TabContainer/MANUAL_TASK_GUIDE_TITLE/TreeParent/Tree" to="." method="_on_tree_item_selected"]
+[connection signal="pressed" from="TabContainer/MANUAL_TASK_GUIDE_TITLE/TreeParent/VBoxContainer/HBoxContainer/GoBack" to="." method="_on_go_back_pressed"]
+[connection signal="pressed" from="TabContainer/MANUAL_TASK_GUIDE_TITLE/TreeParent/VBoxContainer/HBoxContainer/GoNext" to="." method="_on_go_next_pressed"]
+[connection signal="meta_clicked" from="TabContainer/MANUAL_TASK_GUIDE_TITLE/RichTextLabel" to="." method="_on_rich_text_label_meta_clicked"]
+[connection signal="pressed" from="TabContainer/MANUAL_TASK_TRIVIA_TITLE/TreeParent/VBoxContainer/HBoxContainer/GoBack" to="." method="_on_go_back_pressed"]
+[connection signal="pressed" from="TabContainer/MANUAL_TASK_TRIVIA_TITLE/TreeParent/VBoxContainer/HBoxContainer/GoNext" to="." method="_on_go_next_pressed"]
+[connection signal="meta_clicked" from="TabContainer/MANUAL_TASK_TRIVIA_TITLE/RichTextLabel" to="." method="_on_rich_text_label_meta_clicked"]

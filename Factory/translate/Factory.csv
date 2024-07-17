@@ -1,0 +1,27 @@
+keys,en,pl
+FACTORY_BLOCK_NAME_SimpleFactoryBlock,Simple Factory Block,
+FACTORY_BLOCK_NAME_ElectronicControlBlock,Electronic Control Block,
+FACTORY_BLOCK_NAME_ConveyorBelt,Conveyor Belt,
+FACTORY_BLOCK_NAME_ComputerControlBlock,Computer Control Block,
+FACTORY_BLOCK_NAME_ProducerBlock,Component Producer,
+FACTORY_BLOCK_NAME_ConsumerBlock,Consumer,
+FACTORY_START,Run,
+FACTORY_STOP,Stop,
+FACTORY_PAUSE,Pause,
+FACTORY_UNPAUSE,Unpause,
+FACTORY_TASK_INFO,Task Info,
+
+FACTORY_ERROR_TITLE,"Geneal factory error","Ogólny błąd fabryki"
+FACTORY_ERROR_TEXT,"Something went wrong. And no one knows what :-(","Coś poszło nie tak. I nikt nie wie co :-("
+FACTORY_OVERCURRENT_ERROR_TITLE,"Overcurrent protection has been activated","Zadziałały zabezpieczenia nadprądowe!"
+FACTORY_OVERCURERNT_ERROR_TEXT,"Smoke came out of the factory's electronic control system. Fortunately, the protection devices worked in time and cut off the power. Otherwise it could have ended much worse - electricity is no joke!","Z elektronicznego układu sterującego fabryką wydobył się dym. Na szczęście w porę zadziałały zabezpieczenia i odcięły zasilanie. W przeciwnym razie mogło skończyć się to dużo gorzej - z prądem nie ma żartów!"
+FACTORY_OVERVOLTAGE_ERROR_TITLE,"There was a power surge!","Doszło do przepięcia!"
+FACTORY_OVERVOLTAGE_ERROR_TEXT,"Smoke and sparks began to emerge from the factory's electronic control system. Fortunately, someone noticed this and cut off the power to the factory. Otherwise it could have ended much worse - electricity is no joke!","Z elektronicznego układu sterującego fabryką zaczął wydobywać się dym i iskry. Na szczęście ktoś to zauważył odciął zasilanie fabryki. W przeciwnym razie mogło skończyć się to dużo gorzej - z prądem nie ma żartów!"
+FACTORY_CIRCUT_COMPUTER_CONFLICT_ERROR_TITLE,"Overcurrent protection has been activated","Zadziałały zabezpieczenia nadprądowe!"
+FACTORY_CIRCUT_COMPUTER_CONFLICT_ERROR_TEXT,"Smoke came out of the factory's computer and electronic control systems. Fortunately, the protection devices worked in time and cut off the power. Otherwise it could have ended much worse - electricity is no joke!","Z komputerowego oraz z elektronicznego układu sterującego fabryką wydobył się dym. Na szczęście w porę zadziałały zabezpieczenia i odcięły zasilanie. W przeciwnym razie mogło skończyć się to dużo gorzej - z prądem nie ma żartów!"
+FACTORY_ERROR_CLOSE_BUTTON,OK,OK
+
+FACTORY_PRODUCT_FAILURE_TITLE,Mission Fail,Niepowodzenie
+FACTORY_PRODUCT_FAILURE_TEXT,The product did not meet specifications.,Dostarczono produkt niezgodny ze specyfikacją.
+FACTORY_PRODUCT_SUCCESS_TITLE,Mission Successful,Sukces
+FACTORY_PRODUCT_SUCCESS_TEXT_%fTIME,"Congratulation!\n\nYou delivered all required products within %f seconds.","Gratulacje!\n\nDostarczyłeś wszystkie wymagane produkty w ciągu %s sekund."

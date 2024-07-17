@@ -1,0 +1,113 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/easy_charts/control_charts/chart.tscn" id="1_878kg"]
+[ext_resource type="Script" path="res://ElectronicsSimulator/ChartWindow.gd" id="1_xg4ig"]
+[ext_resource type="Script" path="res://Base/SliderWithValue.gd" id="2_33vtm"]
+
+[node name="ChartWindow" type="Window"]
+disable_3d = true
+position = Vector2i(0, 36)
+size = Vector2i(600, 300)
+transient = true
+min_size = Vector2i(400, 200)
+script = ExtResource("1_xg4ig")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Chart" parent="VBoxContainer" instance=ExtResource("1_878kg")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="ManualTime" type="VBoxContainer" parent="VBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="ManualTimeEnabled" type="HBoxContainer" parent="VBoxContainer/MarginContainer/ManualTime"]
+layout_mode = 2
+
+[node name="ManualTimeEnabledButton" type="CheckBox" parent="VBoxContainer/MarginContainer/ManualTime/ManualTimeEnabled"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "ELECTRONIC_SIMULATION_CUSTOM_TIME_RANGE_ENABLED"
+
+[node name="Control" type="Control" parent="VBoxContainer/MarginContainer/ManualTime/ManualTimeEnabled"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Values" type="HBoxContainer" parent="VBoxContainer/MarginContainer/ManualTime"]
+layout_mode = 2
+
+[node name="StartTime" type="HBoxContainer" parent="VBoxContainer/MarginContainer/ManualTime/Values"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_33vtm")
+format_string = "%.3f"
+
+[node name="Label" type="Label" parent="VBoxContainer/MarginContainer/ManualTime/Values/StartTime"]
+layout_mode = 2
+text = "ELECTRONIC_SIMULATION_START_TIME_COLON"
+
+[node name="Slider" type="HSlider" parent="VBoxContainer/MarginContainer/ManualTime/Values/StartTime"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+step = 0.0
+
+[node name="Value" type="LineEdit" parent="VBoxContainer/MarginContainer/ManualTime/Values/StartTime"]
+layout_mode = 2
+virtual_keyboard_type = 2
+
+[node name="Control" type="Control" parent="VBoxContainer/MarginContainer/ManualTime/Values"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="EndTime" type="HBoxContainer" parent="VBoxContainer/MarginContainer/ManualTime/Values"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_33vtm")
+format_string = "%.3f"
+
+[node name="Label" type="Label" parent="VBoxContainer/MarginContainer/ManualTime/Values/EndTime"]
+layout_mode = 2
+text = "ELECTRONIC_SIMULATION_END_TIME_COLON"
+
+[node name="Slider" type="HSlider" parent="VBoxContainer/MarginContainer/ManualTime/Values/EndTime"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+step = 0.0
+
+[node name="Value" type="LineEdit" parent="VBoxContainer/MarginContainer/ManualTime/Values/EndTime"]
+layout_mode = 2
+
+[node name="Control2" type="Control" parent="VBoxContainer/MarginContainer/ManualTime/Values"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="ApplyButton" type="Button" parent="VBoxContainer/MarginContainer/ManualTime/Values"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "ELECTRONIC_SIMULATION_APPLY"
+
+[connection signal="toggled" from="VBoxContainer/MarginContainer/ManualTime/ManualTimeEnabled/ManualTimeEnabledButton" to="." method="_on_manual_time_enabled_button_toggled"]
+[connection signal="value_changed" from="VBoxContainer/MarginContainer/ManualTime/Values/StartTime" to="." method="_on_start_slider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/MarginContainer/ManualTime/Values/EndTime" to="." method="_on_end_slider_value_changed"]
+[connection signal="pressed" from="VBoxContainer/MarginContainer/ManualTime/Values/ApplyButton" to="." method="_on_apply_button_pressed"]

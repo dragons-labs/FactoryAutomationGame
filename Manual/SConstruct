@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+# SPDX-License-Identifier: MIT
+
+bld = Builder(
+    action='./Manual_MD2BBCode_Converter.py $SOURCES > $TARGET',
+    suffix='.not_edit',
+    src_suffix='.md'
+)
+env = Environment(BUILDERS={'BBCodeBuilder': bld})
+
+import glob, os
+
+def is_changed(path):
+	current = env.File(path).get_csig()
+	storred = env.File(path).get_stored_info()
+	if hasattr(storred.ninfo, 'csig'):
+		storred = storred.ninfo.csig
+	return current != storred
+
+if not GetOption("clean") and (is_changed("./pygments_bbcode.py") or is_changed("./Manual_MD2BBCode_Converter.py")):
+	print("Build script was changed - clean target")
+	if not GetOption("no_exec"):
+		os.system("scons -c")
+
+sources = [s for s in glob.glob('**/*.md', root_dir='Pages', recursive=True)]
+for path in sources:
+	in_path = os.path.join("Pages", path)
+	out_path = os.path.join("generated-bbcode", os.path.splitext(path)[0])
+	env.BBCodeBuilder(target=out_path, source=in_path)

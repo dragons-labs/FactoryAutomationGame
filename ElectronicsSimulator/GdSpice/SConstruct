@@ -1,0 +1,87 @@
+#!/usr/bin/env python
+
+# SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+# SPDX-License-Identifier: MIT
+
+DEFAULT_GODOT_CCP_PATH = '../../addons/3rdparty/_godot-cpp/'
+AUTO_BUILD_GODOT_LIB_WHEN_MISSED = False
+
+# set debug options
+ARGUMENTS['debug_symbols'] = '1'
+
+if ARGUMENTS.get('VERBOSE') == '1':
+	# disable set SHCXXCOMSTR and similar by godot scons configuration
+	ARGUMENTS['verbose'] = '1'
+
+
+import os
+
+# create default environment and add variables
+env = Environment(tools=['default'], PLATFORM='')
+opts = Variables([], ARGUMENTS)
+opts.Add('godot_ccp_path', 'Path to `godot-cpp`', '')
+opts.Add('godot_lib', 'Path to pre-build `libgodot-cpp` or `BUILD` to automatically build', '')
+opts.Update(env)
+Help(opts.GenerateHelpText(env))
+
+# if godot_ccp_path is not set try use default
+if not env['godot_ccp_path']:
+	print('INFO: no `godot_ccp_path=...` variable in command line, using default:', DEFAULT_GODOT_CCP_PATH)
+	godot_ccp_path = DEFAULT_GODOT_CCP_PATH
+else:
+	godot_ccp_path = env['godot_ccp_path']
+
+# check if provided paths are valid
+godot_sconscript_path = os.path.join(godot_ccp_path, 'SConstruct')
+if not os.path.isfile(godot_sconscript_path):
+	print('ERROR: ' + godot_ccp_path + ') do not exist or is not valid')
+	exit(1)
+godot_lib = env['godot_lib']
+if godot_lib and godot_lib != 'BUILD' and not os.path.isfile(godot_lib):
+	print('ERROR: Library file "' + godot_lib + '" do not exist')
+	exit(1)
+
+# disable build lib (unless godot_lib is set to 'BUILD') and include environment from godot_ccp
+if godot_lib != 'BUILD':
+	env['build_library'] = False
+	Export('env')
+env = SConscript(godot_sconscript_path)
+
+
+# if godot_lib is not set try use default
+if not godot_lib:
+	lib_path = godot_ccp_path
+	lib_path = os.path.join(lib_path, 'bin')
+	lib_path = os.path.join(lib_path, 'libgodot-cpp' + env['suffix'] + env['LIBSUFFIX'])
+	print('INFO: no `godot_lib=...` variable in command line, auto detect:', lib_path)
+	godot_lib = lib_path
+	
+	if not os.path.isfile(lib_path):
+		if AUTO_BUILD_GODOT_LIB_WHEN_MISSED:
+			print('WARNING: Auto detect `libgodot-cpp` do not exist. Try build.')
+			env['build_library'] = True
+			env = SConscript(godot_sconscript_path)
+		else:
+			print('ERROR: Not found `libgodot-cpp`. If you want automatically build `libgodot-cpp` use `godot_lib=BUILD` in command line arguments')
+			exit()
+	else:
+		env.AppendUnique(LIBS=[env.File(lib_path)])
+
+
+VariantDir('bin', '.', duplicate=False)
+env['OBJPREFIX'] = '#/bin/build-obj/'
+
+if "TERM" in os.environ:
+	env["ENV"]["TERM"] = os.environ["TERM"]
+
+Ignore('.', 'compile_commands.json')
+
+env.Textfile('#/bin/.gdignore', [''])
+
+
+env.Append(CPPPATH=["."])
+sources = Glob("*.cpp")
+library = env.SharedLibrary(
+	"bin/libgdspice{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+	source=sources,
+)

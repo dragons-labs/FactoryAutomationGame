@@ -1,0 +1,47 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/xor-icon.svg" id="1_cph7b"]
+
+[sub_resource type="GDScript" id="GDScript_byugd"]
+resource_name = "FactoryBlockSettings"
+script/source = "extends PhysicsBody3D
+
+### FactoryBlock external info
+
+# for WorldEditorUI: must be on first child of root node
+@export var ui_name : String
+@export var ui_icon : Texture2D
+
+# for Builder3D: must be on first child of root node
+# (and this must be PhysicsBody3D node used to place element in world)
+# NOTE: parent (root) node name will be used as block identifier in UI
+#       (as button name) AND should be equal to `object_subtype` value
+#       for the correct operation of the block number limiter
+const object_type := \"FactoryBlock\"
+const object_subtype := \"ComputerControlBlock\"
+@onready var physics_rids = [get_rid()]
+"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uwn0y"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gl7fj"]
+albedo_color = Color(0.913725, 1, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8i0g4"]
+material = SubResource("StandardMaterial3D_gl7fj")
+
+[node name="ComputerControlBlock" type="Node3D"]
+
+[node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+script = SubResource("GDScript_byugd")
+ui_name = "FACTORY_BLOCK_NAME_ComputerControlBlock"
+ui_icon = ExtResource("1_cph7b")
+
+[node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
+shape = SubResource("BoxShape3D_uwn0y")
+
+[node name="FactoryElementVisual" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_8i0g4")
+skeleton = NodePath("")

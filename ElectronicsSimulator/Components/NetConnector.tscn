@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Base/2DGridSystem/BaseElement.gd" id="1_0r8lw"]
+[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/NetConnector.svg" id="2_fhbit"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mpsrt"]
+
+[node name="NetConnector" type="Node2D"]
+
+[node name="Element" type="Node2D" parent="."]
+script = ExtResource("1_0r8lw")
+connections = PackedVector2Array(0, 0)
+image_texture = ExtResource("2_fhbit")
+image_position = Vector2(0, -20)
+ui_name = "ELECTRONIC_COMPONENT_NAME_NET_CONNECTOR"
+ui_icon = ExtResource("2_fhbit")
+type = "NET"
+subtype = "NetConnector"
+metadata/_edit_lock_ = true
+
+[node name="Value" type="LineEdit" parent="Element"]
+auto_translate_mode = 2
+offset_left = 11.0
+offset_top = -48.0
+offset_right = 78.0625
+offset_bottom = -17.0
+tooltip_text = "ELECTRONIC_COMPONENT_ATTRIBUTE_VALUE"
+theme_override_styles/normal = SubResource("StyleBoxEmpty_mpsrt")
+placeholder_text = "Vcc"
+expand_to_text_length = true
+caret_blink = true
+
+[connection signal="text_submitted" from="Element/Value" to="Element/Value" method="release_focus" unbinds=1]

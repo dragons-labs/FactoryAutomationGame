@@ -1,0 +1,36 @@
+[gd_resource type="Theme" load_steps=6 format=3]
+
+[ext_resource type="FontFile" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-bold-2.304.ttf" id="1_mbo6f"]
+[ext_resource type="FontFile" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-bold_italic-2.304.ttf" id="2_c2xfa"]
+[ext_resource type="FontFile" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-italic-2.304.ttf" id="3_xdeda"]
+[ext_resource type="FontFile" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-regular-2.304.ttf" id="4_s8yr6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7vxvs"]
+
+[resource]
+default_font = ExtResource("4_s8yr6")
+default_font_size = 13
+Terminal/colors/ansi_0_color = Color(0, 0, 0, 1)
+Terminal/colors/ansi_10_color = Color(0, 1, 0, 1)
+Terminal/colors/ansi_11_color = Color(1, 1, 0, 1)
+Terminal/colors/ansi_12_color = Color(0.360784, 0.360784, 1, 1)
+Terminal/colors/ansi_13_color = Color(1, 0, 1, 1)
+Terminal/colors/ansi_14_color = Color(0, 1, 1, 1)
+Terminal/colors/ansi_15_color = Color(1, 1, 1, 1)
+Terminal/colors/ansi_1_color = Color(0.803922, 0, 0, 1)
+Terminal/colors/ansi_2_color = Color(0, 0.803922, 0, 1)
+Terminal/colors/ansi_3_color = Color(0.803922, 0.803922, 0, 1)
+Terminal/colors/ansi_4_color = Color(0, 0, 0.933333, 1)
+Terminal/colors/ansi_5_color = Color(0.803922, 0, 0.803922, 1)
+Terminal/colors/ansi_6_color = Color(0, 0.803922, 0.803922, 1)
+Terminal/colors/ansi_7_color = Color(0.898039, 0.898039, 0.898039, 1)
+Terminal/colors/ansi_8_color = Color(0.498039, 0.498039, 0.498039, 1)
+Terminal/colors/ansi_9_color = Color(1, 0, 0, 1)
+Terminal/colors/background_color = Color(0.12549, 0.12549, 0.12549, 1)
+Terminal/colors/foreground_color = Color(0.658824, 1, 0, 1)
+Terminal/font_sizes/font_size = 13
+Terminal/fonts/bold_font = ExtResource("1_mbo6f")
+Terminal/fonts/bold_italics_font = ExtResource("2_c2xfa")
+Terminal/fonts/italics_font = ExtResource("3_xdeda")
+Terminal/fonts/normal_font = ExtResource("4_s8yr6")
+Terminal/styles/normal = SubResource("StyleBoxEmpty_7vxvs")

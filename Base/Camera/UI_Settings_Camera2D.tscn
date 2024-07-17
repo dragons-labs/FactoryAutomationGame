@@ -1,0 +1,80 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://Base/Camera/ui_icons/MouseActionsIcons.svg" id="1_epk2j"]
+
+[sub_resource type="GDScript" id="GDScript_itkvv"]
+resource_name = "UI_Settings_Camera2D"
+script/source = "extends Node
+
+signal reset_view()
+signal center_on_zoom_enabled(enable : bool)
+
+func set_center_on_zoom(enable : bool) -> void:
+	%CenterOnZoom.button_pressed = enable
+
+func _on_reset_view_pressed() -> void:
+	reset_view.emit()
+
+func _on_center_on_zoom_toggled(toggled_on : bool) -> void:
+	center_on_zoom_enabled.emit(toggled_on)
+"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ck2le"]
+atlas = ExtResource("1_epk2j")
+region = Rect2(0.733719, 0, 36.0283, 46.8421)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mprax"]
+atlas = ExtResource("1_epk2j")
+region = Rect2(39.2126, -0.0786915, 47.7876, 48.3572)
+
+[node name="UI_Settings_Camera2D" type="CanvasLayer"]
+script = SubResource("GDScript_itkvv")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+auto_translate_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -191.0
+offset_top = -118.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="ResetView" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+tooltip_text = "CAMERA_2D_RESET_VIEW_2D_TOOLTIP"
+focus_mode = 0
+text = "CAMERA_2D_RESET_VIEW"
+
+[node name="InfoBox" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/InfoBox"]
+layout_mode = 2
+text = "CAMERA_2D_ZOOM_COLON"
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/InfoBox"]
+layout_mode = 2
+tooltip_text = "CAMERA_2D_USE_MOUSE_SCROLL"
+texture = SubResource("AtlasTexture_ck2le")
+
+[node name="Label2" type="Label" parent="VBoxContainer/InfoBox"]
+layout_mode = 2
+text = "CAMERA_2D_MOVE_COLON"
+
+[node name="TextureRect2" type="TextureRect" parent="VBoxContainer/InfoBox"]
+layout_mode = 2
+tooltip_text = "CAMERA_2D_MOVE_MOUSE_WITH_PRESSED_MIDDLE"
+texture = SubResource("AtlasTexture_mprax")
+
+[node name="CenterOnZoom" type="CheckButton" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "CAMERA_2D_CENTER_ON_ZOOM_TOOLTIP"
+focus_mode = 0
+text = "CAMERA_2D_CENTER_ON_ZOOM"
+
+[connection signal="pressed" from="VBoxContainer/ResetView" to="." method="_on_reset_view_pressed"]
+[connection signal="toggled" from="VBoxContainer/CenterOnZoom" to="." method="_on_center_on_zoom_toggled"]
