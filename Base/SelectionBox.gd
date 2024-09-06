@@ -7,10 +7,10 @@ extends Node2D
 @export var stroke_width := 3
 @export var fill_color := Color(0.5, 1.0, 0, 0.2)
 
-@onready var _line = Line2D.new()
-@onready var _poly = Polygon2D.new()
-@onready var _squared_zero_size = stroke_width * stroke_width
-var _points = [Vector2(0,0), Vector2(1,0), Vector2(1,1), Vector2(0,1)]
+@onready var _line := Line2D.new()
+@onready var _poly := Polygon2D.new()
+@onready var _squared_zero_size := stroke_width * stroke_width
+var _points := [Vector2(0,0), Vector2(1,0), Vector2(1,1), Vector2(0,1)]
 
 func _ready() -> void:
 	_line.default_color = stroke_color
@@ -24,6 +24,7 @@ func _ready() -> void:
 	add_child(_poly)
 	
 	visible = false
+	is_done = false
 
 var is_done := false
 
@@ -55,7 +56,7 @@ func get_second() -> Vector2:
 
 func hit_in_selection_box(point : Vector2) -> bool:
 	return \
-		visible and \
+		is_done and \
 		((_points[0].x < point.x and point.x < _points[2].x) or (_points[2].x < point.x and point.x < _points[0].x)) and \
 		((_points[0].y < point.y and point.y < _points[2].y) or (_points[2].y < point.y and point.y < _points[0].y))
 

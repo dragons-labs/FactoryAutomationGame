@@ -44,9 +44,9 @@ var use_mouse_control := true
 
 func disable_input() -> void:
 	_input_disabled = true
-	_move = Vector3(0, 0, 0)
+	_move = Vector3.ZERO
 	_move_valid = false
-	_rotation = Vector2(0, 0)
+	_rotation = Vector2.ZERO
 	_fov = 0.0
 
 func enable_input() -> void:
@@ -125,9 +125,9 @@ func _ready() -> void:
 	_default_fov = _camera.fov
 
 
-var _move := Vector3(0, 0, 0)
+var _move := Vector3.ZERO
 var _move_valid := false
-var _rotation := Vector2(0, 0)
+var _rotation := Vector2.ZERO
 var _fov := 0.0
 
 func _camera_keyboard_input(event: InputEvent) -> void:
@@ -147,7 +147,7 @@ func _camera_keyboard_input(event: InputEvent) -> void:
 	else:
 		return
 	
-	var move := Vector3(0, 0, 0)
+	var move := Vector3.ZERO
 	var fast_mode = false
 	if FAG_Utils.action_exact_match_pressed("CAMERA_MOVE_FRONT"):
 		move.z = -1

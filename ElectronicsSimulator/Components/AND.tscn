@@ -11,14 +11,13 @@ resource_name = "NetListSettings"
 script/source = "extends LineEdit
 
 func get_netlist_entry(nets_on_element, id):
-	return [
-		[
+	return {
+		\"circuit\" : [
 			\"A%d [ %s ] __output_digital_%d__ AND\" % [id, nets_on_element[0] + \" \" + nets_on_element[1], id],
 			\"V_fuse_%d_ __output_digital_%d__ %s 0\" % [id, id, nets_on_element[2]]
 		],
-		[],
-		[\"V_fuse_%d_#branch\" % id]
-	]
+		\"fuses\" : [\"V_fuse_%d_#branch\" % id]
+	}
 "
 
 [node name="AND" type="Node2D"]
@@ -31,6 +30,7 @@ image_position = Vector2(10, 0)
 ui_name = "ELECTRONIC_COMPONENT_NAME_AND"
 ui_icon = ExtResource("3_kvrh0")
 type = "AND"
+subtype = "AND"
 params = {
 "models": {
 "AND": ".model AND d_and"

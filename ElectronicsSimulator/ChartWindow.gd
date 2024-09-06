@@ -18,6 +18,7 @@ extends Window
 @onready var _end_time_slider = %EndTime/Slider
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_on_manual_time_enabled_button_toggled(false)
 	FAG_WindowManager.init_window(self)
 

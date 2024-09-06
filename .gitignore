@@ -14,6 +14,9 @@
 /ComputerSimulator/OS/bin/
 /ElectronicsSimulator/GdSpice/bin/
 
+# imported meshes from blender file
+/Factory/FactoryBlocks/models/imported/*.tres
+
 # bbcode manual pages build from (custom) markdown
 /Manual/generated-bbcode/
 

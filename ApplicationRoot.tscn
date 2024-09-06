@@ -1,11 +1,15 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="PackedScene" path="res://Factory/FactoryRoot.tscn" id="1_lan0v"]
+[ext_resource type="PackedScene" path="res://addons/debug_menu/debug_menu.tscn" id="1_wx7o7"]
 [ext_resource type="PackedScene" path="res://Manual/Manual.tscn" id="3_7xrpt"]
+[ext_resource type="Script" path="res://Base/GraphicsSettings.gd" id="4_53lq8"]
 [ext_resource type="PackedScene" path="res://MainMenu/MainMenu.tscn" id="4_bwojk"]
 
 [node name="ApplicationRoot" type="Node"]
 process_mode = 3
+
+[node name="DebugMenu" parent="." instance=ExtResource("1_wx7o7")]
 
 [node name="FactoryRoot" parent="." instance=ExtResource("1_lan0v")]
 unique_name_in_owner = true
@@ -15,3 +19,7 @@ _factory_root = NodePath("../FactoryRoot")
 
 [node name="Manual" parent="." instance=ExtResource("3_7xrpt")]
 unique_name_in_owner = true
+scaling_3d_scale = 2.0
+
+[node name="GraphicsSettings" type="Node" parent="."]
+script = ExtResource("4_53lq8")

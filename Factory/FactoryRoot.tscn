@@ -1,21 +1,24 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://Factory/FactoryRoot.gd" id="1_88vxl"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBuilder/FactoryBuilder.tscn" id="2_ncfa0"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBuilder.tscn" id="2_ncfa0"]
 [ext_resource type="Script" path="res://Base/SliderWithValue.gd" id="3_g2qw6"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ConveyorBelt.tscn" id="4_ipc57"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/SimpleFactoryBlock.tscn" id="4_wpvne"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ComponentProducer.tscn" id="5_u6lyq"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ComponentConsumer.tscn" id="6_a113l"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/SimpleBlock.tscn" id="4_wpvne"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Producer.tscn" id="5_u6lyq"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Consumer.tscn" id="6_a113l"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ElectronicControlBlock.tscn" id="7_q855b"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ComputerControlBlock.tscn" id="8_flw0k"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Painter.tscn" id="9_xypg3"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ConveyorSplitter.tscn" id="10_gofsm"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Welder.tscn" id="11_aa"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Detector.tscn" id="12_oom2c"]
 
 [node name="FactoryRoot" type="Node3D"]
 script = ExtResource("1_88vxl")
 
 [node name="FactoryBuilder" parent="." instance=ExtResource("2_ncfa0")]
-elements = Array[PackedScene]([ExtResource("4_wpvne"), ExtResource("4_ipc57"), ExtResource("5_u6lyq"), ExtResource("6_a113l"), ExtResource("7_q855b"), ExtResource("8_flw0k"), ExtResource("9_xypg3")])
+elements = Array[PackedScene]([ExtResource("4_wpvne"), ExtResource("4_ipc57"), ExtResource("5_u6lyq"), ExtResource("6_a113l"), ExtResource("7_q855b"), ExtResource("8_flw0k"), ExtResource("9_xypg3"), ExtResource("10_gofsm"), ExtResource("11_aa"), ExtResource("12_oom2c")])
 
 [node name="FactoryUI" type="CanvasLayer" parent="."]
 
@@ -111,6 +114,10 @@ theme_type_variation = &"HeaderLarge"
 text = "Title"
 horizontal_alignment = 1
 
+[node name="Control" type="Control" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
 [node name="Message_Text" type="Label" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 80)
@@ -120,12 +127,16 @@ text = "Text
 horizontal_alignment = 3
 autowrap_mode = 3
 
+[node name="Control2" type="Control" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
 [node name="OK" type="Button" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "FACTORY_ERROR_CLOSE_BUTTON"
 
-[node name="ProductsRoot" type="Node3D" parent="."]
+[node name="ObjectsRoot" type="Node3D" parent="."]
 process_mode = 1
 
 [node name="UserBlocksRoot" type="Node3D" parent="."]

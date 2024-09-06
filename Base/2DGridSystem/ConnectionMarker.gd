@@ -9,4 +9,4 @@ class_name Grid2D_ConnectionMarker
 @export var radius := 5
 
 func _draw() -> void:
-	draw_circle(Vector2(0, 0), radius, color)
+	draw_circle(Vector2.ZERO, radius, color)

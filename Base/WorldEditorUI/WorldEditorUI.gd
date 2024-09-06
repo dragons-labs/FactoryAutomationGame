@@ -6,21 +6,23 @@ extends Node2D
 @export_group("Editor Cursor settings")
 
 @export var select_cursor : Texture2D = null
-@export var select_cursor_hotspot := Vector2(0, 0)
+@export var select_cursor_hotspot := Vector2.ZERO
+@export var duplicate_cursor : Texture2D = null
+@export var duplicate_cursor_hotspot := Vector2.ZERO
 @export var move_cursor : Texture2D = null
-@export var move_cursor_hotspot := Vector2(0, 0)
+@export var move_cursor_hotspot := Vector2.ZERO
 @export var rotate_cursor : Texture2D = null
-@export var rotate_cursor_hotspot := Vector2(0, 0)
+@export var rotate_cursor_hotspot := Vector2.ZERO
 @export var mirror_cursor : Texture2D = null
-@export var mirror_cursor_hotspot := Vector2(0, 0)
+@export var mirror_cursor_hotspot := Vector2.ZERO
 @export var scale_cursor : Texture2D = null
-@export var scale_cursor_hotspot := Vector2(0, 0)
+@export var scale_cursor_hotspot := Vector2.ZERO
 @export var delete_cursor : Texture2D = null
-@export var delete_cursor_hotspot := Vector2(0, 0)
+@export var delete_cursor_hotspot := Vector2.ZERO
 @export var draw_cursor : Texture2D = null
-@export var draw_cursor_hotspot := Vector2(0, 0)
+@export var draw_cursor_hotspot := Vector2.ZERO
 @export var add_element_cursor : Texture2D = null
-@export var add_element_cursor_hotspot := Vector2(0, 0)
+@export var add_element_cursor_hotspot := Vector2.ZERO
 
 @export_group("Selection Box Settings")
 @export var selection_box_enabled := true
@@ -36,6 +38,7 @@ extends Node2D
 @export_group("Editor Mics Settings")
 
 @export var scale_tool_enabled := false
+@export var duplicate_tool_enabled := false
 @export var line_tool_enabled := false
 @export var elements : Array[PackedScene] = []
 
@@ -47,7 +50,7 @@ extends Node2D
 ## Set to empty string to disable using settings (hide in settings menu, disallow override properties and key mapping).
 @export var settings_group_name := "WORLD_EDITOR_UI_SETTINGS_GROUP_NAME"
 
-enum {NONE, SELECT, SELECT_LONG, MOVE, SCALE, SCALE_IN_PROGRESS, ROTATE, MIRROR, DELETE, LINE, ELEMENT}
+enum {NONE, SELECT, SELECT_LONG, DUPLICATE, MOVE, SCALE, SCALE_IN_PROGRESS, ROTATE, MIRROR, DELETE, LINE, ELEMENT}
 var _active_ui_tool := NONE
 func get_active_ui_tool_mode(): return _active_ui_tool
 
@@ -91,7 +94,7 @@ signal do_move_step(point : Vector2)
 signal do_move_finish()
 
 ## emitted (in SELECT mode) when the left mouse button is released
-signal do_move_cancel(raycast_result : Variant)
+signal do_on_raycast_selection_finish(raycast_result : Variant)
 
 ## emitted (in SCALE mode) when mouse move
 signal do_scale_step(point : Vector2)
@@ -112,10 +115,10 @@ signal line_update_last_point(point : Vector2)
 signal line_finish()
 
 ## emitted (in ELEMENT mode) when the left mouse button is pressed
-signal element_add(point : Vector2)
+signal element_add__finish(point : Vector2)
 
 ## emitted (in ELEMENT mode) when mouse move
-signal element_update_added(point : Vector2)
+signal element_add__update(point : Vector2)
 
 ## emitted on lost focus
 signal focus_lost()
@@ -135,6 +138,7 @@ func _init() -> void:
 		"EDIT_UNDO": [{"key": KEY_Z, "ctrl": true}],
 		"EDIT_REDO": [{"key": KEY_Z, "ctrl": true, "shift": true}],
 		"EDIT_SELECT_MOVE": [{"key": KEY_G}],
+		"EDIT_DUPLICATE": [{"key": KEY_D, "ctrl": true}],
 		"EDIT_SCALE": [{"key": KEY_B}],
 		"EDIT_ROTATE": [{"key": KEY_R}],
 		"EDIT_MIRROR": [{"key": KEY_M}],
@@ -154,6 +158,8 @@ func _ready() -> void:
 	if not import_export_enabled:
 		%Actions/Import.visible = false
 		%Actions/Save.visible = false
+	if not duplicate_tool_enabled:
+		%Tools/Duplicate.visible = false
 	if not scale_tool_enabled:
 		%Tools/Scale.visible = false
 	if not line_tool_enabled:
@@ -182,6 +188,7 @@ func _on_keymap_update() -> void:
 	%Actions/Undo.shortcut = FAG_Utils.create_shorcut("EDIT_UNDO")
 	%Actions/Redo.shortcut = FAG_Utils.create_shorcut("EDIT_REDO")
 	%Tools/SelectMove.shortcut = FAG_Utils.create_shorcut("EDIT_SELECT_MOVE")
+	%Tools/Duplicate.shortcut = FAG_Utils.create_shorcut("EDIT_DUPLICATE")
 	%Tools/Rotate.shortcut = FAG_Utils.create_shorcut("EDIT_ROTATE")
 	%Tools/Mirror.shortcut = FAG_Utils.create_shorcut("EDIT_MIRROR")
 	%Tools/Delete.shortcut = FAG_Utils.create_shorcut("EDIT_DELETE")
@@ -266,8 +273,8 @@ func _on_redo_pressed() -> void:
 	if input_allowed:
 		redo.emit()
 
-func _on_ui_tool_selected(forece := false) -> void:
-	if input_allowed == false and forece == false:
+func _on_ui_tool_selected(force := false) -> void:
+	if input_allowed == false and force == false:
 		return
 	
 	var button_name = _ui_tool_button_group.get_pressed_button().name
@@ -275,6 +282,9 @@ func _on_ui_tool_selected(forece := false) -> void:
 		"SelectMove":
 			_active_ui_tool = SELECT
 			_ui_set_cursor_select()
+		"Duplicate":
+			_active_ui_tool = DUPLICATE
+			_ui_set_cursor_duplicate()
 		"Scale":
 			_active_ui_tool = SCALE
 			_ui_set_cursor_scale()
@@ -322,9 +332,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	elif _active_ui_tool == ELEMENT:
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			element_add.emit(point)
+			element_add__finish.emit(point)
 		elif event is InputEventMouseMotion:
-			element_update_added.emit(point)
+			element_add__update.emit(point)
 	
 	else:
 		# selected / edit existed element mode and mouse button
@@ -354,11 +364,12 @@ func _unhandled_input(event: InputEvent) -> void:
 				elif _active_ui_tool == SCALE_IN_PROGRESS:
 					do_scale_finish.emit()
 					_active_ui_tool = SCALE
-				elif _active_ui_tool == SELECT:
-					_selection_box.is_done = true
+				elif _active_ui_tool == SELECT or _active_ui_tool == DUPLICATE:
+					if _selection_box.visible:
+						_selection_box.is_done = true
 					if _selection_box.is_approx_zero_size():
 						clear_selection()
-					do_move_cancel.emit(_raycast_result)
+					do_on_raycast_selection_finish.emit(_raycast_result)
 				_raycast_result = null
 		
 		# selected / edit existed element mode and mouse move
@@ -387,6 +398,7 @@ func _set_move_mode(immediately := false):
 			_active_ui_tool = SELECT_LONG
 
 func clear_selection():
+	_selection_box.is_done = false
 	_selection_box.visible = false
 	selection_box_has_been_hidden.emit()
 
@@ -397,6 +409,10 @@ var _ui_set_cursor = []
 
 func _ui_set_cursor_select() -> void:
 	_ui_set_cursor = [select_cursor, select_cursor_hotspot]
+	update_cursor()
+
+func _ui_set_cursor_duplicate() -> void:
+	_ui_set_cursor = [duplicate_cursor, duplicate_cursor_hotspot]
 	update_cursor()
 
 func _ui_set_cursor_move() -> void:

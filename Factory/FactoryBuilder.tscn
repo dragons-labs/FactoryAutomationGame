@@ -1,0 +1,160 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://Factory/FactoryBuilder.gd" id="1_51ivo"]
+[ext_resource type="Script" path="res://Base/Camera/Camera3DControl.gd" id="2_2dv8j"]
+[ext_resource type="PackedScene" path="res://Base/WorldEditorUI/WorldEditorUI.tscn" id="3_iwf3v"]
+[ext_resource type="PackedScene" path="res://ElectronicsSimulator/ElectronicsSimulator.tscn" id="10_hxh5h"]
+[ext_resource type="PackedScene" path="res://ComputerSimulator/ComputerSystemSimulator.tscn" id="11_thamu"]
+
+[sub_resource type="GDScript" id="GDScript_gx28t"]
+script/source = "extends Window
+
+func _ready() -> void:
+	FAG_WindowManager.init_window(self)
+	close_requested.connect(_on_close_requested)
+
+func _on_close_requested():
+	FAG_WindowManager.set_windows_visibility_recursive(self, false)
+"
+
+[sub_resource type="GDScript" id="GDScript_i7hjm"]
+script/source = "extends Window
+
+func _ready() -> void:
+	FAG_WindowManager.init_window(self, true)
+	close_requested.connect(_on_close_requested)
+
+func _on_close_requested():
+	FAG_WindowManager.set_windows_visibility_recursive(self, false)
+"
+
+[node name="FactoryBuilder" type="Node3D"]
+script = ExtResource("1_51ivo")
+
+[node name="WorldEditorUI" parent="." instance=ExtResource("3_iwf3v")]
+unique_name_in_owner = true
+selection_box_enabled = false
+import_export_enabled = false
+scale_tool_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(0.848048, -0.280814, 0.449397, 0, 0.848048, 0.529919, -0.529919, -0.449397, 0.719186, 0.735, 3.16, 2.47)
+fov = 40.0
+near = 0.01
+far = 400.0
+script = ExtResource("2_2dv8j")
+
+[node name="ElectronicsSimulatorWindow" type="Window" parent="."]
+unique_name_in_owner = true
+disable_3d = true
+scaling_3d_scale = 2.0
+title = "ELECTRONIC_EDITOR_WINDOW_TITLE"
+initial_position = 4
+size = Vector2i(800, 500)
+visible = false
+script = SubResource("GDScript_gx28t")
+
+[node name="ElectronicsSimulator" parent="ElectronicsSimulatorWindow" instance=ExtResource("10_hxh5h")]
+unique_name_in_owner = true
+
+[node name="ComputerSystemSimulatorWindow" type="Window" parent="."]
+unique_name_in_owner = true
+disable_3d = true
+scaling_3d_scale = 2.0
+initial_position = 3
+size = Vector2i(640, 440)
+current_screen = 0
+visible = false
+wrap_controls = true
+script = SubResource("GDScript_i7hjm")
+
+[node name="ComputerSystemSimulator" parent="ComputerSystemSimulatorWindow" instance=ExtResource("11_thamu")]
+
+[node name="GetNameDialog" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"FullScreenBlocker"
+
+[node name="PanelContainer" type="PanelContainer" parent="GetNameDialog"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_type_variation = &"MessageBox"
+
+[node name="MarginContainer" type="MarginContainer" parent="GetNameDialog/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GetNameDialog/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Message_Title" type="Label" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_type_variation = &"HeaderMedium"
+text = "FACTORY_BUILDER_BLOCK_NAME_TITLE"
+horizontal_alignment = 1
+
+[node name="Control" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="Message_Text" type="Label" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(160, 80)
+layout_mode = 2
+text = "FACTORY_BUILDER_BLOCK_NAME_TEXT"
+horizontal_alignment = 3
+
+[node name="Control2" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="GetNameInput" type="LineEdit" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Control3" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Cancel" type="Button" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "FACTORY_BUILDER_BLOCK_NAME_CANCEL"
+
+[node name="Control" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OK" type="Button" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "FACTORY_BUILDER_BLOCK_NAME_OK"
+
+[connection signal="active_ui_tool_changed" from="WorldEditorUI" to="." method="_on_active_ui_tool_changed"]
+[connection signal="do_move_finish" from="WorldEditorUI" to="." method="_on_do_move_finish"]
+[connection signal="do_move_step" from="WorldEditorUI" to="." method="_on_do_move_step"]
+[connection signal="do_on_raycast_result" from="WorldEditorUI" to="." method="_on_do_on_raycast_result"]
+[connection signal="do_on_raycast_selection_finish" from="WorldEditorUI" to="." method="_on_do_on_raycast_selection_finish"]
+[connection signal="do_scale_finish" from="WorldEditorUI" to="." method="_on_do_scale_finish"]
+[connection signal="do_scale_step" from="WorldEditorUI" to="." method="_on_do_scale_step"]
+[connection signal="element_add__finish" from="WorldEditorUI" to="." method="_on_element_add__finish"]
+[connection signal="element_add__update" from="WorldEditorUI" to="." method="_on_element_add__update"]
+[connection signal="focus_lost" from="WorldEditorUI" to="." method="_on_ui_focus_lost"]
+[connection signal="mouse_enter_exit_gui_area" from="WorldEditorUI" to="." method="_on_mouse_enter_exit_gui_area"]
+[connection signal="text_submitted" from="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/GetNameInput" to="." method="_on_get_name_ok" unbinds=1]
+[connection signal="pressed" from="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/Cancel" to="." method="_on_get_name_cancel"]
+[connection signal="pressed" from="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/OK" to="." method="_on_get_name_ok"]

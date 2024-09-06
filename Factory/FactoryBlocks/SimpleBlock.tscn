@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/resistor-icon.svg" id="1_cabh3"]
+[ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/SimpleBlock.svg" id="1_ukid1"]
 
 [sub_resource type="GDScript" id="GDScript_byugd"]
 resource_name = "FactoryBlockSettings"
@@ -18,25 +18,25 @@ script/source = "extends PhysicsBody3D
 #       (as button name) AND should be equal to `object_subtype` value
 #       for the correct operation of the block number limiter
 const object_type := \"FactoryBlock\"
-const object_subtype := \"SimpleFactoryBlock\"
+const object_subtype := \"SimpleBlock\"
 @onready var physics_rids = [get_rid()]
 "
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_uwn0y"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ts5lk"]
-albedo_color = Color(0.228085, 0.81764, 0.999999, 1)
+albedo_color = Color(0.305882, 0.32549, 0.392157, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_1jxje"]
 material = SubResource("StandardMaterial3D_ts5lk")
 
-[node name="SimpleFactoryBlock" type="Node3D"]
+[node name="SimpleBlock" type="Node3D"]
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 script = SubResource("GDScript_byugd")
 ui_name = "FACTORY_BLOCK_NAME_SimpleFactoryBlock"
-ui_icon = ExtResource("1_cabh3")
+ui_icon = ExtResource("1_ukid1")
 
 [node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
 shape = SubResource("BoxShape3D_uwn0y")

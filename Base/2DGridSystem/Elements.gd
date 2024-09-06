@@ -47,7 +47,8 @@ func serialise() -> Array:
 		})
 	return save_data
 
-func restore(data : Array, elements : Dictionary, offset := Vector2(0, 0)) -> void:
+func restore(data : Array, elements : Dictionary, offset := Vector2.ZERO, duplicate_mode := false) -> void:
+	var new_elements = []
 	for element_info in data:
 		var packed_scene = elements[element_info.type][0]
 		
@@ -67,9 +68,15 @@ func restore(data : Array, elements : Dictionary, offset := Vector2(0, 0)) -> vo
 				info_node.text = element_info.values[info_node.name]
 		
 		main_node.add_child(element)
-		element.owner = main_node
 		
-		on_element_add.emit(element)
+		if duplicate_mode:
+			new_elements.append(element)
+		else:
+			element.owner = owner_node
+			on_element_add.emit(element)
+	
+	if duplicate_mode:
+		add_elements__init(new_elements, offset, false, false)
 
 func store_infos() -> void:
 	# for tscn save mode
@@ -83,7 +90,7 @@ func store_infos() -> void:
 		elif element.has_meta("grid_element_info"):
 			element.remove_meta("grid_element_info")
 
-func restore_infos_and_emit_element_add(element : Node2D) -> void:
+func restore_infos_and_emit_element_add__finish(element : Node2D) -> void:
 	# for tscn restore mode
 	if element.has_meta("grid_element_info"):
 		var info = element.get_meta("grid_element_info")
@@ -95,37 +102,44 @@ func restore_infos_and_emit_element_add(element : Node2D) -> void:
 
 ### Add new element
 
-var new_element : Node2D = null
+var _new_elements := {}
+var _new_elements_init_point : Vector2
 
-func init_element(element_scene : PackedScene, point : Vector2) -> void:
-	cancel_element()
-	new_element = element_scene.instantiate()
-	Grid2D_BaseElement.get_from_element(new_element).set_active(false)
-	main_node.add_child(new_element)
-	update_element(point)
+func add_element__init(element_scene : PackedScene, point : Vector2) -> void:
+	add_elements__init([element_scene.instantiate()], point, false, true)
 
-func add_element(point : Vector2) -> void:
-	update_element(point)
-	
-	var element = new_element.duplicate() # BUG: https://github.com/godotengine/godot/issues/92880
-	Grid2D_BaseElement.get_from_element(element).set_active(true)
+func add_elements__init(elements : Array, point : Vector2, duplicate := true, at_cursor_position := false) -> void:
+	_new_elements_init_point = point
+	add_element__cancel()
+	for element in elements:
+		var new_element = element.duplicate() if duplicate else element
+		_new_elements[new_element] = point if at_cursor_position else new_element.position
+		Grid2D_BaseElement.get_from_element(new_element).set_active(false)
+		main_node.add_child(new_element)
+	add_element__update(point)
+
+func add_element__finish(point : Vector2) -> void:
+	add_element__update(point)
 	
 	undo_redo.create_action("Grid Element: Add")
-	undo_redo.add_do_reference(element)
-	undo_redo.add_do_method(_add_element.bind(element))
-	undo_redo.add_undo_method(_remove_element.bind(element))
+	for new_element in _new_elements:
+		var element = new_element.duplicate() # BUG: https://github.com/godotengine/godot/issues/92880
+		Grid2D_BaseElement.get_from_element(element).set_active(true)
+		undo_redo.add_do_reference(element)
+		undo_redo.add_do_method(_add_element.bind(element))
+		undo_redo.add_undo_method(_remove_element.bind(element))
 	undo_redo.commit_action()
-	element.owner = owner_node
 
-func cancel_element() -> void:
-	if new_element:
+func add_element__cancel() -> void:
+	for new_element in _new_elements:
 		main_node.remove_child(new_element)
 		new_element.queue_free()
-		new_element = null
+	_new_elements.clear()
 
-func update_element(point : Vector2) -> void:
-	if new_element:
-		new_element.position = point.snapped(grid_size)
+func add_element__update(point : Vector2) -> void:
+	var move = point - _new_elements_init_point
+	for new_element in _new_elements:
+		new_element.position = (_new_elements[new_element] + move).snapped(grid_size)
 
 
 ### Move existed element
@@ -268,6 +282,7 @@ func find_all_terminals_by_point(point : Vector2, squared_distance : float, skip
 
 func _add_element(element : Node2D) -> void:
 	main_node.add_child(element)
+	element.owner = owner_node
 	on_element_add.emit(element)
 
 func _remove_element(element : Node2D) -> void:

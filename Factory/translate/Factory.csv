@@ -1,15 +1,23 @@
 keys,en,pl
-FACTORY_BLOCK_NAME_SimpleFactoryBlock,Simple Factory Block,
+FACTORY_BLOCK_NAME_SimpleFactoryBlock,Simple Construction Block,
 FACTORY_BLOCK_NAME_ElectronicControlBlock,Electronic Control Block,
 FACTORY_BLOCK_NAME_ConveyorBelt,Conveyor Belt,
 FACTORY_BLOCK_NAME_ComputerControlBlock,Computer Control Block,
 FACTORY_BLOCK_NAME_ProducerBlock,Component Producer,
-FACTORY_BLOCK_NAME_ConsumerBlock,Consumer,
+FACTORY_BLOCK_NAME_Welder,Welder,
+FACTORY_BLOCK_NAME_Painter,Painter,
+FACTORY_BLOCK_NAME_Detector,Detector,
+FACTORY_BLOCK_NAME_ConveyorSplitter,Conveyor Splitter,
 FACTORY_START,Run,
 FACTORY_STOP,Stop,
 FACTORY_PAUSE,Pause,
 FACTORY_UNPAUSE,Unpause,
 FACTORY_TASK_INFO,Task Info,
+
+FACTORY_BUILDER_BLOCK_NAME_TITLE,Enter name for block,
+FACTORY_BUILDER_BLOCK_NAME_TEXT,"This name will be used in name of this block input/output signals.\nThe name should be unique and lowercase.",
+FACTORY_BUILDER_BLOCK_NAME_OK,OK,
+FACTORY_BUILDER_BLOCK_NAME_CANCEL,Cancel,
 
 FACTORY_ERROR_TITLE,"Geneal factory error","Ogólny błąd fabryki"
 FACTORY_ERROR_TEXT,"Something went wrong. And no one knows what :-(","Coś poszło nie tak. I nikt nie wie co :-("

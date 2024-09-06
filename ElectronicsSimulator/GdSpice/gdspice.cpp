@@ -50,7 +50,7 @@ bool GdSpice::init(const godot::String& libngspice, int _verbose) {
 	}
 	#endif
 	
-	int ret = ngSpice_Init(on_getchar, /*on_getstat*/ nullptr, on_exit, /*on_data*/ nullptr, on_initdata, on_thread_runs, this);
+	int ret = ngSpice_Init(on_getchar, /*on_getstat*/ nullptr, on_exit, /*on_data*/ nullptr, /*on_initdata*/ nullptr, on_thread_runs, this);
 	if (verbose)
 		godot::UtilityFunctions::print("[GdSpice] init thread returned: ", ret);
 	
@@ -68,12 +68,12 @@ void GdSpice::_process(double delta) {
 void GdSpice::load(const godot::PackedStringArray& circuit) {
 	for (int i=0; i<circuit.size(); ++i)
 		run_command("circbyline " + circuit[i]);
-	run_command("bg_run");
+	run_command("bg_op");
 	
 	simulation_state = STARTING;
 }
 
-void GdSpice::start(bool real_start) {
+void GdSpice::start(bool real_start, const godot::String& simulation_time_step, const godot::String& simulation_max_time) {
 	if (!real_start) {
 		set_process(true);
 		last_game_time = 0;
@@ -87,6 +87,7 @@ void GdSpice::start(bool real_start) {
 		cumulative_sleep_time = 0;
 		working_time = 0;
 		
+		run_command("bg_tran " + simulation_time_step + " " + simulation_max_time);
 		simulation_state = RUNNING;
 	} else {
 		godot::UtilityFunctions::printerr("[GdSpice] Can't start ... simulation is not ready");
@@ -325,7 +326,12 @@ int GdSpice::on_thread_runs(bool not_running, int /*ident*/, void* userdata) {
 	if (gd_spice->verbose)
 		godot::UtilityFunctions::print("[GdSpice] running=", gd_spice->running);
 	if (not_running) {
-		if (gd_spice->simulation_state == ENDED) {
+		if (gd_spice->simulation_state == STARTING) {
+			gd_spice->simulation_state = READY;
+			godot::UtilityFunctions::print("[GdSpice] simulation is ready");
+			gd_spice->call_deferred("emit_signal", "simulation_is_ready_to_run");
+		} else if (gd_spice->simulation_state == ENDED) {
+			godot::UtilityFunctions::print("[GdSpice] simulation was ended");
 			gd_spice->stop();
 			gd_spice->simulation_state = NOT_STARTED;
 		} else if (gd_spice->simulation_state != ERROR) {
@@ -404,12 +410,4 @@ void GdSpice::on_sync2(double time) {
 			call_deferred("emit_signal", "simulation_too_slow", time_diff, time_game, time_simulation);
 		}
 	}
-}
-
-int GdSpice::on_initdata(vecinfoall* data, int ident, void* userdata) {
-	auto gd_spice = static_cast<GdSpice*>(userdata);
-	godot::UtilityFunctions::print("[GdSpice] simulation is ready ", data->type, " ", data->veccount);
-	gd_spice->simulation_state = READY;
-	gd_spice->call_deferred("emit_signal", "simulation_is_ready_to_run");
-	return 0;
 }

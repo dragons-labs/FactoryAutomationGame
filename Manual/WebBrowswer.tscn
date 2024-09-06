@@ -74,6 +74,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_bsl1o")
 [node name="DisplayTexture" type="TextureRect" parent="VBoxContainer/PanelContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+focus_mode = 2
 expand_mode = 1
 stretch_mode = 3
 

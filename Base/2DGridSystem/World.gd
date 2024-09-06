@@ -36,9 +36,9 @@ func serialise() -> Dictionary:
 		"Elements": gElements.serialise()
 	}
 
-func restore(data : Dictionary, elements : Dictionary, offset := Vector2(0, 0)) -> void:
-	gLines.restore(data.Lines, offset)
-	gElements.restore(data.Elements, elements, offset)
+func restore(data : Dictionary, elements : Dictionary, offset := Vector2.ZERO, duplicate_mode := false) -> void:
+	gLines.restore(data.Lines, offset, duplicate_mode)
+	gElements.restore(data.Elements, elements, offset, duplicate_mode)
 
 func save_tscn(save_file : String) -> bool:
 	gElements.store_infos()
@@ -51,7 +51,7 @@ func save_tscn(save_file : String) -> bool:
 			return true
 	return false
 
-func restore_tscn(save_file : String, offset := Vector2(0, 0), ui = null) -> void:
+func restore_tscn(save_file : String, offset := Vector2.ZERO, ui = null) -> void:
 	var saved_data = load(save_file).instantiate()
 	
 	# restore gLines
@@ -64,7 +64,7 @@ func restore_tscn(save_file : String, offset := Vector2(0, 0), ui = null) -> voi
 	saved_data.free() # this delete all child of saved_data also
 	# (https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html#memory-management)
 
-func _restore_subnodes(source : Node2D, destination : Node2D, owner : Node2D, offset := Vector2(0, 0), ui = null) -> void:
+func _restore_subnodes(source : Node2D, destination : Node2D, owner : Node2D, offset := Vector2.ZERO, ui = null) -> void:
 	for n in source.get_children():
 		if ui:
 			var subtype = Grid2D_BaseElement.get_from_element(n).subtype
@@ -88,7 +88,7 @@ func _restore_subnodes(source : Node2D, destination : Node2D, owner : Node2D, of
 		element.owner = owner
 		
 		if destination == gElements.main_node:
-			gElements.restore_infos_and_emit_element_add(element)
+			gElements.restore_infos_and_emit_element_add__finish(element)
 
 func close() -> void:
 	_remove_subnodes(gLines.main_node)

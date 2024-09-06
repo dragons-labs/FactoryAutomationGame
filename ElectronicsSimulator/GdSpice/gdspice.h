@@ -8,8 +8,6 @@
 
 #include "../../Base/godot_api_utils.h"
 
-#define USE_DLOPEN
-
 #ifdef USE_DLOPEN
 extern "C" {
 	typedef int (*ngSpice_Init_Type) (SendChar*, SendStat*, ControlledExit*, SendData*, SendInitData*, BGThreadRunning*, void*);
@@ -41,7 +39,7 @@ public:
 	
 	/// start (synchronous) simulation
 	/// if @a real_start is false only time calculation will be started
-	void start(bool real_start);
+	void start(bool real_start, const godot::String& simulation_time_step, const godot::String& simulation_max_time);
 	
 	/// stop (terminate) simulation
 	void stop();
@@ -84,8 +82,8 @@ public:
 	/// simulation states
 	enum SimulationState {
 		NOT_STARTED = 0x00,
-		STARTING = 0x10,
-		READY = 0x21,
+		STARTING = 0x10, // circuit is loaded, "op" is executing
+		READY = 0x21, // "op" is (successfully) calculated, ready to run "tran"
 		RUNNING = 0x32,
 		PAUSED = 0x44,
 		ERROR = 0x50,
@@ -164,7 +162,6 @@ private:
 	static int on_getchar(char* text, int ident, void* userdata);
 	static int on_get_voltage_current_value(double* value, double time, char* node_name, int ident, void* userdata);
 	static int on_sync(double time, double* deltatime, double olddeltatime, int redostep, int ident, int location, void* userdata);
-	static int on_initdata(vecinfoall* data, int ident, void* userdata);
 	/// @}
 	
 	/// non static callback function used by @ref on_sync

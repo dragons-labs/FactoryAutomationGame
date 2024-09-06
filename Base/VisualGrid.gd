@@ -13,7 +13,7 @@ func _draw() -> void:
 	var to_world = (get_global_transform() * get_canvas_transform()).affine_inverse()
 	
 	var world_size = Rect2()
-	world_size.position = to_world * Vector2(0,0)
+	world_size.position = to_world * Vector2.ZERO
 	world_size.end = to_world * Vector2(get_viewport().size)
 	
 	var x = floorf(world_size.position.x / grid_size.x) * grid_size.x

@@ -4,32 +4,6 @@
 extends Node2D
 
 
-
-## List of external (not defined in grid editor) strong (power, logic outputs, ...) nets
-## as 3 element arrays: [code]["voltage_source_name", "net_name", "voltage source specification"][/code]
-##
-## If you use "external" type voltage/current sources then you can set it value during simulation via
-## [code]gdspice.set_voltages_currents(element_name : String, value : double)[/code].[br][br]
-##
-## [b]NOTE:[/b] ngspice will be used lowercase element name (not net name) while ask for
-##              voltage/current value, so use lowercase element name in
-##              [code]set_voltages_currents()[/code] calls also.
-@export var external_output_nets := []
-
-## List of external (not defined in grid editor) input nets (output for grid editor circuit)
-## as 1 or 2 elements arrays: [code]["net_name", "resistor specification"][/code]
-## if [code]"resistor specification"[/code] is not specified then connected via high resistance to GND
-@export var external_input_nets := []
-
-## List of other external (not shown in editor) circuit elements
-@export var external_circuit_entries := []
-
-## Time step used (default 10us, ~100kHz)
-@export var simulation_time_step := "10us"
-
-## Simulation maximum length (default 600s)
-@export var simulation_max_time := "600s"
-
 ## Current value to trigger over current protection (0 to disable current checking)
 @export var current_limit = 0
 
@@ -63,27 +37,67 @@ func close() -> void:
 	grid_editor.grid.close()
 	grid_editor.ui.reset_editor()
 
-func init_circuit() -> Array:
-	error_was_reported = false
-	
-	if gdspice.get_simulation_state() != GdSpice.NOT_STARTED:
-		gdspice.reset()
-		gdspice.stop()
-	
-	print("Init circuit simulation")
-	grid_editor.ui.set_editor_enabled(false)
-	
-	var netlist_info = gdspice.get_ngspice_netlist(grid_editor.grid, external_output_nets, external_input_nets, external_circuit_entries, simulation_time_step, simulation_max_time)
-	gdspice.load(netlist_info[0])
-	return netlist_info[1]
+## Init circuit for simulation, but not start simulation
+##
+## Takes arguments:
+##  - external_nets_input_to_circuit_from_factory:
+##     List of external (not defined in grid editor) strong (power, logic outputs, ...) nets
+##     as 2 or 3 or 4 element arrays: [code]["voltage_source_name", "net_name", "voltage source specification", "internal resistance value"][/code]
+##
+##     If "voltage source specification" is omitted or null then "external" is used.
+##
+##     If you use "external" type voltage/current sources then you can set it value during simulation via
+##     [code]gdspice.set_voltages_currents(element_name : String, value : double)[/code].[br][br]
+##
+##     [b]NOTE:[/b] ngspice will be used lowercase element name (not net name) while ask for
+##                  voltage/current value, so use lowercase element name in
+##                  [code]set_voltages_currents()[/code] calls also.
+##  - external_nets_outputs_from_circuit_to_factory
+##     List of external (not defined in grid editor) input nets (output for grid editor circuit)
+##     as 1 or 2 elements arrays: [code]["net_name", "resistor specification"][/code]
+##     if [code]"resistor specification"[/code] is not specified then connected via high resistance to GND
+##  - external_circuit_entries
+##     List of other external (not shown in editor) circuit elements
+##  - simulation_time_step
+##     Time step used (default 10us, ~100kHz)
+##  - simulation_max_time
+##     Simulation maximum time length (default 600s)
+func init_circuit(
+		external_nets_input_to_circuit_from_factory := [],
+		external_nets_outputs_from_circuit_to_factory := [],
+		external_circuit_entries := []
+	) -> Array:
+		error_was_reported = false
+		
+		if gdspice.get_simulation_state() != GdSpice.NOT_STARTED:
+			gdspice.reset()
+			gdspice.stop()
+		
+		print("Init circuit simulation")
+		grid_editor.ui.set_editor_enabled(false)
+		for element in grid_editor.grid.gElements.main_node.get_children():
+			for ui in element.get_child(0).get_children():
+				if ui is LineEdit:
+					ui.editable = false
+				elif ui is OptionButton:
+					ui.disabled = true
+		
+		var netlist_info = gdspice.get_ngspice_netlist(
+			grid_editor.grid,
+			external_nets_input_to_circuit_from_factory,
+			external_nets_outputs_from_circuit_to_factory,
+			external_circuit_entries
+		)
+		gdspice.load(netlist_info[0])
+		return netlist_info[1]
 
-func start(real_start : bool) -> void:
+func start(real_start : bool, simulation_time_step := "10us", simulation_max_time := "600s") -> void:
 	if not real_start:
-		gdspice.start(false)
+		gdspice.start(false, simulation_time_step, simulation_max_time)
 		return
 	if gdspice.get_simulation_state() == GdSpice.READY:
 		print("Start circuit simulation")
-		gdspice.start()
+		gdspice.start(true, simulation_time_step, simulation_max_time)
 	else:
 		printerr("Can't start, current state = %x" % gdspice.get_simulation_state())
 
@@ -92,13 +106,19 @@ func stop() -> void:
 	gdspice.reset()
 	gdspice.stop()
 	grid_editor.ui.set_editor_enabled(true)
+	for element in grid_editor.grid.gElements.main_node.get_children():
+		for ui in element.get_child(0).get_children():
+			if ui is LineEdit:
+				ui.editable = true
+			elif ui is OptionButton:
+				ui.disabled = false
 
 # do not expose here gdspice.pause() and gdspice.resume()
 # because they are for special cases when nothing happens and we can pause
 # the simulation itself (without pausing the game) to save resources,
 # but we don't know the full internal state of the circuit so it's risky
 #
-# for normal pause/resume simulation use Engine.time_scale value
+# for normal pause/resume simulation use Engine.time_scale or/and get_tree().paused
 
 func set_input_allowed(value):
 	print("Input allowed into circuit simulator: ", value)
@@ -116,6 +136,7 @@ func _ready():
 	
 	gdspice.init()
 	gdspice.verbose = 1
+	gdspice.process_mode = Node.PROCESS_MODE_PAUSABLE
 
 func _process(_delta):
 	match gdspice.get_simulation_state():

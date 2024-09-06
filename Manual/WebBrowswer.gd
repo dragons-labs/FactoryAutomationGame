@@ -22,7 +22,9 @@ func _ready() -> void:
 	if not initialize({
 			"incognito":true,
 			"locale":"en-US",
-			"enable_media_stream": true
+			"enable_media_stream": true,
+			"artifacts": "res://cef_artifacts",
+			"exported_artifacts": FAG_Utils.globalize_path("cef_artifacts" if OS.get_name() != "Windows" else ""), # TODO TEST without "cef_artifacts" dir for Windows platform
 	}):
 		printerr("GDCef init error: ", get_error())
 		return
@@ -108,3 +110,12 @@ func _on_input(event):
 			_browser.set_mouse_left_down()
 		_browser.set_mouse_moved(event.position.x, event.position.y)
 	pass
+
+func _input(event):
+	if display.has_focus() and event is InputEventKey and _browser != null:
+		_browser.set_key_pressed(
+			event.unicode if event.unicode != 0 else event.keycode,
+			event.pressed, event.shift_pressed, event.alt_pressed,
+			event.is_command_or_control_pressed()
+		)
+		get_viewport().set_input_as_handled()

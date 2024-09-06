@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+SPDX-License-Identifier: MIT
+-->
+
+<svg
+   width="48"
+   height="48"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="Detector.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#959595"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="6.7277217"
+     inkscape:cx="-19.694632"
+     inkscape:cy="38.497431"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#efbf19;fill-opacity:0.931747;fill-rule:evenodd;stroke-width:0.264583"
+       id="rect531"
+       width="13.242989"
+       height="13.601558"
+       x="2.6577907"
+       y="23.6717"
+       rx="0.34961572"
+       ry="0.34961575" />
+    <circle
+       fill="#000000"
+       style="fill:#ffffff;fill-opacity:0.968455;fill-rule:evenodd;stroke-width:0.264583"
+       id="path1531"
+       cx="3.5959651"
+       cy="40.635509"
+       r="3.0574241" />
+    <circle
+       fill="#000000"
+       style="fill:#ffffff;fill-opacity:0.968455;fill-rule:evenodd;stroke-width:0.264583"
+       id="path1531-6"
+       cx="10.092677"
+       cy="40.635509"
+       r="3.0574241" />
+    <circle
+       fill="#000000"
+       style="fill:#ffffff;fill-opacity:0.968455;fill-rule:evenodd;stroke-width:0.264583"
+       id="path1531-7"
+       cx="16.585316"
+       cy="40.793289"
+       r="3.0574241" />
+    <circle
+       fill="#000000"
+       style="fill:#ffffff;fill-opacity:0.968455;fill-rule:evenodd;stroke-width:0.264583"
+       id="path1531-6-5"
+       cx="23.082027"
+       cy="40.793289"
+       r="3.0574241" />
+    <circle
+       fill="#000000"
+       style="fill:#ffffff;fill-opacity:0.968455;fill-rule:evenodd;stroke-width:0.264583"
+       id="path1531-6-56"
+       cx="29.578739"
+       cy="40.793289"
+       r="3.0574241" />
+    <circle
+       fill="#000000"
+       style="fill:#ffffff;fill-opacity:0.968455;fill-rule:evenodd;stroke-width:0.264583"
+       id="path1531-7-2"
+       cx="36.071377"
+       cy="40.951065"
+       r="3.0574241" />
+    <circle
+       fill="#000000"
+       style="fill:#ffffff;fill-opacity:0.968455;fill-rule:evenodd;stroke-width:0.264583"
+       id="path1531-6-5-9"
+       cx="42.568092"
+       cy="40.951065"
+       r="3.0574241" />
+    <rect
+       fill="#000000"
+       style="fill:#fffefe;fill-opacity:0.997429;fill-rule:evenodd;stroke:none;stroke-width:1"
+       id="rect904"
+       width="8.6832685"
+       height="12.541291"
+       x="19.658365"
+       y="2.1118228"
+       rx="2.8792639"
+       ry="2.3814383" />
+    <path
+       id="path1796"
+       stroke="#000000"
+       style="fill:none;fill-opacity:0.997429;fill-rule:evenodd;stroke:#ffffff;stroke-opacity:1"
+       d="m 30.101627,16.780332 c -0.739977,2.761631 -3.242576,4.708218 -6.101626,4.708218 -2.859051,0 -5.36165,-1.946588 -6.101627,-4.708219"
+       sodipodi:nodetypes="csc" />
+    <path
+       id="path1796-3"
+       stroke="#000000"
+       style="fill:none;fill-opacity:0.997429;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.999998;stroke-opacity:1"
+       d="m 28.32952,16.314198 c -0.525064,1.876649 -2.300828,3.444343 -4.329519,3.444343 -2.028691,0 -3.804456,-1.567695 -4.32952,-3.444344"
+       sodipodi:nodetypes="csc" />
+    <path
+       id="path1796-3-6"
+       stroke="#000000"
+       style="fill:none;fill-opacity:0.997429;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.999999;stroke-opacity:1"
+       d="m 26.753594,15.909519 c -0.333944,1.150718 -1.463337,1.950874 -2.753593,1.950874 -1.290257,0 -2.419652,-0.800157 -2.753594,-1.950875"
+       sodipodi:nodetypes="csc" />
+  </g>
+</svg>

@@ -30,8 +30,8 @@ signal camera_updated()
 @export var settings_group_name := "CAMERA2D_SETTINGS_GROUP_NAME"
 
 func reset_view() -> void:
-	position = Vector2(0,0)
-	zoom = Vector2(1,1)
+	position = Vector2.ZERO
+	zoom = Vector2.ONE
 	camera_updated.emit()
 
 func set_visibility(value : bool) -> void:

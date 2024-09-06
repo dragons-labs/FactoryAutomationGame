@@ -68,19 +68,32 @@ if not godot_lib:
 		env.AppendUnique(LIBS=[env.File(lib_path)])
 
 
-VariantDir('bin', '.', duplicate=False)
-env['OBJPREFIX'] = '#/bin/build-obj/'
-
+# colour output
 if "TERM" in os.environ:
 	env["ENV"]["TERM"] = os.environ["TERM"]
 
+# build and output directory
+VariantDir('bin', '.', duplicate=False)
+env['OBJPREFIX'] = '#/bin/build-obj/'
+
 Ignore('.', 'compile_commands.json')
 
+# add godot ignore file to output directory
 env.Textfile('#/bin/.gdignore', [''])
 
 
+# platform specific settings
+if env['platform'] == "windows":
+	env.Append(CPPPATH=["#/bin/win64/include/"])
+	env.Append(LIBS=File('bin/win64/dll-mingw/libngspice-0.dll'), RPATH='.')
+else:
+	env.Append(CXXFLAGS=['-DUSE_DLOPEN'])
+
+# define lib sources
 env.Append(CPPPATH=["."])
 sources = Glob("*.cpp")
+
+# build lib
 library = env.SharedLibrary(
 	"bin/libgdspice{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
 	source=sources,

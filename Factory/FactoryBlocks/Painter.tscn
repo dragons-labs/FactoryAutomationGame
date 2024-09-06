@@ -1,8 +1,8 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
-[ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/cursor-pencil.svg" id="1_08vmi"]
-[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/visual/ConveyorBelt.tres" id="1_iucw0"]
+[ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/Painter.svg" id="1_cmfor"]
 [ext_resource type="Script" path="res://Factory/FactoryBlocks/Painter.gd" id="2_enkqh"]
+[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/3d_models/imported/Painter.tres" id="3_truhm"]
 
 [sub_resource type="GDScript" id="GDScript_smjxm"]
 resource_name = "FactoryBlockSettings"
@@ -31,24 +31,38 @@ func on_transform_update():
 [sub_resource type="BoxShape3D" id="BoxShape3D_45hpx"]
 size = Vector3(1, 0.5, 1)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_fm56x"]
+size = Vector3(0.16, 1, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bvuae"]
+size = Vector3(1, 0.5, 0.79)
+
 [node name="Painter" type="Node3D"]
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 script = SubResource("GDScript_smjxm")
 ui_name = "FACTORY_BLOCK_NAME_Painter"
-ui_icon = ExtResource("1_08vmi")
+ui_icon = ExtResource("1_cmfor")
 
 [node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
 shape = SubResource("BoxShape3D_45hpx")
+
+[node name="FactoryElementCollision2" type="CollisionShape3D" parent="FactoryElementPhysics"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0.45)
+shape = SubResource("BoxShape3D_fm56x")
+
+[node name="FactoryElementCollision3" type="CollisionShape3D" parent="FactoryElementPhysics"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -0.45)
+shape = SubResource("BoxShape3D_fm56x")
 
 [node name="Area3D" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 script = ExtResource("2_enkqh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
-shape = SubResource("BoxShape3D_45hpx")
+shape = SubResource("BoxShape3D_bvuae")
 
 [node name="FactoryElementVisual" type="MeshInstance3D" parent="."]
-mesh = ExtResource("1_iucw0")
+mesh = ExtResource("3_truhm")
 skeleton = NodePath("")

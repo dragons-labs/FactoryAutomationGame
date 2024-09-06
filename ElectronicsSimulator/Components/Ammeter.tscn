@@ -12,10 +12,10 @@ script/source = "extends LineEdit
 
 func get_netlist_entry(nets_on_element, id):
 	var _name = \"V%d\" % [id]
-	return [
-		[_name + \" \" + \" \".join(nets_on_element) + \" 0\"],
-		[_name+\"#branch\"]
-	]
+	return  {
+		\"circuit\" : [_name + \" \" + \" \".join(nets_on_element) + \" 0\"],
+		\"meters\" : [_name+\"#branch\"]
+	}
 "
 
 [node name="Ammeter" type="Node2D"]

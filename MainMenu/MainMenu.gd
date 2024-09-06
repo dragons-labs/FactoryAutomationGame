@@ -56,7 +56,6 @@ func _on_load_level_pressed() -> void:
 		if file_name.ends_with(".json"):
 			var levels = FAG_Utils.load_from_json_file(_factory_root.LEVELS_DIR + file_name)
 			for level_id in levels:
-				print("XX",levels[level_id])
 				if not levels[level_id].locked or level_id in game_progress.unlocked_levels:
 					var index = item_list.add_item(
 						FAG_Utils.get_with_fallback(levels[level_id].name, lang, fallback_lang)
@@ -202,6 +201,8 @@ func _on_add_save_slot_pressed(text := "") -> void:
 ### Show / Hide main menu
 
 func _show():
+	if %SettingsDialog.visible:
+		FAG_Settings.cancel_settings_changes()
 	FAG_WindowManager.hide_by_escape_all_windows()
 	_factory_root.pause_factory()
 	_factory_root.input_off()

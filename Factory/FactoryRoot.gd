@@ -5,8 +5,8 @@ extends Node
 
 @onready var game_speed := %GameSpeed
 @onready var factory_builder := $FactoryBuilder
-@onready var circuit_simulator := factory_builder.get_node("%ElectronicsSimulator")
-@onready var products_root := $ProductsRoot
+@onready var circuit_simulator = factory_builder.circuit_simulator
+@onready var objects_root := $ObjectsRoot
 @onready var user_blocks_root := $UserBlocksRoot
 @onready var ui := $FactoryUI
 
@@ -24,15 +24,9 @@ const SAVE_INFO_FILE := "/save_info.json"
 func load_level(level_id : String, save_dir := "") -> void:
 	level_scene_node = load(LEVELS_DIR + level_id + ".tscn").instantiate()
 	level_scene_node.name = "FactoryLevel"
-	level_scene_node.init(self, level_id, save_dir != "")
-	add_child(level_scene_node)
+	level_scene_node.process_mode = Node.PROCESS_MODE_PAUSABLE
 	
-	# set circuit_simulator parameters
-	circuit_simulator.external_output_nets = level_scene_node.circuit_factory_output_nets
-	circuit_simulator.external_input_nets = level_scene_node.circuit_factory_input_nets
-	circuit_simulator.external_circuit_entries = level_scene_node.circuit_factory_extra_entries
-	circuit_simulator.simulation_time_step = level_scene_node.circuit_simulation_time_step
-	circuit_simulator.simulation_max_time = level_scene_node.circuit_simulation_max_time
+	# set circuit_simulator parameters (other parameters are set as arguments in circuit_simulator.init_circuit() call
 	circuit_simulator.current_limit = level_scene_node.circuit_simulation_current_limit
 	circuit_simulator.voltage_limit = level_scene_node.circuit_simulation_voltage_limit
 	
@@ -52,7 +46,7 @@ func load_level(level_id : String, save_dir := "") -> void:
 					FAG_Utils.copy_sparse(saved_img, disk_path)
 				else:
 					# create new disk image
-					FAG_Utils.copy_sparse("res://ComputerSimulator/OS/bin/empty_100MB.img", disk_path)
+					FAG_Utils.copy_sparse("res://qemu_img/empty_100MB.img", disk_path)
 			
 			if not private_fs_created and "virtfs" in computer_config[id] and "private_fs" in computer_config[id]["virtfs"]:
 				private_fs_created = true
@@ -62,8 +56,30 @@ func load_level(level_id : String, save_dir := "") -> void:
 				else:
 					DirAccess.make_dir_recursive_absolute("user://workdir/private_fs")
 			
+			if not "computer_input_names" in computer_config[id]:
+				computer_config[id]["computer_input_names"] = []
+			
+			if not "computer_output_names" in computer_config:
+				computer_config[id]["computer_output_names"] = []
+			
 		factory_builder.computer_systems_configuration = computer_config
-	 
+	factory_builder.defualt_computer_system_id = level_scene_node.defualt_computer_system_id
+	
+	# run register_factory_signals on static blocks
+	for element in level_scene_node.get_node("FactoryBlocks").get_children():
+		var info_obj = factory_builder.get_info_from_block(element)
+		if "factory_signals" in info_obj:
+			factory_builder.register_factory_signals(
+				info_obj.factory_signals[0],
+				info_obj.factory_signals[1],
+				info_obj.factory_signals[2],
+				element.get_meta("in_game_name", ""),
+				element.get_meta("using_computer_id", factory_builder.defualt_computer_system_id),
+			)
+	
+	level_scene_node.init(self, level_id, save_dir != "")
+	add_child(level_scene_node)
+	
 	# hide unsupported blocks in builder UI
 	for button in factory_builder.ui._ui_add_elements_container.get_children():
 		if button.name in level_scene_node.supported_blocks:
@@ -164,7 +180,7 @@ func is_loaded() -> bool:
 func get_signal_value(signal_name : String) -> float:
 	var value1 = null
 	if circuit_simulator.gdspice.get_simulation_state() & circuit_simulator.gdspice.WORKING_TYPE_STATE_MASK:
-		var electric_signal = level_scene_node.control_block_output_signals[signal_name]
+		var electric_signal = factory_builder.outputs_from_circuit_to_factory[signal_name][0]
 		if electric_signal in circuit_simulator.gdspice.used_nets:
 			# NOTE: due to method of construction `used_nets` and `floating_nets` this causes the inability
 			#       to get values ​​for internal factory nodes (not explicitly used in player's circuit)
@@ -177,7 +193,7 @@ func get_signal_value(signal_name : String) -> float:
 	for element in factory_builder.computer_control_blocks.values():
 		var computer_system = element.get_child(0)
 		computer_id = computer_system.computer_system_id
-		if computer_system.is_running_and_ready() and signal_name in computer_system.output_names:
+		if computer_system.is_running_and_ready() and signal_name in computer_system.computer_output_names:
 			# NOTE controlling this same signal by multiple computer system is not supported here
 			value2 = computer_system.get_signal_value(signal_name, null)
 	
@@ -207,10 +223,10 @@ func get_signal_value(signal_name : String) -> float:
 
 func set_signal_value(signal_name : String, value : float) -> void:
 	#print("set_signal_value ", signal_name, " → ", value)
-	circuit_simulator.gdspice.set_voltages_currents(level_scene_node.control_block_input_signals[signal_name], value)
+	circuit_simulator.gdspice.set_voltages_currents(factory_builder.input_to_circuit_from_factory[signal_name][1], value)
 	for element in factory_builder.computer_control_blocks.values():
 		var computer_system = element.get_child(0)
-		if computer_system.is_running_and_ready() and signal_name in computer_system.input_names:
+		if computer_system.is_running_and_ready() and signal_name in computer_system.computer_input_names:
 			computer_system.set_signal_value(signal_name, value)
 
 
@@ -227,7 +243,11 @@ func run_factory() -> void:
 	
 	if _stats.block_count_per_type.get("ElectronicControlBlock", 0) > 0:
 		_circuit_simulation_ready_state = NOT_READY
-		circuit_simulator.init_circuit()
+		circuit_simulator.init_circuit(
+			factory_builder.input_to_circuit_from_factory.values(),
+			factory_builder.outputs_from_circuit_to_factory.values(),
+			factory_builder.external_circuit_entries
+		)
 		# NOTE: we ignore value returned by init_circuit (error list) and do not show UI error here
 		#       because NO_GND is not an issue if circuit connect only input/output signals
 	else:
@@ -244,7 +264,11 @@ func _try_run_factory() -> void:
 	print("_try_run_factory")
 	if _circuit_simulation_ready_state != NOT_READY and _computer_systems_simulation_ready_state != NOT_READY:
 		print(" starting")
-		circuit_simulator.start(_circuit_simulation_ready_state == READY)
+		circuit_simulator.start(
+			_circuit_simulation_ready_state == READY,
+			level_scene_node.circuit_simulation_time_step,
+			level_scene_node.circuit_simulation_max_time
+		)
 		_last_sleep_time = 0
 		game_speed.set_value(_speed_before_stop_pause)
 		factory_start.emit()
@@ -261,7 +285,7 @@ func stop_factory() -> void:
 	_start_stop_hud_ui()
 	circuit_simulator.stop()
 	factory_builder.ui.set_editor_enabled(true)
-	for node in products_root.get_children():
+	for node in objects_root.get_children():
 		node.queue_free()
 	factory_stop.emit()
 	await get_tree().create_timer(0.2, true, false, true).timeout
@@ -269,25 +293,38 @@ func stop_factory() -> void:
 	_start_stop_hud_ui()
 
 func pause_factory():
-	_speed_before_stop_pause = game_speed.get_value()
+	var curr_speed = game_speed.get_value()
+	if curr_speed > 0:
+		_speed_before_stop_pause = curr_speed
+	_speed_before_stop_pause_external = curr_speed
 	game_speed.set_value(0.0)
 
 func unpause_factory():
-	game_speed.set_value(_speed_before_stop_pause)
+	game_speed.set_value(_speed_before_stop_pause_external)
 
 func set_visibility(value : bool) -> void:
 	factory_builder.call_deferred("set_visibility", value)
 	ui.visible = value
 
+var _pre_input_off_ui_input_allowed := true
+var _input_is_off := false
+
 func input_off():
+	prints("input_on", _pre_input_off_ui_input_allowed, _input_is_off)
+	if _input_is_off:
+		return
+	_input_is_off = true
+	_pre_input_off_ui_input_allowed = factory_builder.ui.input_allowed
 	factory_builder.ui.input_allowed = false
 	factory_builder.camera.disable_input()
 	factory_builder.ui.update_cursor(false, true)
 
-func input_on():
-	factory_builder.ui.input_allowed = true
+func input_on(force := false):
+	prints("input_on", _pre_input_off_ui_input_allowed, _input_is_off, force)
+	factory_builder.ui.input_allowed = force or _pre_input_off_ui_input_allowed
 	factory_builder.ui.update_cursor(true, true)
 	factory_builder.camera.enable_input()
+	_input_is_off = false
 
 
 ### factory speed control
@@ -313,10 +350,11 @@ func _on_game_speed_value_changed(value: float) -> void:
 	if is_zero_approx(value):
 		get_tree().paused = true
 		%Pause.text = "FACTORY_UNPAUSE"
+		Engine.time_scale = 0.2 # BUG: https://github.com/godotengine/godot/issues/96359 (also documentation recommended to keep this above 0.0)
 	else:
 		get_tree().paused = false
 		%Pause.text = "FACTORY_PAUSE"
-	Engine.time_scale = value
+		Engine.time_scale = value
 
 func _on_start_stop_pressed() -> void:
 	if _factory_state == FACTORY_STOP:
@@ -358,7 +396,9 @@ func _start_stop_hud_ui():
 	
 	if _factory_state & EMERGENCY_STOP :
 		_speed_before_stop_pause = 0.0
+		_speed_before_stop_pause_external = 0.0
 		game_speed.set_value(0.0)
+		%Pause.disabled = true
 		%GameSpeed/Slider.editable = false
 
 
@@ -366,6 +406,7 @@ func _start_stop_hud_ui():
 
 var _factory_state
 var _speed_before_stop_pause = 0.0
+var _speed_before_stop_pause_external = 0.0
 
 enum { UNUSED, NOT_READY, READY }
 
@@ -418,6 +459,8 @@ func _on_simulation_error() -> void:
 	)
 
 func emergency_stop(title : String, message : String):
+	if _factory_state & EMERGENCY_STOP:
+		return
 	_factory_state = FACTORY_RUNNING | EMERGENCY_STOP
 	circuit_simulator.gdspice.emergency_stop()
 	_start_stop_hud_ui()
@@ -466,6 +509,8 @@ func _update_circuit_element_count(element: Node2D, val: int) -> void:
 	
 	if not base_element.type in ["NET", "Meter"]:
 		_stats.circuit_element_count += val
+	elif base_element.subtype == "NetConnector":
+		base_element.get_node("NetNames").netnames = factory_builder.netnames
 	
 	var element_subtype = base_element.subtype
 	_stats.circuit_element_count_per_type[element_subtype] = _stats.circuit_element_count_per_type.get(element_subtype, 0) + val

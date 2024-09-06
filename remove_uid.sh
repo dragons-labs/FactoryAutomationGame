@@ -4,7 +4,8 @@
 # SPDX-License-Identifier: MIT
 
 #files_list=`find \( -name '*.tscn' -o -name '*.tres' \) ! -exec git check-ignore -q \{\} \; -print`
-files_list=`(git ls-tree -r HEAD --name-only; git ls-files --others --exclude-standard) | egrep '\.(tscn|tres)$'`
+#files_list=`(git ls-tree -r HEAD --name-only; git ls-files --others --exclude-standard) | egrep '\.(tscn|tres)$'`
+files_list=`(git ls-files --cached; git ls-files --others --exclude-standard) | egrep '\.(tscn|tres)$'`
 
 replace_if_need() {
 	ret=1

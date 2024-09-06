@@ -8,10 +8,10 @@ extends Node
 enum Mode {TERMINAL = 1, UI_CODE_EDITOR = 2, GRAPHICAL_VNC = 4}
 
 ## path to kernel image
-@export var kernel_image_path : String = get_script().resource_path.get_base_dir() + "/OS/bin/linux-noinitrd.bzImage"
+@export var kernel_image_path : String = "res://qemu_img/linux-noinitrd.bzImage"
 
 ## path to (read-only) root fs image
-@export var rootfs_image_path : String = get_script().resource_path.get_base_dir() + "/OS/bin/rootfs.img"
+@export var rootfs_image_path : String = "res://qemu_img/rootfs.img"
 
 ## size of memory for emulated system (including kernel memory)
 @export var memory_size = "192M"
@@ -26,10 +26,10 @@ enum Mode {TERMINAL = 1, UI_CODE_EDITOR = 2, GRAPHICAL_VNC = 4}
 @export var virtfs := {}
 
 ## initial list controller inputs names (factory can also add controller inputs on fly by settings it value)
-@export var input_names = []
+@export var computer_input_names = []
 
 ## initial list controller outputs name (factory can also add controller inputs on fly by call [code]add_computer_output[/code])
-@export var output_names = []
+@export var computer_output_names = []
 
 ## time (in seconds) to waiting for emulator quit after poweroff command, before will be killed
 @export var on_close_timeout = 10
@@ -52,7 +52,7 @@ func configure(system_id, configuration : Dictionary) -> void:
 	for setting_name in [
 			"kernel_image_path", "rootfs_image_path",
 			"writable_disk_image", "virtfs",
-			"input_names", "output_names",
+			"computer_input_names", "computer_output_names",
 			"memory_size"
 		]:
 		if setting_name in configuration:
@@ -163,11 +163,11 @@ func wait_for_stop():
 
 func _run_qemu(user_port, msg_port, vnc_port):
 	var args = [
-		"-kernel", ProjectSettings.globalize_path(kernel_image_path),
-		"-drive",  "file=" + ProjectSettings.globalize_path(rootfs_image_path) + ",index=0,media=disk,if=virtio,read-only=on",
+		"-kernel", FAG_Utils.globalize_path(kernel_image_path),
+		"-drive",  "file=" + FAG_Utils.globalize_path(rootfs_image_path) + ",index=0,media=disk,if=virtio,read-only=on",
 		"-append", "init=/init root=/dev/vda console=ttyS0,115200 quiet",
 		"-serial", "tcp:127.0.0.1:%d" % user_port, "-serial", "tcp:127.0.0.1:%d" % msg_port,
-		"-nographic", "-m", memory_size, "-enable-kvm",
+		"-nographic", "-m", memory_size,
 		# "-nic", "socket,mcast=[ff01::46:41:47:0:1]:4617,model=virtio,mac=52:54:%02x:%02x:%02x:%02x" % [
 		# "-netdev", "dgram,id=n1,remote.type=inet,remote.host=::1,remote.port=4617", "-device", "model=virtio,netdev=n1,mac=52:54:%02x:%02x:%02x:%02x" % [
 		# NOTE: qemu do not support IPv6 multicast (in socket nor in dgram) and IPv4 mulicast do not provide host-scope address space (like ffx1::/16 in IPv6)
@@ -176,28 +176,28 @@ func _run_qemu(user_port, msg_port, vnc_port):
 			(computer_system_id>>24)&0xff, (computer_system_id>>16)&0xff, (computer_system_id>>8)&0xff, (computer_system_id>>0)&0xff
 		]
 	]
-	args.append("-nic")
-	if computer_system_id == 0:
-		args.append("socket,connect=127.0.0.1:42647,model=virtio,mac=52:54:%02x:%02x:%02x:%02x" % [
-			(computer_system_id>>24)&0xff, (computer_system_id>>16)&0xff, (computer_system_id>>8)&0xff, (computer_system_id>>0)&0xff
-		])
-	else:
-		args.append("socket,connect=127.0.0.1:42647,model=virtio,mac=52:54:%02x:%02x:%02x:%02x" % [
-			(computer_system_id>>24)&0xff, (computer_system_id>>16)&0xff, (computer_system_id>>8)&0xff, (computer_system_id>>0)&0xff
-		])
 	
-	for virtfs_tag in virtfs:
-		args.append("-virtfs")
-		args.append("local,path=%s,mount_tag=%s,security_model=mapped" % [ProjectSettings.globalize_path(virtfs[virtfs_tag]), virtfs_tag])
+	if OS.get_name() != "Windows":
+		args.append("-enable-kvm")
+	
+	if OS.get_name() != "Windows": # TODO / BUG: no virtfs support under windows → https://gitlab.com/qemu-project/qemu/-/issues/2016
+		for virtfs_tag in virtfs:
+			args.append("-virtfs")
+			args.append("local,path=%s,mount_tag=%s,security_model=mapped" % [FAG_Utils.globalize_path(virtfs[virtfs_tag]), virtfs_tag])
+	
 	if vnc_port:
 		args.append("-vnc")
 		args.append("127.0.0.1:%d,reverse=on" % vnc_port)
 	if writable_disk_image:
 		args.append("-drive")
-		args.append("file=" + ProjectSettings.globalize_path(writable_disk_image) + ",index=1,media=disk,if=virtio,read-only=off")
+		args.append("file=" + FAG_Utils.globalize_path(writable_disk_image) + ",index=1,media=disk,if=virtio,read-only=off")
 	
 	print("Starting qemu with args: ", args)
-	return OS.create_process("qemu-system-x86_64", args)
+	
+	if OS.get_name() == "Windows":
+		return OS.create_process("qemu/qemu-system-x86_64.exe", args)
+	else:
+		return OS.create_process("qemu-system-x86_64", args)
 
 
 var _user_console_server := TCPServer.new()
@@ -245,8 +245,8 @@ func _process(_delta):
 						send_message_via_msg_bus("pong")
 					elif cmd == "controller_ready":
 						send_message_via_msg_bus("terminal_size_changed %d %d" % [terminal.get_rows(), terminal.get_cols()])
-						send_message_via_msg_bus("input_names " + " ".join(input_names))
-						send_message_via_msg_bus("output_names " + " ".join(output_names))
+						send_message_via_msg_bus("input_names " + " ".join(computer_input_names))
+						send_message_via_msg_bus("output_names " + " ".join(computer_output_names))
 						send_message_via_msg_bus("configuration_done")
 					elif cmd.begins_with("computer_system_ready"):
 						running_state = IS_RUNNING | IS_READY
@@ -264,7 +264,13 @@ func is_running_and_ready() -> bool:
 	return running_state & IS_READY
 
 func add_computer_output(signal_name : String) -> void:
-	send_message_via_msg_bus("request_output " + signal_name)
+	send_message_via_msg_bus("add_output " + signal_name)
+
+func remove_computer_output(signal_name : String) -> void:
+	send_message_via_msg_bus("remove_output " + signal_name)
+
+func remove_computer_input(signal_name : String) -> void:
+	send_message_via_msg_bus("remove_input " + signal_name)
 
 func get_signal_value(signal_name : String, default_value : Variant = 0) -> Variant:
 	return _output_values.get(signal_name, default_value)

@@ -40,7 +40,8 @@ func serialise() -> Array:
 		save_data.append(Array(line.points))
 	return save_data
 
-func restore(data : Array, offset := Vector2(0, 0)) -> void:
+func restore(data : Array, offset := Vector2.ZERO, duplicate_mode := false) -> void:
+	var segments = []
 	for line_info in data:
 		var new_line = Line2D.new()
 		new_line.width = line_width
@@ -48,6 +49,10 @@ func restore(data : Array, offset := Vector2(0, 0)) -> void:
 		for point in line_info:
 			new_line.add_point(FAG_Utils.Vector2_from_JSON(point) + offset)
 		main_node.add_child(new_line)
+		if duplicate_mode:
+			segments.append({"line": new_line})
+	if duplicate_mode:
+		init_duplicate(segments, offset, false)
 
 ### Undo Redo counters (for pseudo action merging)
 
@@ -359,6 +364,52 @@ func mirror_segments(segments : Array, pivot, start_undo_redo_action = true, fin
 	if finish_undo_redo_action:
 		undo_redo.commit_action()
 	return true
+
+
+### Duplicate lines
+
+var _new_lines := {}
+var _new_lines_init_point : Vector2
+
+func init_duplicate(segments : Array, point : Vector2, duplicate := true) -> void:
+	_new_lines_init_point = point
+	duplicate_cancel()
+	for segment in segments:
+		var new_line = segment.line.duplicate() if duplicate else segment.line
+		# TODO use only segments matched to segment.indexes (if indexes is available) ... if need (split line) then add new lines
+		_new_lines[new_line] = []
+		_new_lines[new_line].resize(new_line.get_point_count())
+		for i in range(new_line.get_point_count()):
+			_new_lines[new_line][i] = segment.line.get_point_position(i)
+		main_node.add_child(new_line)
+	duplicate_update(point)
+
+func duplicate_finish(point : Vector2) -> void:
+	duplicate_update(point)
+	
+	undo_redo.create_action("Grid Line(s): Add")
+	for new_line in _new_lines:
+		var line = new_line.duplicate() # BUG: https://github.com/godotengine/godot/issues/92880
+		undo_redo.add_do_reference(line)
+		undo_redo.add_do_method(main_node.add_child.bind(line))
+		undo_redo.add_undo_method(main_node.remove_child.bind(line))
+		undo_redo.add_do_method(update_connections)
+		undo_redo.add_undo_method(update_connections)
+	undo_redo.commit_action()
+
+func duplicate_cancel() -> void:
+	for new_line in _new_lines:
+		main_node.remove_child(new_line)
+		new_line.queue_free()
+	_new_lines.clear()
+
+func duplicate_update(point : Vector2) -> void:
+	var move = point - _new_lines_init_point
+	for new_line in _new_lines:
+		for i in range(new_line.get_point_count()):
+			new_line.set_point_position(
+				i, (_new_lines[new_line][i] + move).snapped(grid_size)
+			)
 
 
 ### Edit existed lines

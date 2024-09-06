@@ -28,29 +28,42 @@ static func register_action(action_name : StringName, events_keys_info : Array, 
 		else:
 			continue
 		event.pressed = not key.get("released", false)
+		event.alt_pressed = key.get("alt", false)
 		event.ctrl_pressed = key.get("ctrl", false)
 		event.shift_pressed = key.get("shift", false)
 		event.meta_pressed = key.get("meta", false)
 		InputMap.action_add_event(action_name, event)
 	return true
 
+static func _get_prop_info(property_list : Array, name : String) -> Dictionary:
+	for prop_info in property_list:
+		if prop_info.name == name:
+			return prop_info
+	return {}
+
 static func set_default_setting_from_object(object : Object, tr_prefix : String, setting_list : Array) -> Dictionary:
 	var settings = {}
-	for setting_info in setting_list:
-		var setting_name = setting_info
-		var setting_flags = {}
-		if setting_info is Array:
-			setting_name = setting_info[0]
-			setting_flags = setting_info[1]
-		settings[setting_name] = [object.get(setting_name), tr_prefix + setting_name, setting_flags]
+	var props_info = object.get_property_list()
+	for setting_name in setting_list:
+		var setting_info = {}
+		if setting_name is Array:
+			setting_info = setting_name[1]
+			setting_name = setting_name[0]
+		setting_info["default_value"] = object.get(setting_name)
+		setting_info["ui_name"] = tr_prefix + setting_name
+		if not "possible_values" in setting_info:
+			var prop_info = _get_prop_info(props_info, setting_name)
+			if prop_info.hint == PROPERTY_HINT_ENUM:
+				setting_info["possible_values"] = prop_info.hint_string.split(",")
+		settings[setting_name] = setting_info
 	return settings
 	
 static func set_default_controls_and_create_actions(tr_prefix : String, actions_list : Dictionary) -> Dictionary:
-	var settings = {}
+	var actions = {}
 	for action_name in actions_list:
 		register_action(action_name, actions_list[action_name])
-		settings[action_name] = [actions_list[action_name], tr_prefix + action_name]
-	return settings
+		actions[action_name] = [actions_list[action_name], tr_prefix + action_name]
+	return actions
 
 
 var _all_settings := {}
@@ -60,14 +73,18 @@ var _custom_actions := {}
 func register_settings(object : Object, group_name : String, settings : Dictionary, actions : Dictionary) -> void:
 	if group_name in _all_settings:
 		_all_settings[group_name].objects.append(object)
+		_all_settings[group_name].settings.merge(settings)
+		_all_settings[group_name].actions.merge(actions)
 	else:
 		_all_settings[group_name] = {
 			"objects": [object],
 			"settings": settings,
 				# Dictionary:
 				#   key → setting name
-				#   value[0] → default value
-				#   value[1] → UI name
+				#   value → Dictionary:
+				#     default_value → default value
+				#     ui_name → UI name (for translate)
+				#     possible_values → (optional) list of possible values for this setting
 			"actions": actions,
 				# Dictionary:
 				#   key → action name (used in InputMap)
@@ -79,9 +96,10 @@ func reset_to_default(group_name : String) -> void:
 	_custom_values.clear()
 	_custom_actions.clear()
 	for setting_name in _all_settings[group_name].settings:
-		var def_value = _all_settings[group_name].settings[setting_name][0]
+		var def_value = _all_settings[group_name].settings[setting_name].default_value
 		for obj in _all_settings[group_name].objects:
-			obj.set(setting_name, def_value)
+			if setting_name in obj:
+				obj.set(setting_name, def_value)
 	for action_name in _all_settings[group_name].actions:
 		register_action(action_name, _all_settings[group_name].actions[action_name][0], true)
 
@@ -94,7 +112,8 @@ func apply_custom(group_name : String) -> void:
 		for setting_name in _custom_values[group_name]:
 			var value = _custom_values[group_name][setting_name]
 			for obj in _all_settings[group_name].objects:
-				obj.set(setting_name, value)
+				if setting_name in obj:
+					obj.set(setting_name, value)
 	if group_name in _custom_actions:
 		for action_name in _custom_actions[group_name]:
 			register_action(action_name, _custom_actions[group_name][action_name], true)
@@ -128,10 +147,14 @@ func generate_settings_ui(group_name : String, ui_parent : Control, ui_remap_inf
 				
 			# add settings
 			for setting_name in group_info.settings:
-				var current_value = group_info.objects[0].get(setting_name)
+				var current_value
+				for obj in group_info.objects:
+					if setting_name in obj:
+						current_value = obj.get(setting_name)
+						break
 				var setting_info = group_info.settings[setting_name]
 				var setting_ui = setting_ui_template.duplicate()
-				setting_ui.setup_and_show(setting_info[1], group_name, setting_name, setting_info[0], current_value, _on_setting_value_changed, ui_parent)
+				setting_ui.setup_and_show(group_name, setting_name, setting_info, current_value, _on_setting_value_changed, ui_parent)
 
 func reset_settings_ui(ui_parent : Control) -> void:
 	for c in ui_parent.get_children():
@@ -175,6 +198,7 @@ func _on_action_remap_finish(event : Variant) -> void:
 			new_event_info["button"] = event.button_index
 			new_event_info["double_click"] = event.double_click
 		new_event_info["released"] = not event.pressed
+		new_event_info["alt"] = event.alt_pressed
 		new_event_info["ctrl"] = event.ctrl_pressed
 		new_event_info["shift"] = event.shift_pressed
 		new_event_info["meta"] = event.meta_pressed
@@ -202,13 +226,15 @@ func _on_action_remap_finish(event : Variant) -> void:
 	action_rempaing = []
 	ui_setting_info_widget.hide()
 
-func _on_setting_value_changed(value : Variant, group_name : String, setting_name : String, _default_value : float) -> void:
+func _on_setting_value_changed(value : Variant, group_name : String, setting_name : String) -> void:
+	print("XXX", value, setting_name, _all_settings[group_name].objects)
 	if not group_name in _custom_values:
 		_custom_values[group_name] = {}
 	_custom_values[group_name][setting_name] = value
 	
 	for obj in _all_settings[group_name].objects:
-		obj.set(setting_name, value)
+		if setting_name in obj:
+			obj.set(setting_name, value)
 
 func _ready() -> void:
 	load_from_file_and_apply()

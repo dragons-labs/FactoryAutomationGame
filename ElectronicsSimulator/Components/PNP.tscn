@@ -11,12 +11,12 @@ resource_name = "NetListSettings"
 script/source = "extends LineEdit
 
 func get_netlist_entry(nets_on_element, id):
-	return [
-		[\"Q%d \" % id + \\
+	return {
+		\"circuit\" : [\"Q%d \" % id + \\
 			\" \".join(nets_on_element) + \" \" + \\
 			\"PNP\"
 		]
-	]
+	}
 "
 
 [node name="PNP" type="Node2D"]

@@ -15,7 +15,7 @@
       "scale": "(1, 1)",
       "type": "NetConnector",
       "values": {
-        "Value": "product_ready_[in]"
+        "Value": "producer_object_ready_[in]"
       }
     },
     {
@@ -24,7 +24,7 @@
       "scale": "(1, 1)",
       "type": "NetConnector",
       "values": {
-        "Value": "release_product_[out]"
+        "Value": "producer_release_object_[out]"
       }
     },
     {
@@ -33,7 +33,7 @@
       "scale": "(1, 1)",
       "type": "NetConnector",
       "values": {
-        "Value": "control_enabled_[out]"
+        "Value": "producer_control_enabled_[out]"
       }
     },
     {

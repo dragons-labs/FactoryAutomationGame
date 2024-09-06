@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+SPDX-FileCopyrightText: Cosmin Negoita (https://www.svgrepo.com/author/Cosmin%20Negoita/)
+SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+
+SPDX-License-Identifier: CC-BY-4.0
+
+Based-On: https://www.svgrepo.com/svg/408927/objects (https://github.com/stephenhutchings/microns) UNDER CC-BY-4.0 BY Cosmin Negoita
+-->
+
+<svg
+   fill="#000000"
+   version="1.1"
+   id="Layer_1"
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
+   enable-background="new 0 0 24 24"
+   xml:space="preserve"
+   sodipodi:docname="duplicate.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:ns="&amp;#38;ns_sfw;"><defs
+   id="defs21" /><sodipodi:namedview
+   id="namedview19"
+   pagecolor="#7a7a7a"
+   bordercolor="#666666"
+   borderopacity="1.0"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   showgrid="false"
+   inkscape:zoom="3.337544"
+   inkscape:cx="6.1422411"
+   inkscape:cy="-8.089781"
+   inkscape:window-width="1920"
+   inkscape:window-height="1003"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_1" />
+<metadata
+   id="metadata2">
+	<ns:sfw>
+		<ns:slices>
+
+</ns:slices>
+		<ns:sliceSourceBounds
+   width="505"
+   height="984"
+   bottomLeftOrigin="true"
+   x="0"
+   y="-552">
+
+</ns:sliceSourceBounds>
+	</ns:sfw>
+</metadata>
+<g
+   id="g16"
+   transform="matrix(1.8417688,0,0,1.8417688,1.8987744,1.8987744)"
+	fill="#000000"
+   style="stroke-width:0.542956;stroke:none;stroke-opacity:1;fill:#ffffff;fill-opacity:1">
+	<g
+   id="g8"
+	fill="#000000"
+   style="stroke-width:0.542956;stroke:none;stroke-opacity:1;fill:#ffffff;fill-opacity:1">
+		<g
+   id="g6"
+ 	fill="#000000"
+  style="stroke-width:0.542956;stroke:none;stroke-opacity:1;fill:#ffffff;fill-opacity:1">
+			<path
+   d="M 8,17 H 1 C 0.4,17 0,16.6 0,16 V 1 C 0,0.4 0.4,0 1,0 h 15 c 0.6,0 1,0.4 1,1 V 8 C 17,8.6 16.6,9 16,9 15.4,9 15,8.6 15,8 V 2 H 2 v 13 h 6 c 0.6,0 1,0.4 1,1 0,0.6 -0.4,1 -1,1 z"
+   id="path4"
+	fill="#000000"
+   style="stroke-width:0.542956;stroke:none;stroke-opacity:1;fill:#ffffff;fill-opacity:1" />
+		</g>
+	</g>
+	<g
+   id="g14"
+	fill="#000000"
+   style="stroke-width:0.542956;stroke:none;stroke-opacity:1;fill:#ffffff;fill-opacity:1">
+		<g
+   id="g12"
+	fill="#000000"
+   style="stroke-width:0.542956;stroke:none;stroke-opacity:1;fill:#ffffff;fill-opacity:1">
+			<path
+   d="M 23,24 H 8 C 7.4,24 7,23.6 7,23 V 8 C 7,7.4 7.4,7 8,7 h 15 c 0.6,0 1,0.4 1,1 v 15 c 0,0.6 -0.4,1 -1,1 z M 9,22 H 22 V 9 H 9 Z"
+   id="path10"
+	fill="#000000"
+   style="stroke-width:0.542956;stroke:none;stroke-opacity:1;fill:#ffffff;fill-opacity:1" />
+		</g>
+	</g>
+</g>
+</svg>

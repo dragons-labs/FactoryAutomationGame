@@ -1,6 +1,8 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/xor-icon.svg" id="1_cph7b"]
+[ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/ComputerControlBlock.svg" id="1_a3dtk"]
+[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/3d_models/imported/ControlBlock.tres" id="2_2xuij"]
+[ext_resource type="Material" path="res://Factory/FactoryBlocks/3d_models/ComputerControlBlock.material.tres" id="3_l7mko"]
 
 [sub_resource type="GDScript" id="GDScript_byugd"]
 resource_name = "FactoryBlockSettings"
@@ -24,24 +26,19 @@ const object_subtype := \"ComputerControlBlock\"
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_uwn0y"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gl7fj"]
-albedo_color = Color(0.913725, 1, 0, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_8i0g4"]
-material = SubResource("StandardMaterial3D_gl7fj")
-
 [node name="ComputerControlBlock" type="Node3D"]
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 script = SubResource("GDScript_byugd")
 ui_name = "FACTORY_BLOCK_NAME_ComputerControlBlock"
-ui_icon = ExtResource("1_cph7b")
+ui_icon = ExtResource("1_a3dtk")
 
 [node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
 shape = SubResource("BoxShape3D_uwn0y")
 
 [node name="FactoryElementVisual" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-mesh = SubResource("BoxMesh_8i0g4")
+mesh = ExtResource("2_2xuij")
 skeleton = NodePath("")
+surface_material_override/0 = ExtResource("3_l7mko")

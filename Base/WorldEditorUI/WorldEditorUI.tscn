@@ -1,9 +1,10 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/undo.svg" id="1_a4hem"]
 [ext_resource type="Script" path="res://Base/WorldEditorUI/WorldEditorUI.gd" id="1_kdydk"]
 [ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/redo.svg" id="2_g8go6"]
 [ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/cursor-normal.svg" id="2_g33n0"]
+[ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/cursor-duplicate.svg" id="3_344tk"]
 [ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/cursor-move.svg" id="3_evb7p"]
 [ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/select-move.svg" id="3_xkg5s"]
 [ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/cursor-rotate.svg" id="4_lh4ej"]
@@ -19,12 +20,14 @@
 [ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/scale.svg" id="11_865rq"]
 [ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/import.svg" id="11_a2raq"]
 [ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/save.svg" id="12_saxks"]
+[ext_resource type="Texture2D" path="res://Base/WorldEditorUI/ui_icons/duplicate.svg" id="14_8qkfq"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_05y61"]
 
 [node name="WorldEditorUI" type="Node2D"]
 script = ExtResource("1_kdydk")
 select_cursor = ExtResource("2_g33n0")
+duplicate_cursor = ExtResource("3_344tk")
 move_cursor = ExtResource("3_evb7p")
 rotate_cursor = ExtResource("4_lh4ej")
 mirror_cursor = ExtResource("5_x1l62")
@@ -102,6 +105,13 @@ button_pressed = true
 button_group = SubResource("ButtonGroup_05y61")
 icon = ExtResource("3_xkg5s")
 
+[node name="Duplicate" type="Button" parent="UI/LeftPanel/FixedButtons/VBoxContainer/Tools"]
+layout_mode = 2
+tooltip_text = "EDITOR_DUPLICATE_TOOLTIP"
+toggle_mode = true
+button_group = SubResource("ButtonGroup_05y61")
+icon = ExtResource("14_8qkfq")
+
 [node name="Scale" type="Button" parent="UI/LeftPanel/FixedButtons/VBoxContainer/Tools"]
 layout_mode = 2
 tooltip_text = "EDITOR_SCALE_RESIZE_TOOLTIP"
@@ -119,7 +129,6 @@ icon = ExtResource("5_co538")
 [node name="Mirror" type="Button" parent="UI/LeftPanel/FixedButtons/VBoxContainer/Tools"]
 layout_mode = 2
 tooltip_text = "EDITOR_MIRROR_TOOLTIP"
-focus_mode = 0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_05y61")
 icon = ExtResource("6_frc30")
@@ -179,6 +188,7 @@ script = ExtResource("8_3dr2u")
 [connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Actions/Undo" to="." method="_on_undo_pressed"]
 [connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Actions/Redo" to="." method="_on_redo_pressed"]
 [connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Tools/SelectMove" to="." method="_on_ui_tool_selected"]
+[connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Tools/Duplicate" to="." method="_on_ui_tool_selected"]
 [connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Tools/Scale" to="." method="_on_ui_tool_selected"]
 [connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Tools/Rotate" to="." method="_on_ui_tool_selected"]
 [connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Tools/Mirror" to="." method="_on_ui_tool_selected"]

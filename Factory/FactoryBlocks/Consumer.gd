@@ -8,6 +8,6 @@ extends Area3D
 func _ready() -> void:
 	body_entered.connect(FAG_FactoryBlocksUtils.on_object_enter_block__delayed_interaction.bind(self))
 
-func transfer_element_to_factory_block(node : RigidBody3D):
+func transfer_object_to_factory_block(node : RigidBody3D):
 	_factory_root.validate_product(node)
 	node.queue_free()

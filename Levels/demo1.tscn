@@ -1,9 +1,28 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://Levels/demo1.gd" id="1_7y1sa"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ComponentConsumer.tscn" id="2_gbgwv"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ComponentProducer.tscn" id="3_3l6sj"]
-[ext_resource type="Script" path="res://Levels/demo1_product.gd" id="4_b36je"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Consumer.tscn" id="2_gbgwv"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Producer.tscn" id="3_3l6sj"]
+[ext_resource type="Script" path="res://Levels/demo1_object.gd" id="4_b36je"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kkeuu"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+sky_energy_multiplier = 2.0
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_jswve"]
+sky_material = SubResource("ProceduralSkyMaterial_kkeuu")
+
+[sub_resource type="Environment" id="Environment_yuo2n"]
+background_mode = 1
+background_color = Color(0.941176, 0.941176, 0.854902, 1)
+background_energy_multiplier = 0.5
+sky = SubResource("Sky_jswve")
+ambient_light_source = 2
+ambient_light_color = Color(0.941176, 0.941176, 0.913725, 1)
+ambient_light_energy = 0.8
+tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_vt021"]
 size = Vector3(100, 0.4, 100)
@@ -19,8 +38,8 @@ size = Vector3(0.5, 0.2, 0.5)
 [node name="StaticWorld" type="Node3D"]
 script = ExtResource("1_7y1sa")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.895409, 0.445245, 0, -0.445245, 0.895409, 0, 5.35788, 0)
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_yuo2n")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 
@@ -38,24 +57,26 @@ transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -50, 5
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
 shape = SubResource("BoxShape3D_vt021")
 
-[node name="Consumer" parent="." instance=ExtResource("2_gbgwv")]
+[node name="FactoryBlocks" type="Node3D" parent="."]
+
+[node name="Consumer" parent="FactoryBlocks" instance=ExtResource("2_gbgwv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -3)
 
-[node name="Producer" parent="." node_paths=PackedStringArray("product") instance=ExtResource("3_3l6sj")]
+[node name="Producer" parent="FactoryBlocks" node_paths=PackedStringArray("object") instance=ExtResource("3_3l6sj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, -2)
-product = NodePath("../ComponentsTemplates/Demo1Product")
+object = NodePath("../../ComponentsTemplates/Object_Demo1")
 timer_period = 0.7
 
 [node name="ComponentsTemplates" type="Node3D" parent="."]
 visible = false
 
-[node name="Demo1Product" type="RigidBody3D" parent="ComponentsTemplates"]
+[node name="Object_Demo1" type="RigidBody3D" parent="ComponentsTemplates"]
 script = ExtResource("4_b36je")
 
-[node name="FactoryElementVisual" type="MeshInstance3D" parent="ComponentsTemplates/Demo1Product"]
+[node name="FactoryElementVisual" type="MeshInstance3D" parent="ComponentsTemplates/Object_Demo1"]
 transform = Transform3D(0.5, 0, 0, 0, 0.2, 0, 0, 0, 0.5, 0, 0, 0)
 mesh = SubResource("BoxMesh_qro3m")
 skeleton = NodePath("")
 
-[node name="FactoryElementCollision" type="CollisionShape3D" parent="ComponentsTemplates/Demo1Product"]
+[node name="FactoryElementCollision" type="CollisionShape3D" parent="ComponentsTemplates/Object_Demo1"]
 shape = SubResource("BoxShape3D_6rctr")

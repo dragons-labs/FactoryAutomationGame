@@ -4,7 +4,8 @@ EDITOR_SAVE_TOOLTIP,"Export (save to separate file)"
 EDITOR_UNDO_TOOLTIP,Undo
 EDITOR_REDO_TOOLTIP,Redo
 EDITOR_SELECT_MOVE_TOOLTIP,Select / Move
-EDITOR_SCALE_RESIZE_TOOLTIP,Scale / Resize
+EDITOR_DUPLICATE_TOOLTIP,Duplicate
+EEDITOR_SCALE_RESIZE_TOOLTIP,Scale / Resize
 EDITOR_ROTATE_TOOLTIP,Rotate
 EDITOR_MIRROR_TOOLTIP,Mirror
 EDITOR_DELETE_TOOLTIP,Delete
@@ -12,9 +13,13 @@ EDITOR_LINE_TOOL_TOOLTIP,"Line\n - LMB to start drawing / finish segment\n - RMB
 
 WORLD_EDITOR_UI_SETTINGS_GROUP_NAME,World Editor
 
+WORLD_EDITOR_SETTINGS_orthogonal_lines,"Disallow drawing non orthogonal lines in grid editor (require game restart)"
+WORLD_EDITOR_SETTINGS_use_interactive_import,"Use paste (duplicate) mode while importing part of schematic to grid editor"
+
 ACTION_EDIT_UNDO,"Undo (in editors)"
 ACTION_EDIT_REDO,"Redo (in editors)"
 ACTION_EDIT_SELECT_MOVE,"Select / Move tool (in editors)"
+ACTION_EDIT_DUPLICATE,"Duplicate tool (in editors)"
 ACTION_EDIT_SCALE,"Scale tool (in editors)"
 ACTION_EDIT_ROTATE,"Rotate tool (in editors)"
 ACTION_EDIT_MIRROR,"Mirror tool (in editors)"

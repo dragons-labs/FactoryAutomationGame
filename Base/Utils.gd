@@ -70,7 +70,7 @@ static func Vector3_from_JSON(data : Variant) -> Vector3:
 		return data
 	if data is not String or data[0] != '(':
 		printerr("Invalid data ", data, " passed to Vector3_from_JSON")
-		return Vector3(0, 0, 0)
+		return Vector3.ZERO
 	
 	var data_splited = data.substr(1, data.length()-2).split(",")
 	return Vector3(
@@ -84,7 +84,7 @@ static func Vector2_from_JSON(data : Variant) -> Vector2:
 		return data
 	if data is not String or data[0] != '(':
 		printerr("Invalid data ", data, " passed to Vector2_from_JSON")
-		return Vector2(0, 0)
+		return Vector2.ZERO
 	
 	var data_splited = data.substr(1, data.length()-2).split(",")
 	return Vector2(
@@ -97,8 +97,19 @@ static func Vector2_from_JSON(data : Variant) -> Vector2:
 # paths, files and directories
 #
 
+static func globalize_path(path : String) -> String:
+	if OS.has_feature("editor"):
+		return ProjectSettings.globalize_path(path)
+	else:
+		if path.begins_with("res://"):
+			return OS.get_executable_path().get_base_dir().path_join(path.substr(6))
+		elif path.begins_with("user://"):
+			return ProjectSettings.globalize_path(path)
+		else:
+			return OS.get_executable_path().get_base_dir().path_join(path)
+
 static func get_system_path_to_script_dir(caller : Variant) -> String:
-	return ProjectSettings.globalize_path( caller.get_script().resource_path.get_base_dir() )
+	return globalize_path( caller.get_script().resource_path.get_base_dir() )
 
 static func copy_dir_absolute(src: String, dst: String) -> void:
 	var src_dir = DirAccess.open(src)
@@ -126,11 +137,11 @@ static func remove_dir_recursive(path: String) -> void:
 
 static func copy_sparse(src: String, dst: String) -> void:
 	# try rsync with -S option
-	if 0 == OS.execute("rsync", ["-S", ProjectSettings.globalize_path(src), ProjectSettings.globalize_path(dst)]):
+	if 0 == OS.execute("rsync", ["-S", globalize_path(src), globalize_path(dst)]):
 		return
 	if OS.get_name() in ["Linux", "FreeBSD", "NetBSD", "OpenBSD", "BSD", "macOS"]:
 		# Linux (GNU Coreutils) and maybe some other posix-like OS `cp` support sparse
-		if 0 == OS.execute("cp", [ProjectSettings.globalize_path(src), ProjectSettings.globalize_path(dst)]):
+		if 0 == OS.execute("cp", [globalize_path(src), globalize_path(dst)]):
 			return
 	# use Godot copy as fallback
 	DirAccess.copy_absolute(src, dst)

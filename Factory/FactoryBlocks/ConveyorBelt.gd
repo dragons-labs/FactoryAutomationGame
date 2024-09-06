@@ -18,5 +18,5 @@ func _ready():
 	
 	FAG_FactoryBlocksUtils.on_block_transform_updated(self)
 
-func transfer_element_to_factory_block(node : RigidBody3D):
+func transfer_object_to_factory_block(node : RigidBody3D):
 	FAG_FactoryBlocksUtils.accept_object_on_block(node, self, exclusive_owner)

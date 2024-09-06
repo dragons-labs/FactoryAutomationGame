@@ -3,45 +3,12 @@
 
 extends Node3D
 
-## control blocks input signals (from factory) with mapping to circuit element name (not net name)
-## (NOTE: circuit element name should be lowercase, because ngspice using lowercase element name to ask for voltage value)
-var control_block_input_signals := {
-	"product_ready"   : "v_product_ready",
-}
 
-## control blocks output signals (to factory) with mapping to circuit net name (not element name)
-var control_block_output_signals := {
-	"control_enabled" : "control_enabled_[out]",
-	"release_product" : "release_product_[out]",
-}
-
-## factory strong (power, logic outputs, ...) nets
-## as 3 element arrays: `[voltage_source_name, net_name, voltage_source_specification]`
-var circuit_factory_output_nets := [
-	["Vcc", "Vcc", "dc 3.3"],
-	["v_product_ready", "product_ready_[in]", "external"],
-]
-
-## factory input nets (output from circuit to factory)
-## as 1 or 2 elements arrays: [net_name, resistor_specification]
-## when resistor_specification is not specified then connected via high resistance to GND
-var circuit_factory_input_nets := [
-	["release_product_[out]"],
-	["control_enabled_[out]"],
-	# ["sink_input_sample", "Vcc 10k"]
-	# ["source_input_sample", "GND 10k"]
-]
-
-## other factory circuit elements
-var circuit_factory_extra_entries := [
-	# "Rsample1 factory_signal1 factory_signal2 10k",
-]
-
-## factory simulation time and limits parameters
+## circuit simulation time and limits parameters
 var circuit_simulation_time_step := "10us"
 var circuit_simulation_max_time := "600s"
-var circuit_simulation_current_limit = 5
-var circuit_simulation_voltage_limit = 0
+var circuit_simulation_current_limit := 5
+var circuit_simulation_voltage_limit := 0
 
 ## circuit components settings
 var supported_circuit_components := [
@@ -67,13 +34,12 @@ var computer_systems_configuration := {
 			"private_fs": "user://workdir/private_fs",
 		},
 		"writable_disk_image": true,
-		# "rootfs_image_path" : "res://some_path/"
-		# "kernel_image_path" : "res://some_path/"
+		# "rootfs_image_path" : "res://qemu_img/some_path/"
+		# "kernel_image_path" : "res://qemu_img/some_path/"
 		# "memory_size" : "192M"
-		"input_names":  control_block_input_signals.keys(),
-		"output_names": control_block_output_signals.keys(),
 	}
 }
+var defualt_computer_system_id = 0
 
 ## factory block settings
 var supported_blocks := [
@@ -82,6 +48,7 @@ var supported_blocks := [
 	"ComputerControlBlock",
 	"ElectronicControlBlock",
 	"Painter",
+	"ConveyorSplitter", "Welder", "Detector" # TODO temporary
 ]
 var _max_blocks := {
 	"ComputerControlBlock": 3,
@@ -110,9 +77,32 @@ var level_id : String
 ## externally set just **after** level is loaded
 var unlocks_levels : Array
 
-## level init (call after instantiate of level and before add it to scene tree)
+## level init, call
+##  - after:
+##    - instantiate of level
+##    - set value of factory_builder.computer_systems_configuration based on level data
+##  - before:
+##    - add level to scene tree
+## should call factory_root.factory_builder.register_factory_signals() to register factory inputs and outputs signals
 func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 	level_id = id
+	
+	factory_root.factory_builder.register_factory_signals(
+		# (global level) outputs to control blocks
+		{
+			"Vcc" : ["Vcc", "Vcc", "dc 3.3"],
+		},
+		# (global level) input from control blocks
+		{},
+		# (global level) extra circuit elements
+		[],
+		"",
+		defualt_computer_system_id
+	)
+	# NOTE register_factory_signals will be also (automatically) called on
+	#      all children (having `factory_signals`) of `FactoryBlocks` child of main root of level scene
+	#      so no need to define static blocks signals here
+	
 	_factory_root = factory_root
 	_factory_root.factory_start.connect(_on_factory_start)
 	_factory_root.factory_stop.connect(_on_factory_stop)
@@ -128,8 +118,7 @@ func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 ## zero if game should be continue
 ## positive value if game should be ended with success
 func validate_product(node : RigidBody3D):
-	print ("validate_product", node.is_valid())
-	if node.is_valid():
+	if node.factory_object_info.color.r < 0.3:
 		_valid_product_counter += 1
 		if _valid_product_counter > 5:
 			return 1

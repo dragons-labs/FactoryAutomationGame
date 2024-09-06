@@ -16,12 +16,38 @@ Factory Automation offers, made available as part of the gameplay progression, d
   * creating of programs in C and Pythons
   * networking multiple computer blocks with TCP/IP
 
-## Project Status: Alpha-1
+## Project Status: Alpha-2
 
-* All core gameplay features (like circuit simulation, computer simulation, 3d factory) are in place and works (but may be bugged or have missing minor features).
+* All core gameplay features (like circuit simulation, computer simulation, 3d factory) are in place and works.
 * Demo mission is playable and allow check / test core features, but is the only one mission available.
-* Many things (like 3D models, icons, guide texts) are placeholders.
-* It's works, but tested only under Linux and in editor mode (exporter are not configured).
+* Many things (like guide texts) are placeholders.
+* It's works (but may be bugged or have missing minor features).
+
+## Build Instruction (on Linux platform)
+
+1. use `git submodule update --init` to download addons dependencies
+2. build *GodotXterm* addon
+
+    a. use `addons/godot_xterm/native/build.sh`
+    b. (for Windows export option) use `scons build_library=no platform=windows arch=x86_64` in `addons/godot_xterm/native/`
+
+3. build *GdSpice*
+
+    a. run `scons` in `ElectronicsSimulator/GdSpice/`
+    b. (for Windows export option) use `scons platform=windows arch=x86_64` in `ElectronicsSimulator/GdSpice/`
+
+4. build or download binary release of *GDCEF*
+
+    a. binary files should be placed in `addons/3rdparty/gdcef/build/Linux` and (for Windows export option) in `addons/3rdparty/gdcef/build/Windows`
+    b. *GDCEF* should be build with `cef_artifacts` as binary / artifact directory
+
+5. open `project.godot` in Godot 4.3 (or higher), **ignore errors** and close editor after import is complete
+6. open `project.godot` in Godot editor again (there should be no errors)
+7. run project
+
+You can also export project for Linux and Windows platform using `./export.sh` script (do not directly use export option in editor).
+Use `./export.sh` to export amd64 Linux version or `./export.sh Windows` to export amd64 Windows version.
+Results will be written to `tmp/export/`.
 
 ## License
 

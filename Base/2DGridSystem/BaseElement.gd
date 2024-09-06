@@ -86,6 +86,7 @@ func get_terminals_nets(netlist) -> Array:
 
 func get_terminals_nets_names(netlist) -> Array:
 	var ret = []
+	var not_connected = []
 	var count = 0
 	for terminal in connections_node.get_children():
 		var net = netlist.find_net_by_terminal(terminal)
@@ -93,14 +94,18 @@ func get_terminals_nets_names(netlist) -> Array:
 			ret.append(net.name)
 			count += 1
 		else:
-			ret.append("__unused_%s_" % terminal.get_instance_id())
-	return [count, ret]
+			var nc_net = "__unused_%s_" % terminal.get_instance_id()
+			ret.append(nc_net)
+			not_connected.append(nc_net)
+	return [count, ret, not_connected]
 
 func get_netlist_entry(netlist, id, value_name := "Value"):
 	var nets_on_element = get_terminals_nets_names(netlist)
 	var value_node = get_node(value_name)
 	if nets_on_element[0] > 0 and value_node and "get_netlist_entry" in value_node:
-		return value_node.get_netlist_entry(nets_on_element[1], id)
+		var ret = value_node.get_netlist_entry(nets_on_element[1], id)
+		ret["not_connected"] = nets_on_element[2]
+		return ret
 	return null
 
 
@@ -171,7 +176,7 @@ func on_transform_updated() -> void:
 	
 	if _was_mirrored != element_is_mirrored or _was_180_deg_rotated != element_is_180_deg_rorared:
 		for node in get_children():
-			if node is LineEdit:
+			if node is LineEdit or node is OptionButton:
 				# clear old fixes
 				if _was_180_deg_rotated:
 					node.rotation -= PI

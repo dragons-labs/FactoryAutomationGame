@@ -67,8 +67,12 @@ void execute_command(const std::string& data) {
 			output_values.clear();
 			for (auto& name : args_vector)
 				output_values[name] = "";
-		} else if (command == "request_output") {
+		} else if (command == "add_output") {
 			output_values[args_vector[0]] = "";
+		} else if (command == "remove_output") {
+			output_values.erase(args_vector[0]);
+		} else if (command == "remove_input") {
+			input_values.erase(args_vector[0]);
 		} else if (command == "configuration_done") {
 			configured = true;
 			ready.notify_all();

@@ -1,0 +1,78 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/Detector.svg" id="1_ne86n"]
+[ext_resource type="Script" path="res://Factory/FactoryBlocks/Detector.gd" id="2_enkqh"]
+[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/3d_models/imported/Detector.tres" id="3_txfn6"]
+
+[sub_resource type="GDScript" id="GDScript_smjxm"]
+resource_name = "FactoryBlockSettings"
+script/source = "extends PhysicsBody3D
+
+### FactoryBlock external info
+
+# for WorldEditorUI: must be on first child of root node
+@export var ui_name : String
+@export var ui_icon : Texture2D
+
+# for Builder3D: must be on first child of root node
+# (and this must be PhysicsBody3D node used to place element in world)
+# NOTE: parent (root) node name will be used as block identifier in UI
+#       (as button name) AND should be equal to `object_subtype` value
+#       for the correct operation of the block number limiter
+const object_type := \"FactoryBlock\"
+const object_subtype := \"Detector\"
+@onready var physics_rids = [get_rid()]
+
+# (optional*) definition of input / output signal for this block
+#
+# value of `in_game_name` meta (if set and not empty) with `_`
+# will be used as prefix for signals names
+#
+# see FactoryBuilder.register_factory_signals for details
+#
+# *) required for player addable blocks with input/output signal
+#    for factory control system
+const factory_signals = [
+	# block outputs (to control system)
+	{
+		\"detector_pulse\"   : [\"detector_pulse[in]\", \"v_detector_pulse\"],
+		\"detector_object_inside\"   : [\"detector_object_inside[in]\", \"v_object_inside\"],
+	},
+	# block inputs (from control system)
+	{},
+	# extra circuit elements for this block
+	[]
+]
+"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_45hpx"]
+size = Vector3(1, 0.5, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gtxib"]
+
+[node name="Detector" type="Node3D"]
+
+[node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+script = SubResource("GDScript_smjxm")
+ui_name = "FACTORY_BLOCK_NAME_Detector"
+ui_icon = ExtResource("1_ne86n")
+
+[node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
+shape = SubResource("BoxShape3D_45hpx")
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+script = ExtResource("2_enkqh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_gtxib")
+
+[node name="FactoryElementVisual" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8, 0)
+mesh = ExtResource("3_txfn6")
+skeleton = NodePath("")
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.444193, 0)
+billboard = 1

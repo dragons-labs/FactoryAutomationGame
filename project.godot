@@ -34,7 +34,7 @@ project/assembly_name="EduGame"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/3rdparty/godot-filesystem-drawer/addons/filesystem_drawer/plugin.cfg", "res://addons/3rdparty/rrp_main_screen_per_tab/plugin.cfg", "res://addons/godot_xterm/plugin.cfg", "res://addons/repl/plugin.cfg")
+enabled=PackedStringArray("res://addons/editor_main_screen_per_tab/plugin.cfg", "res://addons/filesystem_drawer/plugin.cfg", "res://addons/godot_xterm/plugin.cfg", "res://addons/repl/plugin.cfg", "res://addons/script-ide/plugin.cfg")
 
 [gui]
 
@@ -43,3 +43,7 @@ theme/custom="res://UI_theme.tres"
 [internationalization]
 
 locale/translations=PackedStringArray("res://Base/Camera/translate/Camera.en.translation", "res://Base/WorldEditorUI/translate/WorldEditorUI.en.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.en.translation", "res://ComputerSimulator/translate/ComputerSystemSimulator.en.translation", "res://MainMenu/translate/MainMenu.en.translation", "res://Manual/translate/Manual.en.translation", "res://Factory/translate/Factory.en.translation")
+
+[rendering]
+
+anti_aliasing/screen_space_roughness_limiter/enabled=false

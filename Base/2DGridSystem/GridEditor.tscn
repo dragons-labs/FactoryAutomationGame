@@ -7,10 +7,6 @@
 
 [node name="GridEditor" type="Node2D"]
 script = ExtResource("1_ekobs")
-elements = null
-grid_size = null
-grid_color = null
-orthogonal_lines = null
 
 [node name="VisualGrid" type="Node2D" parent="."]
 unique_name_in_owner = true
@@ -21,6 +17,7 @@ unique_name_in_owner = true
 
 [node name="WorldEditorUI" parent="." instance=ExtResource("9_sp5h3")]
 unique_name_in_owner = true
+duplicate_tool_enabled = true
 line_tool_enabled = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -29,10 +26,10 @@ script = ExtResource("4_fpxj2")
 
 [connection signal="active_ui_tool_changed" from="WorldEditorUI" to="." method="_on_active_ui_tool_changed"]
 [connection signal="do_import" from="WorldEditorUI" to="." method="_on_do_import"]
-[connection signal="do_move_cancel" from="WorldEditorUI" to="." method="_on_do_move_cancel"]
 [connection signal="do_move_finish" from="WorldEditorUI" to="." method="_on_do_move_finish"]
 [connection signal="do_move_step" from="WorldEditorUI" to="." method="_on_do_move_step"]
 [connection signal="do_on_raycast_result" from="WorldEditorUI" to="." method="_on_do_on_raycast_result"]
+[connection signal="do_on_raycast_selection_finish" from="WorldEditorUI" to="." method="_on_do_on_raycast_selection_finish"]
 [connection signal="do_on_selection" from="WorldEditorUI" to="." method="_on_do_on_selection"]
 [connection signal="do_save" from="WorldEditorUI" to="." method="_on_do_save"]
 [connection signal="mouse_enter_exit_gui_area" from="WorldEditorUI" to="." method="_on_mouse_enter_exit_gui_area"]

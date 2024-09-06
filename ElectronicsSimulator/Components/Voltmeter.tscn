@@ -11,10 +11,9 @@ resource_name = "NetListSettings"
 script/source = "extends LineEdit
 
 func get_netlist_entry(nets_on_element, _id):
-	return [
-		[],
-		[nets_on_element[0]]
-	]
+	return {
+		\"meters\" : [nets_on_element[0]]
+	}
 "
 
 [node name="Voltmeter" type="Node2D"]

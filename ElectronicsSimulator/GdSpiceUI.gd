@@ -25,7 +25,13 @@ func reset():
 	_last_oscilloscope = null
 	_last_on_process_time = -1
 
-func get_ngspice_netlist(grid : Grid2D_World, external_output_nets : Array, external_input_nets : Array, external_circuit_entries : Array, time_step : String, max_time : String) -> Array:
+func get_ngspice_netlist(
+		grid : Grid2D_World,
+		external_nets_input_to_circuit_from_factory : Array,
+		external_nets_outputs_from_circuit_to_factory : Array,
+		external_circuit_entries : Array
+	) -> Array:
+	
 	var circuit := ["factory control"]
 	var errors := []
 	var netlist := grid.get_netlist()
@@ -45,15 +51,17 @@ func get_ngspice_netlist(grid : Grid2D_World, external_output_nets : Array, exte
 	gnd_net.name = "GND"
 	
 	# create strong nets (voltage sources) / external outputs
-	for ext_output in external_output_nets:
-		circuit.append("%s __RAW_%s_ 0 %s" % ext_output)
-		circuit.append("R_%s_PROT_ __RAW_%s_ %s 0.001" % [ext_output[0], ext_output[1], ext_output[1]])
-		fuses.append(ext_output[0] + "#branch")
-		strong_nets.append(ext_output[1])
+	for ext_output in external_nets_input_to_circuit_from_factory:
+		var source_definition = "external" if (len(ext_output) < 3 or ext_output[2] == null) else ext_output[2]
+		var internal_resistance = "0.001" if (len(ext_output) < 4 or ext_output[3] == null) else ext_output[3]
+		circuit.append("%s __RAW_%s_ 0 %s" % [ext_output[1], ext_output[0], source_definition])
+		circuit.append("R_%s_INTERNAL_ __RAW_%s_ %s %s" % [ext_output[1], ext_output[0], ext_output[0], internal_resistance])
+		fuses.append(ext_output[1] + "#branch")
+		strong_nets.append(ext_output[0])
 	
 	# create external inputs
-	for ext_intput in external_input_nets:
-		if len(ext_intput) == 1:
+	for ext_intput in external_nets_outputs_from_circuit_to_factory:
+		if len(ext_intput) == 1 or ext_intput[1] == null:
 			circuit.append("R_%s %s GND 10G" % [ext_intput[0], ext_intput[0]])
 		else:
 			circuit.append("R_%s %s %s" % [ext_intput[0], ext_intput[0], ext_intput[1]])
@@ -75,7 +83,7 @@ func get_ngspice_netlist(grid : Grid2D_World, external_output_nets : Array, exte
 	# connect (floating) nets via high impedance to GND
 	var rzgnd_number = 0
 	for x in nets:
-		if x.terminals:
+		if x.terminals: # TODO use settings to enable / disable this feature
 			circuit.append("RZGND%d %s %s 10G" % [rzgnd_number, x.name, gnd_net.name])
 			floating_nets.append_array(x.names)
 			rzgnd_number += 1
@@ -98,19 +106,21 @@ func get_ngspice_netlist(grid : Grid2D_World, external_output_nets : Array, exte
 			models.merge(base_element.params.models)
 		var entry = base_element.get_netlist_entry(netlist, j)
 		if entry:
-			if entry[0]:
-				circuit.append_array(entry[0])
-			if len (entry) > 1 and entry[1]:
-				measurers[base_element] = entry[1][0]
-			if len (entry) > 2 and entry[2]:
-				fuses.append_array(entry[2])
+			if "circuit" in entry:
+				circuit.append_array(entry.circuit)
+			if "meters" in entry:
+				measurers[base_element] = entry.meters[0]
+			if "fuses" in entry:
+				fuses.append_array(entry.fuses)
+			if "not_connected" in entry: # TODO use settings to enable / disable this feature
+				for netname in entry.not_connected:
+					circuit.append("RZGND%d %s %s 10G" % [rzgnd_number, netname, gnd_net.name])
+					rzgnd_number += 1
 	
 	# add models to circuit
 	for model in models:
 		circuit.append(models[model])
 	
-	# set simulation parameters: suggested step = time_step, simulation time = max_time
-	circuit.append(".tran %s %s" % [time_step, max_time])
 	circuit.append(".end")
 	
 	# debug print
