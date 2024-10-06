@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+SPDX-License-Identifier: MIT
+-->
+
+<svg
+   version="1.1"
+   id="svg2"
+   width="251.136"
+   height="106.368"
+   viewBox="0 0 251.136 106.368"
+   sodipodi:docname="resistor-variable-symbols.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview219"
+     pagecolor="#afafaf"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="2.2187125"
+     inkscape:cx="66.479998"
+     inkscape:cy="53.183998"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g14" />
+  <defs
+     id="defs6">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath18">
+      <path
+         d="M 0,0 H 188 V 79 H 0 Z"
+         id="path16" />
+    </clipPath>
+  </defs>
+  <g
+     id="g8"
+     transform="matrix(1.3333333,0,0,1.3333333,0,2.6592e-6)">
+    <g
+       id="g10" />
+    <g
+       id="g12">
+      <g
+         id="g14"
+         clip-path="url(#clipPath18)">
+        <path
+           d="M 0,0 H 189 V 80 H 0 Z"
+           stroke="#000000" style="fill:#ffffff;fill-opacity:0;fill-rule:nonzero;stroke:none"
+           id="path20" />
+        <g
+           id="g22"
+           transform="scale(1,-1)">
+          <path
+             d="m 54.574,-29.375 v 10.801"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.72;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path24" />
+        </g>
+        <g
+           id="g26"
+           transform="scale(1,-1)">
+          <path
+             d="m 54.574,-47.375 -3.742,7.27"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path28" />
+        </g>
+        <g
+           id="g30"
+           transform="scale(1,-1)">
+          <path
+             d="m 54.648,-47.305 3.743,7.274"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path32" />
+        </g>
+        <g
+           id="g34"
+           transform="scale(1,-1)">
+          <path
+             d="M 61.777,-47.375 54.574,-61.777"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path36" />
+        </g>
+        <g
+           id="g38"
+           transform="scale(1,-1)">
+          <path
+             d="m 54.574,-61.777 -7.199,14.402"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path40" />
+        </g>
+        <g
+           id="g42"
+           transform="scale(1,-1)">
+          <path
+             d="M 47.375,-47.375 40.176,-61.777"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path44" />
+        </g>
+        <g
+           id="g46"
+           transform="scale(1,-1)">
+          <path
+             d="m 40.176,-61.777 -7.199,14.402"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path48" />
+        </g>
+        <g
+           id="g50"
+           transform="scale(1,-1)">
+          <path
+             d="m 61.777,-47.375 7.2,-14.402"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path52" />
+        </g>
+        <g
+           id="g54"
+           transform="scale(1,-1)">
+          <path
+             d="m 68.977,-61.777 3.597,7.203"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path56" />
+        </g>
+        <g
+           id="g58"
+           transform="scale(1,-1)">
+          <path
+             d="M 83.375,-54.574 H 72.574"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.72;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path60" />
+        </g>
+        <g
+           id="g62"
+           transform="scale(1,-1)">
+          <path
+             d="M 18.574,-54.574 H 29.52"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.72;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path64" />
+        </g>
+        <g
+           id="g66"
+           transform="scale(1,-1)">
+          <path
+             d="m 33.047,-47.375 -3.672,-7.199"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path68" />
+        </g>
+        <g
+           id="g70"
+           transform="scale(1,-1)">
+          <path
+             d="m 54.574,-47.375 v 18"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path72" />
+        </g>
+        <g
+           id="g74"
+           transform="scale(1,-1)">
+          <path
+             d="m 104.977,-54.574 h 14.398"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.72;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path76" />
+        </g>
+        <g
+           id="g78"
+           transform="scale(1,-1)">
+          <path
+             d="m 155.375,-54.574 h 14.402"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.72;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path80" />
+        </g>
+        <g
+           id="g82"
+           transform="scale(1,-1)">
+          <path
+             d="m 140.977,-32.977 v 14.403"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.72;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path84" />
+        </g>
+        <g
+           id="g86"
+           transform="scale(1,-1)">
+          <path
+             d="m 119.375,-47.379 h 36 v -14.398 h -36 z"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path88" />
+        </g>
+        <g
+           id="g90"
+           transform="scale(1,-1)">
+          <path
+             d="M 140.977,-32.977 V -47.375"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path92" />
+        </g>
+        <g
+           id="g94"
+           transform="scale(1,-1)">
+          <path
+             d="m 140.977,-47.375 -3.602,7.199"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path96" />
+        </g>
+        <g
+           id="g98"
+           transform="scale(1,-1)">
+          <path
+             d="m 140.977,-47.375 3.597,7.199"
+             stroke="#000000" style="fill:none;stroke:#ffffff;stroke-width:0.36;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path100" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

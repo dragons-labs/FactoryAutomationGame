@@ -1,15 +1,163 @@
 {
+	"factory": {
+		"title": {
+			"en": "Factory Blocks",
+		},
+		"guide": "factory/guide",
+		"subtopics" : {
+			"electronics_control" : {
+				"title": {
+					"en": "Electronics Control",
+				},
+				"guide": "factory/electronics_control/guide",
+			},
+			"computer_control" : {
+				"title": {
+					"en": "Computer Control",
+				},
+				"guide": "factory/computer_control/guide",
+			},
+			"producer" : {
+				"title": {
+					"en": "Producer",
+				},
+				"guide": "factory/producer/guide",
+			},
+			"conveyor_splitter" : {
+				"title": {
+					"en": "Conveyor Splitter",
+				},
+				"guide": "factory/conveyor_splitter/guide",
+			},
+		}
+	},
 	"electronics" : {
 		"title": {
 			"en": "Electronics",
 		},
+		"guide": "electronics/guide",
 		"subtopics" : {
-			"basic" : {
+			"passive_component" : {
 				"title": {
-					"en": "Intro",
+					"en": "Passive Component",
 				},
-				"guide": "electronics/intro/guide",
-				"trivia": "electronics/intro/trivia",
+				"guide": "electronics/passive_component/guide",
+				"trivia": "electronics/passive_component/trivia",
+			},
+			"diode" : {
+				"title": {
+					"en": "Diodes",
+				},
+				"guide": "electronics/diode/guide",
+				"trivia": "electronics/diode/trivia",
+			},
+			"transistors" : {
+				"title": {
+					"en": "Transistors",
+				},
+				"guide": "electronics/transistors/guide",
+				"trivia": "electronics/transistors/trivia",
+			},
+			"digital" : {
+				"title": {
+					"en": "Digital",
+				},
+				"guide": "electronics/digital/guide",
+				"trivia": "electronics/digital/trivia",
+				"subtopics" : {
+					"digital_gates" : {
+						"title": {
+							"en": "Gates",
+						},
+						"guide": "electronics/digital_gates/guide",
+						"trivia": "electronics/digital_gates/trivia",
+					},
+					"registers" : {
+						"title": {
+							"en": "Registers",
+						},
+						"guide": "electronics/registers/guide",
+						"trivia": "electronics/registers/trivia",
+					},
+					"transmission" : {
+						"title": {
+							"en": "Transmission",
+						},
+						"guide": "electronics/transmission/guide",
+						"trivia": "electronics/transmission/trivia",
+					},
+					"programmable" : {
+						"title": {
+							"en": "Programmable",
+						},
+						"guide": "electronics/programmable/guide",
+						"trivia": "electronics/programmable/trivia",
+					},
+				}
+			},
+		}
+	},
+	"programming" : {
+		"title": {
+			"en": "Programming",
+		},
+		"guide": "programming/guide",
+		"subtopics" : {
+			"running_program" : {
+				"title": {
+					"en": "Running program",
+				},
+				"guide": "programming/running_program/guide",
+				"trivia": "programming/running_program/trivia",
+			},
+			"posix_command_line" : {
+				"title": {
+					"en": "Command Line",
+				},
+				"guide": "programming/posix_command_line/guide",
+				"trivia": "programming/posix_command_line/trivia",
+			},
+			"posix_filesystem" : {
+				"title": {
+					"en": "File System",
+				},
+				"guide": "programming/posix_filesystem/guide",
+				"trivia": "programming/posix_filesystem/trivia",
+			},
+			"langs" : {
+				"title": {
+					"en": "Langs",
+				},
+				"subtopics" : {
+					"c" : {
+						"title": {
+							"en": "Basics of C",
+						},
+						"guide": "programming/langs/c/guide",
+						"trivia": "programming/langs/c/trivia",
+					},
+					"sh" : {
+						"title": {
+							"en": "Shell programming",
+						},
+						"guide": "programming/langs/sh/guide",
+						"trivia": "programming/langs/sh/trivia",
+					},
+					"sh_commands" : {
+						"title": {
+							"en": "Shell commands",
+						},
+						"guide": "programming/langs/sh_commands/guide",
+						"trivia": "programming/langs/sh_commands/trivia",
+					},
+					"python" : {
+						"title": {
+							"en": "Basics of Python",
+						},
+						"guide": "programming/langs/python/guide",
+						"trivia": "programming/langs/python/trivia",
+					},
+				}
 			},
 		}
 	},
