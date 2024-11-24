@@ -1,28 +1,55 @@
 {
-  "demo1" : {
+  "painter/painter_slow" : {
     "locked": false,
-    "unlocks": ["demo2"],
+    "unlocks": ["painter/painter_fast"],
+    "name": {
+      "en": "Painting factory",
+      "pl": "Fabryka malująca",
+    },
+    "description": {
+      "en": "Painting factory",
+      "pl": "Fabryka malująca",
+    }
+  },
+  "painter/painter_fast" : {
+    "locked": true,
+    "unlocks": ["painter/painter_computer"],
+    "name": {
+      "en": "Fast painting factory",
+      "pl": "Szybka fabryka malująca",
+    },
+    "description": {
+      "en": "Fast painting factory",
+      "pl": "Szybka fabryka malująca",
+    }
+  },
+  "painter/painter_computer" : {
+    "locked": true,
+    "unlocks": ["demo1"],
+    "name": {
+      "en": "Computerized painting factory",
+      "pl": "Skomputeryzowana fabryka malująca",
+    },
+    "description": {
+      "en": "Computerized painting factory",
+      "pl": "Skomputeryzowana fabryka malując",
+    }
+  },
+
+  "demo1" : {
+    "locked": true,
+    "unlocks": [],
     "name": {
       "en": "Demo Level",
       "pl": "Demo fabryki",
     },
     "description": {
-      "en": "Factory Automation Game [b]alpha-1 sample / demo level[/b]
+      "en": "Factory Automation Game [b]alpha-3 sample / demo level[/b]
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent volutpat, massa id interdum placerat, urna sem faucibus neque, sit amet aliquet elit mi in felis. Aenean fermentum tellus mattis aliquam volutpat. Integer justo diam, condimentum at lobortis ac, commodo eget felis.
 
 Nullam molestie tincidunt lectus, a molestie diam imperdiet non. Nunc finibus felis eget consequat tristique. Proin a tincidunt magna. Quisque fermentum eros vel ex ultrices auctor. Mauris et enim pharetra nibh convallis pellentesque sed et felis.",
-      "pl": "Demo wersji alpha-1",
-    }
-  },
-  "demo2" : {
-    "locked": true,
-    "unlocks": [],
-    "name": {
-      "en": "Fake locked level for testing",
-    },
-    "description": {
-      "en": "Nullam molestie tincidunt lectus, a molestie diam imperdiet non. Nunc finibus felis eget consequat tristique. Proin a tincidunt magna. Quisque fermentum eros vel ex ultrices auctor. Mauris et enim pharetra nibh convallis pellentesque sed et felis.",
+      "pl": "Demo wersji alpha-3",
     }
   },
 }

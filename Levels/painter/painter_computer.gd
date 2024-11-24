@@ -5,7 +5,7 @@ extends Node3D
 
 
 ## circuit simulation time and limits parameters
-var circuit_simulation_time_step := "10us"
+var circuit_simulation_time_step := "50us"
 var circuit_simulation_max_time := "600s"
 var circuit_simulation_current_limit := 5
 var circuit_simulation_voltage_limit := 0
@@ -46,13 +46,11 @@ var supported_blocks := [
 	"SimpleFactoryBlock",
 	"ConveyorBelt",
 	"ComputerControlBlock",
-	"ElectronicControlBlock",
 	"Painter",
-	"ConveyorSplitter", "ConveyorFastSplitter", "Welder", "Detector"
+	"ConveyorFastSplitter",
 ]
 var _max_blocks := {
-	"ComputerControlBlock": 3,
-	"ElectronicControlBlock": 1,
+	"ComputerControlBlock": 1,
 }
 func circuit_element_count_updated(component_subtype : String, _component: Node2D, component_subtype_count : int, button : Button) -> bool:
 	return FAG_Utils.check_elements_count_default(component_subtype, component_subtype_count, _max_components, button)
@@ -60,17 +58,25 @@ func circuit_element_count_updated(component_subtype : String, _component: Node2
 ## list of guide topic paths used by this level / unlocked by accessing this level
 ## first element will be used as default guide topic for this level
 var guide_topic_paths := [
-	"electronics/basic",
+    "programming",
+    "programming/running_program",
+    "programming/posix_command_line",
+    "programming/posix_filesystem",
+    "programming/langs/c",
+    "programming/langs/sh",
+    "programming/langs/sh_commands",
+    "programming/langs/python",
+    "electronics/digital/transmission", # TODO should be introduced in separated level
+    "electronics/digital/programmable",
 ]
 
 ## level task info
 var task_info := {
+"pl": """
+Dyrektor produkcji chce abyś przebudował układ fabryki malującej, tak aby wykorzystać najnowsze osiągnięcie techniki - komputer sterujący. Do dzieła!
+""",
 "en" : """
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent volutpat, massa id interdum placerat, urna sem faucibus neque, sit amet aliquet elit mi in felis. Aenean fermentum tellus mattis aliquam volutpat. Integer justo diam, condimentum at lobortis ac, commodo eget felis.
-
-Nullam molestie tincidunt lectus, a molestie diam imperdiet non. Nunc finibus felis eget consequat tristique. Proin a tincidunt magna. Quisque fermentum eros vel ex ultrices auctor. Mauris et enim pharetra nibh convallis pellentesque sed et felis.
-
-Integer ullamcorper maximus faucibus. Fusce cursus, lacus placerat varius lacinia, tortor nisi laoreet odio, et placerat purus est vel lectus. Vestibulum ac tristique sapien. Donec lacus lectus, consequat at justo et, hendrerit lacinia nulla. Aliquam nulla purus, condimentum sit amet rhoncus non, condimentum vitae lectus. In hac habitasse platea dictumst.
+The production director wants you to redesign the paint factory layout to take advantage of the latest technological advancement - the control computer. Get to work!
 """,
 }
 
@@ -113,7 +119,7 @@ func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 	if not from_save:
 		_factory_root.circuit_simulator.restore(
 			FAG_Utils.load_from_json_file(
-				get_script().resource_path.get_base_dir() + "/demo1.circuit"
+				get_script().resource_path.get_base_dir() + "/painter_slow.circuit"
 			)
 		)
 

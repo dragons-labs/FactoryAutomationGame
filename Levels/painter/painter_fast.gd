@@ -5,7 +5,7 @@ extends Node3D
 
 
 ## circuit simulation time and limits parameters
-var circuit_simulation_time_step := "10us"
+var circuit_simulation_time_step := "50us"
 var circuit_simulation_max_time := "600s"
 var circuit_simulation_current_limit := 5
 var circuit_simulation_voltage_limit := 0
@@ -45,13 +45,11 @@ var defualt_computer_system_id = 0
 var supported_blocks := [
 	"SimpleFactoryBlock",
 	"ConveyorBelt",
-	"ComputerControlBlock",
 	"ElectronicControlBlock",
 	"Painter",
-	"ConveyorSplitter", "ConveyorFastSplitter", "Welder", "Detector"
+	"ConveyorFastSplitter",
 ]
 var _max_blocks := {
-	"ComputerControlBlock": 3,
 	"ElectronicControlBlock": 1,
 }
 func circuit_element_count_updated(component_subtype : String, _component: Node2D, component_subtype_count : int, button : Button) -> bool:
@@ -60,17 +58,23 @@ func circuit_element_count_updated(component_subtype : String, _component: Node2
 ## list of guide topic paths used by this level / unlocked by accessing this level
 ## first element will be used as default guide topic for this level
 var guide_topic_paths := [
-	"electronics/basic",
+    "electronics/digital/registers",
+    "electronics/digital/digital_gates", # TODO should be introduced in separated level
+    "electronics/diode", # TODO should be introduced in separated level
+    "electronics/transistors", # TODO should be introduced in separated level
 ]
 
 ## level task info
 var task_info := {
+"pl": """
+Inżynierowie opracowali nowy rodzaj bloku - przekierowanie taśmociągu, który pozwala na kierowanie produktu znajdującego się na taśmociągu w jednym z 3 kierunków. Spróbój wykorzystać go do zwiększenia wydajności fabryki malującej produkty.
+
+Twój cel: 5 pomalowanych produktów w mniej niż 11 sekund.
+""",
 "en" : """
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent volutpat, massa id interdum placerat, urna sem faucibus neque, sit amet aliquet elit mi in felis. Aenean fermentum tellus mattis aliquam volutpat. Integer justo diam, condimentum at lobortis ac, commodo eget felis.
+Engineers have developed a new type of block - conveyor belt redirection, which allows you to direct a product on the conveyor belt in one of 3 directions. Try to use it to increase the efficiency of a factory painting products.
 
-Nullam molestie tincidunt lectus, a molestie diam imperdiet non. Nunc finibus felis eget consequat tristique. Proin a tincidunt magna. Quisque fermentum eros vel ex ultrices auctor. Mauris et enim pharetra nibh convallis pellentesque sed et felis.
-
-Integer ullamcorper maximus faucibus. Fusce cursus, lacus placerat varius lacinia, tortor nisi laoreet odio, et placerat purus est vel lectus. Vestibulum ac tristique sapien. Donec lacus lectus, consequat at justo et, hendrerit lacinia nulla. Aliquam nulla purus, condimentum sit amet rhoncus non, condimentum vitae lectus. In hac habitasse platea dictumst.
+Your goal: 5 painted products in less than 11 seconds.
 """,
 }
 
@@ -95,6 +99,7 @@ func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 		# (global level) outputs to control blocks
 		{
 			"Vcc" : ["Vcc", "Vcc", "dc 3.3"],
+			"PowerOnReset" : ["PowerOnReset", "V_PowerOnReset", "0 PULSE(3.3V 0 100ms)"],
 		},
 		# (global level) input from control blocks
 		{},
@@ -113,7 +118,7 @@ func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 	if not from_save:
 		_factory_root.circuit_simulator.restore(
 			FAG_Utils.load_from_json_file(
-				get_script().resource_path.get_base_dir() + "/demo1.circuit"
+				get_script().resource_path.get_base_dir() + "/painter_slow.circuit"
 			)
 		)
 
@@ -139,6 +144,13 @@ var _valid_product_counter = 0
 func _on_factory_start() -> void:
 	_valid_product_counter = 0
 	print("START")
+	_factory_root.create_timer(11).timeout.connect(_on_timer_timeout)
 
 func _on_factory_stop() -> void:
 	print("STOP")
+
+func _on_timer_timeout(_val : float) -> void:
+	_factory_root.emergency_stop(
+		"FACTORY_PRODUCT_FAILURE_TITLE",
+		"FACTORY_PRODUCT_TIMEOUT_TEXT"
+	)

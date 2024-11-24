@@ -22,7 +22,9 @@ var _name_prefix := ""
 func _ready():
 	body_entered.connect(_on_object_enter_block)
 	body_exited.connect(_on_object_exit_block)
-	_factory_root.factory_start.connect(_on_factory_start)
+	_factory_root.factory_start.connect(_on_factory_start_stop)
+	_factory_root.factory_process.connect(_on_factory_process)
+	_factory_root.factory_stop.connect(_on_factory_start_stop)
 	FAG_FactoryBlocksUtils.on_block_transform_updated(self)
 	
 	_name_prefix = get_parent().get_meta("in_game_name", "")
@@ -30,7 +32,10 @@ func _ready():
 	if _name_prefix:
 		_name_prefix += "_"
 
-func _on_factory_start() -> void:
+func _on_factory_start_stop() -> void:
+	if not is_inside_tree():
+		return
+	
 	_object = null
 	
 	_waiting_object = null
@@ -56,7 +61,7 @@ func transfer_object_to_factory_block(node : RigidBody3D):
 	_new_accepted_object = true
 	_factory_root.set_signal_value(_name_prefix + "splitter_object_inside", 3.3)
 
-func _process(_delta : float):
+func _on_factory_process(_time : float, _delta_time : float):
 	if _new_accepted_object:
 		var direction = 0
 		if _factory_root.get_signal_value(_name_prefix + "splitter_redirect_forward") > 2:
@@ -82,6 +87,7 @@ func _on_object_exit_block(node : Node3D) -> void:
 		return
 	
 	print(_object, " splitter exit")
+	_factory_root.set_signal_value(_name_prefix + "splitter_object_inside", 0)
 	
 	# transfer object to next conveyor
 	FAG_FactoryBlocksUtils.on_object_leave_block(_object, self)

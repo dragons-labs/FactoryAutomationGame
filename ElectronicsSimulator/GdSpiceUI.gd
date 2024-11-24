@@ -6,21 +6,21 @@ extends GdSpice
 
 ### netlists and measurer list preparation
 
-var measurers := {}
+var measurements := {}
 var fuses := []
 var used_nets := []
 var floating_nets := []
 enum Errors {NO_GND, NOT_ACCESSIBLE_NETS}
 
 func reset():
-	measurers.clear()
+	measurements.clear()
 	fuses.clear()
 	used_nets.clear()
 	floating_nets.clear()
 	
 	for base_element in oscilloscopes:
 		base_element.get_node("Label").text = ""
-		oscilloscopes[base_element][0].get_parent().get_parent().queue_free()
+		oscilloscopes[base_element][0].get_parent().queue_free()
 	oscilloscopes.clear()
 	_last_oscilloscope = null
 	_last_on_process_time = -1
@@ -109,7 +109,7 @@ func get_ngspice_netlist(
 			if "circuit" in entry:
 				circuit.append_array(entry.circuit)
 			if "meters" in entry:
-				measurers[base_element] = entry.meters[0]
+				measurements[base_element] = entry.meters[0]
 			if "fuses" in entry:
 				fuses.append_array(entry.fuses)
 			if "not_connected" in entry: # TODO use settings to enable / disable this feature
@@ -158,17 +158,17 @@ var oscilloscopes = {}
 var _oscilloscope_id = 0
 var _last_oscilloscope = null
 
-func _create_graph_function(win : Window, win_chart : Chart, base_element : Grid2D_BaseElement) -> Function:
+func _create_graph_function(win : Window, base_element : Grid2D_BaseElement) -> Function:
 	var value = [0]
 	var time = [0]
 	if get_simulation_state() in [GdSpice.RUNNING, GdSpice.PAUSED]:
-		var data = get_latest_timed_values([measurers[base_element]], _chart_properties.max_samples, 0.01666)
+		var data = get_latest_timed_values([measurements[base_element]], _chart_properties.max_samples, 0.01666)
 		time = data[0]
 		value = data[1]
 		# var index = get_last_index()
 		# var data_step = 1666 # = (1s/60) / 10us number of simulation step in single game frame
 		# time = get_values("time", _chart_properties.max_samples, data_step, index)
-		# value = get_values(measurers[base_element], _chart_properties.max_samples, data_step, index)
+		# value = get_values(measurements[base_element], _chart_properties.max_samples, data_step, index)
 	
 	var title
 	if base_element.subtype == "Ammeter":
@@ -189,14 +189,14 @@ func _create_graph_function(win : Window, win_chart : Chart, base_element : Grid
 			point_size = 2.0
 		}
 	)
-	win_chart_func.set_meta("vector", measurers[base_element])
+	win_chart_func.set_meta("vector", measurements[base_element])
 	if base_element.subtype == "Ammeter":
 		win_chart_func.set_meta("ammeter", "mA")
 	base_element.get_node("Label").text = "#%d" % _oscilloscope_id
 	base_element.get_node("Label").add_theme_color_override("font_color", color)
 	_oscilloscope_id+=1
 	
-	oscilloscopes[base_element] = [win_chart, win_chart_func]
+	oscilloscopes[base_element] = [win, win_chart_func]
 	var base_elements = win.get_meta("base_elements", [])
 	base_elements.append(base_element)
 	win.set_meta("base_elements", base_elements)
@@ -204,7 +204,7 @@ func _create_graph_function(win : Window, win_chart : Chart, base_element : Grid
 	return win_chart_func
 
 func create_oscilloscope(base_element : Grid2D_BaseElement):
-	if not base_element in measurers:
+	if not base_element in measurements:
 		return
 	
 	var win := _chart_window_packed_scene.instantiate()
@@ -222,24 +222,24 @@ func create_oscilloscope(base_element : Grid2D_BaseElement):
 	if not oscilloscopes:
 		_oscilloscope_id = 0
 	
-	var win_chart_func = _create_graph_function(win, win_chart, base_element)
+	var win_chart_func = _create_graph_function(win, base_element)
 	win_chart.plot([win_chart_func] as Array[Function], _chart_properties)
 	
 	return win
 
 func add_graph_to_oscilloscope(win : Window, base_element : Grid2D_BaseElement):
-	if not base_element in measurers:
+	if not base_element in measurements:
 		return
 	
 	var win_chart = win.get_node("%Chart")
-	var win_chart_func := _create_graph_function(win, win_chart, base_element)
+	var win_chart_func := _create_graph_function(win, base_element)
 	
 	var func_arr : Array[Function] = win_chart.functions
 	func_arr.append(win_chart_func)
 	win_chart.plot(func_arr, _chart_properties)
 	# some tricks to fix after reusing plot()
 	win_chart._draw()
-	await get_tree().create_timer(0.02, true, false, true).timeout
+	await get_tree().process_frame
 	win_chart._canvas._legend.hide()
 	win_chart._canvas._legend.show()
 
@@ -254,32 +254,37 @@ func _on_win_close(win : Window):
 
 func on_measurer_click(base_element : Grid2D_BaseElement):
 	if base_element in oscilloscopes:
-		oscilloscopes[base_element][0].get_parent().get_parent().grab_focus()
+		oscilloscopes[base_element][0].get_parent().grab_focus()
 	elif _last_oscilloscope and not Input.is_key_pressed(KEY_SHIFT):
 		add_graph_to_oscilloscope(_last_oscilloscope, base_element)
-		oscilloscopes[base_element][0].get_parent().get_parent().grab_focus()
+		oscilloscopes[base_element][0].get_parent().grab_focus()
 	else:
 		_last_oscilloscope = create_oscilloscope(base_element)
 
 
-### update oscilloscopes and measurers
+### update oscilloscopes and measurements
 
 var _last_on_process_time = -1
 
-func update_measurers():
-	if measurers and get_simulation_state() == GdSpice.RUNNING:
+func update_measurements():
+	if measurements and get_simulation_state() == GdSpice.RUNNING:
 		var time = get_time_simulation()
 		if time == _last_on_process_time:
 			return
 		_last_on_process_time = time
-		for base_element in measurers:
-			var value = get_last_value(measurers[base_element])
+		for base_element in measurements:
+			var value = get_last_value(measurements[base_element])
 			if base_element.subtype == "Ammeter":
 				value *= 1000
 			base_element.get_node("Value").text = str(value)
 			if base_element in oscilloscopes and not oscilloscopes[base_element][0].get_node("%ManualTimeEnabledButton").button_pressed:
-				oscilloscopes[base_element][1].add_point(time, value)
-				oscilloscopes[base_element][0].queue_redraw()
+				if oscilloscopes[base_element][0].skip:
+					oscilloscopes[base_element][0].skip = false
+				else:
+					# TODO add all new values (not just the last one) to avoid loss of resolution and weird x-axis scale 
+					# TODO / BUG fix drawing constant zero value graphs
+					oscilloscopes[base_element][1].add_point(time, value)
+					oscilloscopes[base_element][0].chart.queue_redraw()
 
 func _on_chart_time_range_changed(win : Window, win_chart : Chart):
 	var start_time = win.get_node("%StartTime/Slider").value

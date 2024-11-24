@@ -24,10 +24,11 @@ PACKAGES="$PACKAGES zsh"
 PACKAGES="$PACKAGES tcc libc6-dev"
 
 # man (~ 15 MB)
-PACKAGES="$PACKAGES man-db manpages manpages-dev" #
+PACKAGES="$PACKAGES man-db manpages manpages-dev"
 
-# Python  (~23 MB)
-PACKAGES="$PACKAGES python3-minimal"
+# Python
+#PACKAGES="$PACKAGES python3-minimal" # (~23 MB)
+PACKAGES="$PACKAGES python3"
 
 # C/C++ compilers (GNU) (~243 MB)
 PACKAGES="$PACKAGES gcc g++"
@@ -64,7 +65,7 @@ TMP_DIR="/dev/shm"
 BASE_DIR=$(realpath $(dirname "$0"))
 
 
-if $MINIMAL_SYSTEM; then
+if eval $MINIMAL_SYSTEM; then
 	#
 	# remove packages included in PACKAGES from DEBIAN_TEMPORARY*
 	#
@@ -135,7 +136,7 @@ mmdebstrap \
 	$MINIMAL_SYSTEM_MMDEBSTRAP_OPTIONS_1 \
 	--include="$BASE_DIR/bin/busybox_1.36.1-6_amd64.deb" \
 	--include="$DEBIAN_TEMPORARY1 $DEBIAN_TEMPORARY2 $PACKAGES" \
-	--setup-hook='dpkg --root="$1" --log="$1/var/log/dpkg.log" --install `ls '"$TMP_DIR"'/busybox-*.deb`' \
+	--setup-hook='if ls '"$TMP_DIR"'/busybox-*.deb; then dpkg --root="$1" --log="$1/var/log/dpkg.log" --install `ls '"$TMP_DIR"'/busybox-*.deb`; fi' \
 	--extract-hook='
 		# busybox
 		if [ -x "$1/bin/busybox" ]; then
@@ -297,6 +298,8 @@ done
 g++ "$BASE_DIR/computer_system_controller.cpp" -I/usr/include/fuse3 -lfuse3 -o "${INSTALL_PATH}/usr/local/sbin/computer_system_controller"
 chmod a+x,a-w "${INSTALL_PATH}/usr/local/sbin/computer_system_controller"
 mkdir -p "${INSTALL_PATH}/dev/factory_control"
+
+cp "$BASE_DIR/factory_control.py" "${INSTALL_PATH}/usr/local/lib/python3.11/dist-packages/"
 
 
 #

@@ -29,8 +29,9 @@
 # 		→ a2
 #  - `__` is used for underline (not for strong), single `_` is not markup character
 #  - formatting via * ~ and _ ignore left/right-flanking delimiter run
-#  - code blocks may use [lang] at begin to set code highlight in specific lang: `[python]x = 2**3`
-#     - so content of square bracket opened at the very beginning of code block will be ignored in output code → add lang id, empty `[]` or space if code start with `[`
+#  - inline single ` code blocks (not inline ```) may use [lang] at begin to set code highlight in specific lang: `[python]x = 2**3`
+#     - so content of square bracket opened at the very beginning of code block will be ignored in output code → use triple ` variant or add lang id, empty `[]` or space if code start with `[` 
+#  - first line of multiline ``` code blocks (text between ``` and \n) is used as lang id, it may be or may be not enclosed in []
 #  - quotes, link, images and tables syntax are not supported → use Godot BBCode syntax
 
 import sys
@@ -91,6 +92,7 @@ def process_line(line, comment_is_open = False):
 	code_level, opened_code_level = 0, 0
 	format_chars_positions = []
 	line_splited = []
+	code_mode = []
 	start_in_comment = comment_is_open
 	for i in range(len(line)):
 		# block split into code in comment mode → comment will be single text part and will be removed in copy_plain_text
@@ -110,6 +112,7 @@ def process_line(line, comment_is_open = False):
 					code = False
 					line_splited.append( copy_plain_text(line, text_start, text_end-code_level, format_chars_positions, start_in_comment, comment_is_open) )
 					line_splited.append( line[part_start:i-code_level] )
+					code_mode.append(code_level-1)
 					# start new part
 					start_in_comment = comment_is_open
 					part_start = i
@@ -163,7 +166,6 @@ def process_line(line, comment_is_open = False):
 	# fix opening/closing order for [i] / [b]
 	text = text.split("\x0f")
 	b_open, i_open, b_close, i_close = -15, -15, -15, -15,
-	open_can_be_switch, close_can_be_switch = False, False
 	for i in range(len(text)):
 		if text[i] == "[b]":
 			b_open = i
@@ -176,10 +178,16 @@ def process_line(line, comment_is_open = False):
 		
 		if b_close > 0 and i_close > 0:
 			fix = 0
-			if (b_open > i_open and b_close > i_close):
-				fix = 1 if text[i_open+1] == "" else 2
-			elif (b_open < i_open and b_close < i_close):
-				fix = 1 if text[b_open+1] == "" else 2
+			if (b_open > i_open and b_close > i_close and i_close > b_open): # [i]_empty→fix=1_[b][/i]_empty→fix=2_[/b]
+				if text[i_open+1] == "":
+					fix = 1
+				elif text[i_close+1] == "":
+					fix = 2
+			elif (b_open < i_open and b_close < i_close and b_close > i_open): # [b]_empty→fix=1_[i][/b]_empty→fix=2_[/i]
+				if text[b_open+1] == "":
+					fix = 1
+				elif text[b_close+1] == "":
+					fix = 2
 			
 			if fix == 1:
 				text[i_open], text[b_open] = text[b_open], text[i_open]
@@ -189,7 +197,7 @@ def process_line(line, comment_is_open = False):
 				i_close, b_close = b_close, i_close
 	
 	# re-join text ... this (split/join) also remove non escape mark ("\x0f")
-	text = "".join(text)
+	text = "".join(text).replace('\\\\', '\\')
 	
 	# split line text into parts again (separated by code fragments)
 	text = text.split("\x03")
@@ -202,13 +210,13 @@ def process_line(line, comment_is_open = False):
 		output += text[part_index]
 		code_part_index = 2*part_index+1
 		if code_part_index < len(line_splited):
-			output += code_higlight(line_splited[code_part_index])
+			output += code_higlight(line_splited[code_part_index].replace('\\\\', '\\'), code_mode[part_index])
 	
 	return output, comment_is_open
 
 
 code_block_re = re.compile('^(\s*)```([^`]*)$')
-first_world_format = re.compile('(\s*)(\\*|-|–|→|\\+|\\.|_|[0-9]+\\.|#{1,6})(\s*)(.*)$')
+first_world_format = re.compile('(\s*)(\\*|-|–|→|\\+|\\.|_|[0-9]+\\.|#{1,6})(\s+)(.*)$')
 header = re.compile('^(---|===)')
 
 def process_lines(lines):
@@ -239,7 +247,7 @@ def process_lines(lines):
 						hold_list_indent = True
 						output += "[ul bullet=]"
 					# put code to output
-					output += code_higlight(code_block)
+					output += code_higlight(code_block, 3)
 					code_block = None
 				else:
 					code_block += line
@@ -332,20 +340,34 @@ def process_lines(lines):
 	
 	return output
 
-def code_higlight(text):
-	if text[-1] == "\n":
-		text = text[:-1]
-	if text[0] == '[':
-		opt_end = text.find(']')
-		opt = text[1:opt_end]
-		opt_end += 1
-		if text[opt_end] == '\n':
-			opt_end += 1
-		text = text[opt_end:]
-		text = highlight(text, get_lexer_by_name(opt), BBCodeGodotFormatter(style='github-dark'))
-	elif text[0] == '\n':
-		text = text[1:]
-	return "[code]" + text + "[/code]"
+def code_higlight(text, mode):
+	# mode: 0 → inline `, 2 → inline ```, 3 → multiline ```
+	try:
+		if text[-1] == "\n":
+			text = text[:-1]
+		
+		lexer_name = ""
+		if mode != 2 and text[0] == '[':
+			lexer_end = text.find(']')
+			lexer_name = text[1:lexer_end]
+			lexer_end += 1
+			if text[lexer_end] == '\n':
+				lexer_end += 1
+			text = text[lexer_end:]
+		elif mode == 3:
+			lexer_end = text.find('\n')
+			lexer_name = text[0:lexer_end]
+			text = text[lexer_end:]
+		
+		if lexer_name:
+			text = highlight(text, get_lexer_by_name(lexer_name), BBCodeGodotFormatter(style='github-dark'))
+		else:
+			text = "[color=#8b949e]" + text.replace('[', '[lb]') + "[/color]"
+		
+		return "[code]" + text + "[/code]"
+	except Exception as err:
+		print("Error in code_higlight for: »", text, "« mode=", mode, sep="", file=sys.stderr)
+		raise err
 
 def make_head(line, head_level, postfix=""):
 	if line[-1] == '\n':

@@ -7,13 +7,14 @@ const MANUALS_BBCODE_DIR := "res://Manual/generated-bbcode/"
 const MANUALS_CONTENTS_FILE := "res://Manual/Pages/contents.json"
 
 func show_info(object : Object, progress_save_path : String) -> void:
+	_tab_container.get_current_tab_control().get_node("RichTextLabel").text = tr("MANUAL_SELECT_TOPIC")
 	if object:
 		if _task_info_node.get_parent() != _tab_container:
 			_task_info_node.get_parent().remove_child(_task_info_node)
 			_tab_container.add_child(_task_info_node)
 			_tab_container.move_child(_task_info_node, 0)
 		_task_info_node.get_child(0).text = FAG_Utils.get_locale_version(object.task_info)
-		_update_tree(object.guide_topic_path, progress_save_path)
+		_update_tree(object.guide_topic_paths[0], progress_save_path)
 		_task_info_node.show()
 	else:
 		if _task_info_node.get_parent() == _tab_container:
@@ -112,11 +113,13 @@ func _on_tree_item_selected() -> void:
 		if file: 
 			text = file.get_as_text()
 	
+	var richTextLabel = tab.get_node("RichTextLabel")
 	if text:
 		_add_to_history(item, tab)
-		tab.get_node("RichTextLabel").text = text
+		richTextLabel.text = text
 	else:
-		tab.get_node("RichTextLabel").text = tr("MANUAL_NOTHING_TO_SHOW")
+		richTextLabel.text = tr("MANUAL_NOTHING_TO_SHOW")
+	richTextLabel.scroll_to_line(0)
 
 
 ## keep common tree for multiple tabs
@@ -194,6 +197,8 @@ func _ready() -> void:
 	FAG_WindowManager.init_window(self)
 	close_requested.connect(_on_close_requested)
 	_tab_container.tab_changed.connect(_on_tab_changed)
+	_guide_info_node.get_node("RichTextLabel").text = tr("MANUAL_SELECT_TOPIC")
+	_trivia_info_node.get_node("RichTextLabel").text = tr("MANUAL_SELECT_TOPIC")
 	_on_tab_changed()
 
 func _on_close_requested() -> void:

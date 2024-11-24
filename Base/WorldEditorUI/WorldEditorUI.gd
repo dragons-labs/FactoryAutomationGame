@@ -203,6 +203,7 @@ func reset_editor() -> void:
 
 func set_editor_enabled(value : bool) -> void:
 	_editor_enabled = value
+	clear_selection()
 	if not _editor_enabled:
 		reset_editor()
 	%UI.visible = _editor_enabled
@@ -348,14 +349,15 @@ func _unhandled_input(event: InputEvent) -> void:
 				else:
 					clear_selection()
 					_raycast_result = do_raycast.call(point)
-					if _raycast_result:
-						if _active_ui_tool == SELECT:
-							_set_move_mode()
-						elif _active_ui_tool == SCALE:
-							_active_ui_tool = SCALE_IN_PROGRESS
-						do_on_raycast_result.emit(_active_ui_tool, point, _raycast_result)
-					elif selection_box_enabled:
-						_selection_box.init(point)
+					if _editor_enabled:
+						if _raycast_result:
+							if _active_ui_tool == SELECT:
+								_set_move_mode()
+							elif _active_ui_tool == SCALE:
+								_active_ui_tool = SCALE_IN_PROGRESS
+							do_on_raycast_result.emit(_active_ui_tool, point, _raycast_result)
+						elif selection_box_enabled:
+							_selection_box.init(point)
 			else: # mouse button released
 				if _active_ui_tool == MOVE or _active_ui_tool == SELECT_LONG:
 					do_move_finish.emit()
@@ -384,7 +386,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _set_move_mode(immediately := false):
 	if not immediately:
-		await get_tree().create_timer(0.13, true, false, true).timeout
+		await FAG_Utils.real_time_wait(0.13)
 	# 1. timers are "processed after all of the nodes in the current frame"
 	# 2. _unhandled_input is processed before at begin of nodes processing
 	# so it should not be a race condition between this code and "mouse button released"

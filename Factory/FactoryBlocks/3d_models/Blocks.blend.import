@@ -60,6 +60,15 @@ _subresources={
 "save_to_file/enabled": true,
 "save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/ConveyorBelt.tres"
 },
+"Blocks_ConveyorBelt_simple": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"lods/normal_split_angle": 25.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/ConveyorBeltSimple.tres"
+},
 "Blocks_ConveyorSplitter": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
@@ -68,6 +77,15 @@ _subresources={
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
 "save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/ConveyorSplitter.tres"
+},
+"Blocks_ConveyorSplitterFast": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"lods/normal_split_angle": 25.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/ConveyorSplitterFast.tres"
 },
 "Blocks_Detector": {
 "generate/lightmap_uv": 0,
@@ -107,11 +125,6 @@ _subresources={
 }
 }
 }
-fbx/importer=0
-fbx/allow_geometry_helper_nodes=false
-fbx/embedded_image_handling=1
-gltf/naming_version=1
-gltf/embedded_image_handling=1
 blender/nodes/visible=0
 blender/nodes/active_collection_only=false
 blender/nodes/punctual_lights=true

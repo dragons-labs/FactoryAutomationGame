@@ -12,7 +12,7 @@ Stworzony układ powinien zawierać elementy typu „Net Connector”, które re
 Połączenia reprezentują sygnały trzech typów:
 
 * Napięcia zasilające, takie jak: Vcc, 5V, GND (masa posiada tez własny symbol połączenia: ⏚)
-* Sygnały wejściowe (oznaczane jako ```[in]```) dostarczają informacje o stanie fabryki do układu elektroniczego. Nie należy łączyć ich ze sobą lub z liniami zasilania.
-* Sygnały wyjściowe (oznaczane jako ```[out]```) dostarczają służą do kontrolowania elementów fabryki poprzez podanie na nie odpowiedniej wartości napięcia.
+* Sygnały wejściowe (oznaczane jako ```@in```) dostarczają informacje o stanie fabryki do układu elektroniczego. Posiadają one niską impedancję (rzędu miliomów). Nie należy łączyć ich ze sobą lub z liniami zasilania.
+* Sygnały wyjściowe (oznaczane jako ```@out```) dostarczają służą do kontrolowania elementów fabryki poprzez podanie na nie odpowiedniej wartości napięcia. Posiadają one wysoką impedancję (rzędu gigaomów). 
 
 Nazwy sygnałów wejściowych i wyjściowych są poprzedzone nazwą bloczka z którego pochodzą (jeżeli jest ona niepusta).

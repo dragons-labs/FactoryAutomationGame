@@ -35,8 +35,8 @@ const object_subtype := \"Detector\"
 const factory_signals = [
 	# block outputs (to control system)
 	{
-		\"detector_pulse\"   : [\"detector_pulse[in]\", \"v_detector_pulse\"],
-		\"detector_object_inside\"   : [\"detector_object_inside[in]\", \"v_object_inside\"],
+		\"detector_pulse\"   : [\"detector_pulse@in\", \"v_detector_pulse\"],
+		\"detector_object_inside\"   : [\"detector_object_inside@in\", \"v_object_inside\"],
 	},
 	# block inputs (from control system)
 	{},

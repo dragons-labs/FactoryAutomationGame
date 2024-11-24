@@ -35,12 +35,12 @@ const object_subtype := \"ProducerBlock\"
 const factory_signals = [
 	# block outputs (to control system)
 	{
-		\"producer_object_ready\"   : [\"producer_object_ready_[in]\", \"v_producer_object_ready\"],
+		\"producer_object_ready\"   : [\"producer_object_ready_@in\", \"v_producer_object_ready\"],
 	},
 	# block inputs (from control system)
 	{
-		\"producer_control_enabled\" : [\"producer_control_enabled_[out]\"],
-		\"producer_release_object\" : [\"producer_release_object_[out]\"],
+		\"producer_control_enabled\" : [\"producer_control_enabled_@out\"],
+		\"producer_release_object\" : [\"producer_release_object_@out\"],
 	},
 	# extra circuit elements for this block
 	[]
@@ -66,10 +66,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
 mesh = ExtResource("3_8nnfk")
 skeleton = NodePath("")
 
-[node name="Timer" type="Timer" parent="."]
-
 [node name="Label3D" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.652998, 0)
 billboard = 1
-
-[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

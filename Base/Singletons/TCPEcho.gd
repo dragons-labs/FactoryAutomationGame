@@ -23,7 +23,10 @@ var _clients : Array[StreamPeerTCP]
 
 # TODO move this to C++ to run as separated thread with `while (true) {...; sleep(1ms);}` to decrease ping value
 
-func _process(_delta: float) -> void:
+func _ready() -> void:
+	process_physics_priority = -10
+
+func _physics_process(_delta: float) -> void:
 	if _server.is_connection_available():
 		var client = _server.take_connection()
 		_clients.append(client)

@@ -19,6 +19,8 @@ func _ready():
 		_name_prefix += "_"
 
 func _on_factory_start() -> void:
+	if not is_inside_tree():
+		return
 	_object = null
 	_factory_root.set_signal_value(_name_prefix + "detector_object_inside", 0)
 	_factory_root.set_signal_value(_name_prefix + "detector_pulse", 0)
@@ -28,7 +30,7 @@ func _on_object_enter_block(node : Node3D) -> void:
 		_object = node
 		_factory_root.set_signal_value(_name_prefix + "detector_object_inside", 3.3)
 		_factory_root.set_signal_value(_name_prefix + "detector_pulse", 3.3)
-		await get_tree().create_timer(0.1, false).timeout
+		await _factory_root.create_timer(0.1).timeout
 		_factory_root.set_signal_value(_name_prefix + "detector_pulse", 0)
 
 func _on_object_exit_block(node : Node3D) -> void:

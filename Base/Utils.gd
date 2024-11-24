@@ -179,3 +179,9 @@ static func check_elements_count_default(element_type : String, element_type_cou
 		else:
 			button.disabled = false
 	return editor_need_reset
+
+static func real_time_wait(time : float, parent : Node = null) -> void:
+	if parent:
+		await parent.get_tree().create_timer(time, true, false, true).timeout
+	else:
+		await Engine.get_main_loop().create_timer(time, true, false, true).timeout

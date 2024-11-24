@@ -14,7 +14,7 @@ The created circuit should include elements like "Net Connector," which represen
 Connections represent three types of signals:
 
 * Power supply voltages, such as Vcc, 5V, GND (ground also has its own connection symbol: ⏚)
-* Input signals (marked as ```[in]```) provide information about the factory's state to the electronic circuit. They should not be connected to each other or to power lines.
-* Output signals (marked as ```[out]```) are used to control factory elements by providing the appropriate voltage value.
+* Input signals (marked as ```@in```) provide information about the factory's state to the electronic circuit. They are low impedance (in the miliohms). They should not be connected to each other or to power lines.
+* Output signals (marked as ```@out```) are used to control factory elements by providing the appropriate voltage value. They are high impedance (in the gigaohms).
 
 The names of input and output signals are prefixed with the block name from which they originate (if it's not empty).

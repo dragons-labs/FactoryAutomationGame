@@ -227,7 +227,6 @@ func _on_action_remap_finish(event : Variant) -> void:
 	ui_setting_info_widget.hide()
 
 func _on_setting_value_changed(value : Variant, group_name : String, setting_name : String) -> void:
-	print("XXX", value, setting_name, _all_settings[group_name].objects)
 	if not group_name in _custom_values:
 		_custom_values[group_name] = {}
 	_custom_values[group_name][setting_name] = value

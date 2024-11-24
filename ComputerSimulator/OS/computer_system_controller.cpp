@@ -23,6 +23,7 @@
 std::atomic_int ping_timer = 0;
 std::map<std::string, std::string> input_values;
 std::map<std::string, std::string> output_values;
+std::string time_value = "-2";
 
 std::condition_variable ready;
 bool configured = false;
@@ -57,6 +58,8 @@ void execute_command(const std::string& data) {
 			system("sync");
 		} else if (command == "terminal_size_changed") {
 			system(("stty -F /dev/ttyS0 rows " + args_vector[0] + " cols " + args_vector[1]).c_str());
+		} else if (command == "time") {
+			time_value = args_vector[0];
 		} else if (command == "set_input_value") {
 			input_values[args_vector[0]] = args_vector[1];
 		} else if (command == "input_names") {
@@ -232,6 +235,13 @@ static int ctrl_fs_getattr(const char *path, struct stat *buf, struct fuse_file_
 		return 0;
 	}
 	
+	if (path2 == "/time") {
+		buf->st_mode = S_IFREG | 0444;
+		buf->st_nlink = 1;
+		buf->st_size = time_value.length();
+		return 0;
+	}
+	
 	int mode;
 	auto file_content = get_file_data(path2, mode);
 	if (mode) {
@@ -250,6 +260,7 @@ static int ctrl_fs_readdir(const char* path, void* buf, fuse_fill_dir_t entry_ad
 	if (dir_path == "/") {
 		entry_add(buf, "inputs", NULL, 0, DIR_DEFAULT_FLAGS);
 		entry_add(buf, "outputs", NULL, 0, DIR_DEFAULT_FLAGS);
+		entry_add(buf, "time", NULL, 0, DIR_DEFAULT_FLAGS);
 	} else if (dir_path == "/inputs") {
 		for (auto& file : input_values) {
 			entry_add(buf, file.first.c_str(), NULL, 0, DIR_DEFAULT_FLAGS);
@@ -268,7 +279,15 @@ static int ctrl_fs_readdir(const char* path, void* buf, fuse_fill_dir_t entry_ad
 	return 0;
 }
 
-static int ctrl_fs_read(const char *file_path, char *buf, size_t size, off_t offset, struct fuse_file_info*) {
+static int ctrl_fs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info*) {
+	std::string file_path(path);
+	
+	if (file_path == "/time") {
+		size = time_value.length() - offset;
+		memcpy(buf, time_value.c_str() + offset, size);
+		return size;
+	}
+	
 	int mode;
 	auto file_content = get_file_data(file_path, mode);
 	if (mode) {

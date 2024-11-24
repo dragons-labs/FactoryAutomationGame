@@ -4,6 +4,7 @@ MANUAL_TASK_GUIDE_TITLE,Guide
 MANUAL_TASK_TRIVIA_TITLE,Triva
 MANUAL_EXTERNAL_TITLE,External
 MANUAL_NOTHING_TO_SHOW,"Nothing to show here. Try switch guide↔trivia or select another topic"
+MANUAL_SELECT_TOPIC,"Use menu on left to select topic"
 
 BUTTON_GO_BACK,←
 BUTTON_GO_BACK_TOOLTIP,previous page

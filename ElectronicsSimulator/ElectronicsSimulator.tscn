@@ -28,5 +28,4 @@ elements = Array[PackedScene]([ExtResource("3_d4gdo"), ExtResource("4_x8v0y"), E
 [node name="GdSpice+UI" type="GdSpice" parent="."]
 verbose = 1
 unique_name_in_owner = true
-process_mode = 1
 script = ExtResource("13_bt7c4")

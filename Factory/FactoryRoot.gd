@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
+
 extends Node
 
 @onready var game_speed := %GameSpeed
@@ -11,6 +12,7 @@ extends Node
 @onready var ui := $FactoryUI
 
 signal factory_start()
+signal factory_process(time : float, delta_time : float)
 signal factory_stop()
 
 var level_scene_node : Node3D
@@ -18,6 +20,50 @@ var level_scene_node : Node3D
 const LEVELS_DIR := "res://Levels/"
 const GAME_PROGRESS_SAVE := "user://game_progress.json"
 const SAVE_INFO_FILE := "/save_info.json"
+
+var _pause_count = 0
+func _physics_process(delta):
+	if not _factory_state & FACTORY_RUNNING or _factory_state & EMERGENCY_STOP:
+		return
+	
+	# if electronic circuit simulation is used then check if it's "on time" ... if it's delayed then pause 3d factory processing
+	if _circuit_simulation_ready_state == READY:
+		if circuit_simulator.try_step(_factory_time):
+			if not _factory_simulation_on_time:
+				_factory_simulation_on_time = true
+				get_tree().paused = _factory_paused
+				prints("unpause after emergency pause", _pause_count, _factory_time, circuit_simulator.gdspice.get_time_game(), circuit_simulator.gdspice.get_time_simulation())
+			_pause_count = 0
+		else:
+			if _factory_simulation_on_time:
+				_factory_simulation_on_time = false
+				get_tree().paused = true
+				prints("emergency pause", _pause_count, _factory_time, circuit_simulator.gdspice.get_time_game(), circuit_simulator.gdspice.get_time_simulation())
+				# TODO show UI special-pause message like "Factory simulation in progress ... please wait."
+			_pause_count += 1
+			if _pause_count % 60 == 0:
+				prints(_pause_count, _factory_time, circuit_simulator.gdspice.get_time_game(), circuit_simulator.gdspice.get_time_simulation())
+			return
+	
+	# do not update time while game is pause
+	# (the previous code must be processed also during pause - for unpausing)
+	if get_tree().paused:
+		return
+	
+	_factory_time = _factory_time + delta
+	# NOTE: delta value is scaled by current Engine.time_scale (set from _factory_speed)
+	#       but it does NOT reflect game pause state
+	
+	circuit_simulator.try_step(_factory_time) # electronic circuit simulation will be processing in background
+	factory_process.emit(_factory_time, delta) # all factory_process signal's observers will be processed before this function exit
+	for element in factory_builder.computer_control_blocks.values():
+		element.get_child(0).time_step(_factory_time) # update factory time in computer simulation (this can cause finished some factory_sleep)
+		# NOTE: updating computer outputs will be done via _physics_process in ComputerSystemSimulator, called before this function (negative process_physics_priority in ComputerSystemSimulator)
+	
+	for i in range(len(_factory_timers)):
+		if _factory_timers[i] and _factory_timers[i].update(delta):
+			_factory_timers[i] = null
+
 
 ### load / save / restore
 
@@ -106,15 +152,16 @@ func load_level(level_id : String, save_dir := "") -> void:
 	
 	# update unlocked manuals ... need be done in load to to ensure correct operation of the manual for this level
 	var game_progress = FAG_Utils.load_from_json_file(GAME_PROGRESS_SAVE)
-	if not level_scene_node.guide_topic_path in game_progress.unlocked_manuals:
-		var guide_topic_path_splited = level_scene_node.guide_topic_path.split("/")
-		var added_path = ""
-		for node_id in guide_topic_path_splited:
-			added_path += node_id
-			if not added_path in game_progress.unlocked_manuals:
-				game_progress.unlocked_manuals.append(added_path)
-			added_path += "/"
-		FAG_Utils.write_to_json_file(GAME_PROGRESS_SAVE, game_progress)
+	for topic_path in level_scene_node.guide_topic_paths:
+		if not topic_path in game_progress.unlocked_manuals:
+			var guide_topic_path_splited = topic_path.split("/")
+			var added_path = ""
+			for node_id in guide_topic_path_splited:
+				added_path += node_id
+				if not added_path in game_progress.unlocked_manuals:
+					game_progress.unlocked_manuals.append(added_path)
+				added_path += "/"
+			FAG_Utils.write_to_json_file(GAME_PROGRESS_SAVE, game_progress)
 	
 	_factory_state = FACTORY_STOP
 	_start_stop_hud_ui()
@@ -140,7 +187,7 @@ func save(save_dir : String) -> void:
 		FAG_Utils.copy_dir_absolute("user://workdir/private_fs", save_dir + "/private_fs")
 		for id in factory_builder.computer_control_blocks:
 			factory_builder.computer_control_blocks[id].get_child(0).send_message_via_msg_bus("request_sync") # TODO request also pause ???
-			await get_tree().create_timer(0.3, true, false, true).timeout  # TODO wait for sync not for timer
+			await FAG_Utils.real_time_wait(0.3)  # TODO wait for sync not for timer
 			DirAccess.copy_absolute("user://workdir/disk_%d.img" % id, save_dir + "/disk_%d.img" % id)
 
 func restore(save_dir : String) -> void:
@@ -151,14 +198,18 @@ func restore(save_dir : String) -> void:
 	circuit_simulator.restore(FAG_Utils.load_from_json_file(save_dir + "/Circuit.json"))
 
 func close() -> void:
+	_factory_timers.clear()
 	await stop_simulations()
 	factory_builder.close()
 	circuit_simulator.close()
 	FAG_TCPEcho.stop()
 	if level_scene_node:
+		_factory_state = FACTORY_STOP | ON_CHANGE
 		remove_child(level_scene_node)
 		level_scene_node.queue_free()
 		level_scene_node = null
+	for node in objects_root.get_children():
+		node.queue_free()
 	_reset_stats()
 
 func stop_simulations() -> void:
@@ -230,6 +281,46 @@ func set_signal_value(signal_name : String, value : float) -> void:
 			computer_system.set_signal_value(signal_name, value)
 
 
+### factory timers
+
+class FactoryTimer:
+	var _period : float
+	var _time_left : float
+	
+	signal timeout(_time_left: float)
+	
+	func _init(time : float, one_shot := true):
+		_time_left = time
+		if one_shot:
+			_period = 0
+		else:
+			_period = time
+	
+	func reset(time : float) -> void:
+		_time_left = time
+		if _period:
+			_period = time
+	
+	func update(delta : float) -> bool:
+		_time_left -= delta
+		if _time_left <= 0:
+			timeout.emit(_time_left)
+			if _period:
+				_time_left += _period
+			else:
+				return true # timer to remove
+		return false # timer to keep
+
+func create_timer(time : float, one_shot := true):
+	var timer = FactoryTimer.new(time, one_shot)
+	for i in range(len(_factory_timers)):
+		if not _factory_timers[i]:
+			_factory_timers[i] = timer
+			return timer
+	_factory_timers.append(timer)
+	return timer
+
+
 ### start / stop / pause / visibility
 
 func run_factory() -> void:
@@ -238,6 +329,10 @@ func run_factory() -> void:
 		return
 	
 	_factory_state = FACTORY_RUNNING | ON_CHANGE
+	_factory_paused = false
+	_factory_time = 0
+	_factory_speed = game_speed.get_value()
+	Engine.call_deferred("set_time_scale", _factory_speed)
 	factory_builder.ui.set_editor_enabled(false)
 	_start_stop_hud_ui()
 	
@@ -264,15 +359,15 @@ func _try_run_factory() -> void:
 	print("_try_run_factory")
 	if _circuit_simulation_ready_state != NOT_READY and _computer_systems_simulation_ready_state != NOT_READY:
 		print(" starting")
-		circuit_simulator.start(
-			_circuit_simulation_ready_state == READY,
-			level_scene_node.circuit_simulation_time_step,
-			level_scene_node.circuit_simulation_max_time
-		)
-		_last_sleep_time = 0
-		game_speed.set_value(_speed_before_stop_pause)
+		if _circuit_simulation_ready_state == READY:
+			circuit_simulator.start(
+				level_scene_node.circuit_simulation_time_step,
+				level_scene_node.circuit_simulation_max_time
+			)
+		_factory_simulation_on_time = true
+		unpause_factory()
 		factory_start.emit()
-		await get_tree().create_timer(0.2, true, false, true).timeout
+		await FAG_Utils.real_time_wait(0.2)
 		_factory_state &= ~ON_CHANGE
 		_start_stop_hud_ui()
 
@@ -283,28 +378,36 @@ func stop_factory() -> void:
 	
 	_factory_state = FACTORY_STOP | ON_CHANGE
 	_start_stop_hud_ui()
+	_factory_timers.clear()
 	circuit_simulator.stop()
-	factory_builder.ui.set_editor_enabled(true)
+	for element in factory_builder.computer_control_blocks.values():
+		element.get_child(0).time_step(-1)
 	for node in objects_root.get_children():
 		node.queue_free()
 	factory_stop.emit()
-	await get_tree().create_timer(0.2, true, false, true).timeout
+	
+	factory_builder.ui.set_editor_enabled(true)
+	Engine.call_deferred("set_time_scale", 1.0)
+	
+	await FAG_Utils.real_time_wait(0.2)
 	_factory_state &= ~ON_CHANGE
 	_start_stop_hud_ui()
 
 func pause_factory():
-	var curr_speed = game_speed.get_value()
-	if curr_speed > 0:
-		_speed_before_stop_pause = curr_speed
-	_speed_before_stop_pause_external = curr_speed
-	game_speed.set_value(0.0)
+	if not _factory_state & FACTORY_RUNNING:
+		return
+	
+	_factory_paused = true
+	get_tree().call_deferred("set_pause", _factory_paused)
+	# NOTE: we do not pause circuit simulation here ... it will be "paused" in sync function (via sleep)
 
 func unpause_factory():
-	game_speed.set_value(_speed_before_stop_pause_external)
-
-func set_visibility(value : bool) -> void:
-	factory_builder.call_deferred("set_visibility", value)
-	ui.visible = value
+	if not _factory_state & FACTORY_RUNNING or _factory_state & EMERGENCY_STOP:
+		return
+	
+	_factory_paused = false
+	if _factory_simulation_on_time:
+		get_tree().call_deferred("set_pause", _factory_paused)
 
 var _pre_input_off_ui_input_allowed := true
 var _input_is_off := false
@@ -326,50 +429,42 @@ func input_on(force := false):
 	factory_builder.camera.enable_input()
 	_input_is_off = false
 
+func set_visibility(value : bool) -> void:
+	factory_builder.call_deferred("set_visibility", value)
+	ui.visible = value
+
 
 ### factory speed control
 
-var _last_sleep_time := 0
-func _on_circuit_simulation_too_slow(time_diff, time_game, time_simulation):
-	var game_time_diff = time_game - _last_sleep_time
-	var delay_ratio = -time_diff / game_time_diff
-	var new_speed = game_speed.get_value() * (1 - delay_ratio)
-	if new_speed < 0:
-		new_speed = 0
-	
-	_last_sleep_time = time_game
-	game_speed.set_value(new_speed)
-	printerr("_on_simulation_too_slow ", time_diff , " → delay_ratio=", delay_ratio, " new_speed=", new_speed)
-
-func _on_circuit_simulation_go_sleep(time_diff, time_game, time_simulation, cumulative_sleep_time):
-	_last_sleep_time = time_game
-	# TODO use sleep value to control how much the game speed can be increased ... + allow only small step speed increase
-	#prints("_on_simulation_go_sleep", time_diff, time_game, time_simulation, cumulative_sleep_time)
-
 func _on_game_speed_value_changed(value: float) -> void:
+	if not _factory_state & FACTORY_RUNNING:
+		_factory_speed = value
+		return
+	
+	if is_equal_approx(value, _factory_speed):
+		return
+	
 	if is_zero_approx(value):
-		get_tree().paused = true
-		%Pause.text = "FACTORY_UNPAUSE"
-		Engine.time_scale = 0.2 # BUG: https://github.com/godotengine/godot/issues/96359 (also documentation recommended to keep this above 0.0)
-	else:
-		get_tree().paused = false
-		%Pause.text = "FACTORY_PAUSE"
-		Engine.time_scale = value
+		pause_factory()
+	
+	if is_zero_approx(_factory_speed):
+		unpause_factory()
+	
+	_factory_speed = value
+	Engine.call_deferred("set_time_scale", _factory_speed)
 
 func _on_start_stop_pressed() -> void:
 	if _factory_state == FACTORY_STOP:
-		_speed_before_stop_pause = 0.3
 		run_factory()
 	else:
 		stop_factory()
 
 func _on_pause_pressed() -> void:
-	var curr_speed = game_speed.get_value()
-	if curr_speed > 0:
-		_speed_before_stop_pause = curr_speed
-		game_speed.set_value(0.0)
+	if _factory_paused:
+		unpause_factory()
 	else:
-		game_speed.set_value(_speed_before_stop_pause)
+		pause_factory()
+	_start_stop_hud_ui()
 
 enum { FACTORY_RUNNING = 0b00001 , FACTORY_STOP = 0b00010, ON_CHANGE = 0b00100, EMERGENCY_STOP = 0b01000}
 
@@ -377,36 +472,35 @@ func _start_stop_hud_ui():
 	print("_start_stop_hud_ui _factory_state=%x" % _factory_state)
 	if _factory_state & FACTORY_STOP:
 		%StartStop.text = tr("FACTORY_START")
-		_speed_before_stop_pause = game_speed.get_value()
-		game_speed.set_value(0.0)
 		%StartStop.disabled = true
 	if _factory_state & FACTORY_RUNNING:
 		%StartStop.text = tr("FACTORY_STOP")
 		%StartStop.disabled = true
-		game_speed.set_value(_speed_before_stop_pause)
 	
 	if _factory_state & ON_CHANGE:
 		%StartStop.disabled = true
-		%GameSpeed/Slider.editable = false
 		%Pause.disabled = true
 	else:
 		%StartStop.disabled = false
-		%GameSpeed/Slider.editable = (_factory_state & FACTORY_RUNNING)
 		%Pause.disabled = not (_factory_state & FACTORY_RUNNING)
 	
 	if _factory_state & EMERGENCY_STOP :
-		_speed_before_stop_pause = 0.0
-		_speed_before_stop_pause_external = 0.0
-		game_speed.set_value(0.0)
 		%Pause.disabled = true
-		%GameSpeed/Slider.editable = false
+	
+	if _factory_paused:
+		%Pause.text = "FACTORY_UNPAUSE"
+	else:
+		%Pause.text = "FACTORY_PAUSE"
 
 
 ### running / ready flags
 
 var _factory_state
-var _speed_before_stop_pause = 0.0
-var _speed_before_stop_pause_external = 0.0
+var _factory_simulation_on_time
+var _factory_time
+var _factory_timers = []
+var _factory_paused
+var _factory_speed
 
 enum { UNUSED, NOT_READY, READY }
 
@@ -462,6 +556,8 @@ func emergency_stop(title : String, message : String):
 	if _factory_state & EMERGENCY_STOP:
 		return
 	_factory_state = FACTORY_RUNNING | EMERGENCY_STOP
+	_factory_paused = true
+	get_tree().paused = true
 	circuit_simulator.gdspice.emergency_stop()
 	_start_stop_hud_ui()
 	FAG_WindowManager.hide_by_escape_all_windows(self)
@@ -538,11 +634,10 @@ func _ready() -> void:
 	
 	circuit_simulator.grid_editor.ui.import_export_path = "user://circuits/"
 	DirAccess.make_dir_recursive_absolute(circuit_simulator.grid_editor.ui.import_export_path)
+	
 	circuit_simulator.grid_editor.grid.gElements.on_element_add.connect(_update_circuit_element_count.bind(1))
 	circuit_simulator.grid_editor.grid.gElements.on_element_remove.connect(_update_circuit_element_count.bind(-1))
 	circuit_simulator.gdspice.simulation_is_ready_to_run.connect(_on_circuit_simulation_ready_state)
-	circuit_simulator.gdspice.simulation_too_slow.connect(_on_circuit_simulation_too_slow)
-	circuit_simulator.gdspice.simulation_go_sleep.connect(_on_circuit_simulation_go_sleep)
 	circuit_simulator.overcurrent_protection.connect(_on_circuit_simulation_overcurrent)
 	circuit_simulator.overvoltage_protection.connect(_on_circuit_simulation_overvoltage)
 	circuit_simulator.simulation_error.connect(_on_simulation_error)
@@ -553,16 +648,19 @@ func _ready() -> void:
 ### misc / utils
 
 func validate_product(node : RigidBody3D):
+	if not _factory_state & FACTORY_RUNNING:
+		return
+	
 	var status = level_scene_node.validate_product(node)
 	if status < 0:
-		_stats.time = circuit_simulator.gdspice.get_raw_time_game()
+		_stats.time = _factory_time
 		_stats.status = "fail"
 		emergency_stop(
 			"FACTORY_PRODUCT_FAILURE_TITLE",
 			"FACTORY_PRODUCT_FAILURE_TEXT"
 		)
 	elif status > 0:
-		_stats.time = circuit_simulator.gdspice.get_raw_time_game()
+		_stats.time = _factory_time
 		_stats.status = "success"
 		var game_progress = FAG_Utils.load_from_json_file(GAME_PROGRESS_SAVE)
 		game_progress.unlocked_levels[level_scene_node.level_id] = _stats

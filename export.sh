@@ -101,11 +101,16 @@ cp -rf $CEF_ARTIFACTS/* $TARGET/cef_artifacts/
 \rm -f $TARGET/cef_artifacts/debug.log $TARGET/cef_artifacts/gdcef.gdextension
 \rm -f $TARGET/libgdcef.so $TARGET/libgdcef.dll
 
+# add readme and licence info
+cp -r README.md LICENSES $TARGET/
+
 # Windows specific (.exe, add libstdc++-6.dll, add ngspice dlls, add qemu)
 if [ "$PLATFORM" = "Windows" ]; then
 	mv $TARGET/FactoryAutomation $TARGET/FactoryAutomation.exe
 	cp ElectronicsSimulator/GdSpice/bin/win64/dll-mingw/* $TARGET/
+	cp ElectronicsSimulator/GdSpice/bin/win64/spinit $TARGET/
+	cp ElectronicsSimulator/GdSpice/bin/win64/lib/ngspice/*.cm $TARGET/
 	cp /usr/lib/gcc/x86_64-w64-mingw32/12-posix/libstdc++-6.dll $TARGET/
 	cp -r ComputerSimulator/OS/bin/qemu $TARGET/
-	cp $TARGET/cef_artifacts/* $TARGET/ # TODO this is not elegant solution
+	cp -r $TARGET/cef_artifacts/* $TARGET/ # TODO this is not great solution
 fi

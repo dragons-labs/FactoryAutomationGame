@@ -5,7 +5,7 @@ extends Node3D
 
 
 ## circuit simulation time and limits parameters
-var circuit_simulation_time_step := "10us"
+var circuit_simulation_time_step := "50us"
 var circuit_simulation_max_time := "600s"
 var circuit_simulation_current_limit := 5
 var circuit_simulation_voltage_limit := 0
@@ -16,8 +16,8 @@ var supported_circuit_components := [
 	"Voltmeter", "Ammeter",
 	"GND", "NetConnector",
 	"Resistor", "Capacitor", "Inductor",
-	"Diode", "PNP", "NPN",
-	"AND", "OR", "XOR", "NOT",
+	# "Diode", "PNP", "NPN",
+	# "AND", "OR", "XOR", "NOT",
 ]
 var _max_components := {
 	# "Resistor": 2,
@@ -45,13 +45,10 @@ var defualt_computer_system_id = 0
 var supported_blocks := [
 	"SimpleFactoryBlock",
 	"ConveyorBelt",
-	"ComputerControlBlock",
 	"ElectronicControlBlock",
 	"Painter",
-	"ConveyorSplitter", "ConveyorFastSplitter", "Welder", "Detector"
 ]
 var _max_blocks := {
-	"ComputerControlBlock": 3,
 	"ElectronicControlBlock": 1,
 }
 func circuit_element_count_updated(component_subtype : String, _component: Node2D, component_subtype_count : int, button : Button) -> bool:
@@ -60,17 +57,23 @@ func circuit_element_count_updated(component_subtype : String, _component: Node2
 ## list of guide topic paths used by this level / unlocked by accessing this level
 ## first element will be used as default guide topic for this level
 var guide_topic_paths := [
-	"electronics/basic",
+    "electronics",
+    "electronics/passive_component",
+    "factory/electronics_control",
+    "factory/producer",
 ]
 
 ## level task info
 var task_info := {
+"pl": """
+Twoim zadaniem jest zbudowanie fabryki, która będzie malowała produkty. Malowanie jest procesem wymagającym trochę czasu, jednak standardowe jednokrotne przejście przez bloczek malujący jest wystarczające. Problemem z którym nie poradzili sobie poprzednicy jest fakt iż (aby zapewnić wymagane pokrycie farbą) taśmociąg w bloczku malującym działa wolniej niż taśmociągi dystrybucyjne. W związku z tym bez zapewnienia dodatkowej kontroli nad przesyłem produktów fabrykę szybko ogarnia chaos.
+
+Wskazówka: jedynym elementem działanie którego możemy kontrolować jest dystrybutor produktów. Wykorzystaj to!
+""",
 "en" : """
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent volutpat, massa id interdum placerat, urna sem faucibus neque, sit amet aliquet elit mi in felis. Aenean fermentum tellus mattis aliquam volutpat. Integer justo diam, condimentum at lobortis ac, commodo eget felis.
+Your task is to build a factory that will paint products. Painting is a time-consuming process, but a standard one-time pass through the painting block is sufficient. The problem that the predecessors did not cope with is the fact that (to provide the required paint coverage) the conveyor belt in the painting block works slower than the distribution conveyors. Therefore, without additional control over the transfer of products, the factory quickly descends into chaos.
 
-Nullam molestie tincidunt lectus, a molestie diam imperdiet non. Nunc finibus felis eget consequat tristique. Proin a tincidunt magna. Quisque fermentum eros vel ex ultrices auctor. Mauris et enim pharetra nibh convallis pellentesque sed et felis.
-
-Integer ullamcorper maximus faucibus. Fusce cursus, lacus placerat varius lacinia, tortor nisi laoreet odio, et placerat purus est vel lectus. Vestibulum ac tristique sapien. Donec lacus lectus, consequat at justo et, hendrerit lacinia nulla. Aliquam nulla purus, condimentum sit amet rhoncus non, condimentum vitae lectus. In hac habitasse platea dictumst.
+Hint: the only element we can control is the product distributor. Use it!
 """,
 }
 
@@ -113,7 +116,7 @@ func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 	if not from_save:
 		_factory_root.circuit_simulator.restore(
 			FAG_Utils.load_from_json_file(
-				get_script().resource_path.get_base_dir() + "/demo1.circuit"
+				get_script().resource_path.get_base_dir() + "/painter_slow.circuit"
 			)
 		)
 

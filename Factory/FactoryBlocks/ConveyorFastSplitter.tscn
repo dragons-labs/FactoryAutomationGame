@@ -1,8 +1,8 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
-[ext_resource type="Script" path="res://Factory/FactoryBlocks/ConveyorSplitter.gd" id="1_kb8ux"]
+[ext_resource type="Script" path="res://Factory/FactoryBlocks/ConveyorFastSplitter.gd" id="1_kb8ux"]
 [ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/ConveyorSplitter.svg" id="1_omw6g"]
-[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/3d_models/imported/ConveyorSplitter.tres" id="3_wnwaj"]
+[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/3d_models/imported/ConveyorSplitterFast.tres" id="3_nt83r"]
 
 [sub_resource type="GDScript" id="GDScript_smjxm"]
 resource_name = "FactoryBlockSettings"
@@ -20,7 +20,7 @@ script/source = "extends PhysicsBody3D
 #       (as button name) AND should be equal to `object_subtype` value
 #       for the correct operation of the block number limiter
 const object_type := \"FactoryBlock\"
-const object_subtype := \"ConveyorSplitter\"
+const object_subtype := \"ConveyorFastSplitter\"
 @onready var physics_rids = [get_rid()]
 
 # (optional*) definition of input / output signal for this block
@@ -39,9 +39,7 @@ const factory_signals = [
 	},
 	# block inputs (from control system)
 	{
-		\"splitter_redirect_forward\" : [\"splitter_redirect_forward_@out\"],
-		\"splitter_redirect_to_left\" : [\"splitter_redirect_to_left_@out\"],
-		\"splitter_redirect_to_right\" : [\"splitter_redirect_to_right_@out\"],
+		\"splitter_push\" : [\"splitter_push_@out\"],
 	},
 	# extra circuit elements for this block
 	[]
@@ -58,12 +56,18 @@ size = Vector3(1, 0.5, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_vlpht"]
 size = Vector3(1, 0.5, 1)
 
-[node name="ConveyorSplitter" type="Node3D"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_nxmv6"]
+size = Vector3(0.05, 0.5, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cdbpl"]
+size = Vector3(0.2, 0.5, 1)
+
+[node name="ConveyorFastSplitter" type="Node3D"]
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 script = SubResource("GDScript_smjxm")
-ui_name = "FACTORY_BLOCK_NAME_ConveyorSplitter"
+ui_name = "FACTORY_BLOCK_NAME_ConveyorFastSplitter"
 ui_icon = ExtResource("1_omw6g")
 
 [node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
@@ -76,10 +80,35 @@ script = ExtResource("1_kb8ux")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
 shape = SubResource("BoxShape3D_vlpht")
 
+[node name="PusherArea3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PusherArea3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+shape = SubResource("BoxShape3D_nxmv6")
+
+[node name="Pusher" type="StaticBody3D" parent="."]
+unique_name_in_owner = true
+process_mode = 4
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pusher"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_nxmv6")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pusher"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_cdbpl")
+
 [node name="FactoryElementVisual" type="MeshInstance3D" parent="."]
-mesh = ExtResource("3_wnwaj")
+mesh = ExtResource("3_nt83r")
 skeleton = NodePath("")
 
 [node name="Label3D" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.652998, 0)
 billboard = 1
+
+[connection signal="body_entered" from="PusherArea3D" to="Area3D" method="_on_pusher_area_3d_body_entered"]
+[connection signal="body_exited" from="PusherArea3D" to="Area3D" method="_on_pusher_area_3d_body_exited"]

@@ -1,23 +1,24 @@
 keys,en,pl
-FACTORY_BLOCK_NAME_SimpleFactoryBlock,Simple Construction Block,
-FACTORY_BLOCK_NAME_ElectronicControlBlock,Electronic Control Block,
-FACTORY_BLOCK_NAME_ConveyorBelt,Conveyor Belt,
-FACTORY_BLOCK_NAME_ComputerControlBlock,Computer Control Block,
-FACTORY_BLOCK_NAME_ProducerBlock,Component Producer,
-FACTORY_BLOCK_NAME_Welder,Welder,
-FACTORY_BLOCK_NAME_Painter,Painter,
-FACTORY_BLOCK_NAME_Detector,Detector,
-FACTORY_BLOCK_NAME_ConveyorSplitter,Conveyor Splitter,
-FACTORY_START,Run,
-FACTORY_STOP,Stop,
-FACTORY_PAUSE,Pause,
-FACTORY_UNPAUSE,Unpause,
-FACTORY_TASK_INFO,Task Info,
+FACTORY_BLOCK_NAME_SimpleFactoryBlock,Simple Construction Block,Blok konstrukcyjny
+FACTORY_BLOCK_NAME_ElectronicControlBlock,Electronic Control Block,Elektroniczny blok kontrolny
+FACTORY_BLOCK_NAME_ConveyorBelt,Conveyor Belt,Pas transmisyjny
+FACTORY_BLOCK_NAME_ComputerControlBlock,Computer Control Block,Komputerowy blok kontrolny
+FACTORY_BLOCK_NAME_ProducerBlock,Component Producer,Producent
+FACTORY_BLOCK_NAME_Welder,Welder,Spawacz
+FACTORY_BLOCK_NAME_Painter,Painter,Malarz
+FACTORY_BLOCK_NAME_Detector,Detector,Detektor
+FACTORY_BLOCK_NAME_ConveyorSplitter,Conveyor Splitter,Podział pasa transmisyjnego
+FACTORY_BLOCK_NAME_ConveyorFastSplitter,Fast Conveyor Splitter,Szybki podział pasa transmisyjnego
+FACTORY_START,Run,Start
+FACTORY_STOP,Stop,Stop
+FACTORY_PAUSE,Pause,Pause
+FACTORY_UNPAUSE,Unpause,Unpause
+FACTORY_TASK_INFO,Task Info,Informacje
 
-FACTORY_BUILDER_BLOCK_NAME_TITLE,Enter name for block,
-FACTORY_BUILDER_BLOCK_NAME_TEXT,"This name will be used in name of this block input/output signals.\nThe name should be unique and lowercase.",
-FACTORY_BUILDER_BLOCK_NAME_OK,OK,
-FACTORY_BUILDER_BLOCK_NAME_CANCEL,Cancel,
+FACTORY_BUILDER_BLOCK_NAME_TITLE,Enter name for block,Wprowadź nazwę bloku
+FACTORY_BUILDER_BLOCK_NAME_TEXT,"This name will be used in name of this block input/output signals.\nThe name should be unique and lowercase.","Nazwa ta będzie używana w sygnałach wejścia / wyjścia związanych z blokiem.\nNazwa powinna być unikalna i zapisywana małymi literami."
+FACTORY_BUILDER_BLOCK_NAME_OK,OK,OK
+FACTORY_BUILDER_BLOCK_NAME_CANCEL,Cancel,Anuluj
 
 FACTORY_ERROR_TITLE,"Geneal factory error","Ogólny błąd fabryki"
 FACTORY_ERROR_TEXT,"Something went wrong. And no one knows what :-(","Coś poszło nie tak. I nikt nie wie co :-("
@@ -31,5 +32,6 @@ FACTORY_ERROR_CLOSE_BUTTON,OK,OK
 
 FACTORY_PRODUCT_FAILURE_TITLE,Mission Fail,Niepowodzenie
 FACTORY_PRODUCT_FAILURE_TEXT,The product did not meet specifications.,Dostarczono produkt niezgodny ze specyfikacją.
+FACTORY_PRODUCT_TIMEOUT_TEXT,Products not delivered within the required time.,Nie dostarczono produktów w wymaganym czasie.
 FACTORY_PRODUCT_SUCCESS_TITLE,Mission Successful,Sukces
 FACTORY_PRODUCT_SUCCESS_TEXT_%fTIME,"Congratulation!\n\nYou delivered all required products within %f seconds.","Gratulacje!\n\nDostarczyłeś wszystkie wymagane produkty w ciągu %s sekund."

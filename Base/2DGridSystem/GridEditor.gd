@@ -230,10 +230,14 @@ func _input(event: InputEvent) -> void:
 		return
 	# override UI buttons shortcuts in some situations
 	if FAG_Utils.action_exact_match_pressed("EDIT_ROTATE", event) and ui.get_active_ui_tool_mode() == ui.ELEMENT:
-		grid.gElements.new_element.rotate(-PI/2)
+		if len(grid.gElements._new_elements) == 1:
+			for new_element in grid.gElements._new_elements:
+				new_element.rotate(-PI/2)
 		get_viewport().set_input_as_handled()
 	elif FAG_Utils.action_exact_match_pressed("EDIT_MIRROR", event) and ui.get_active_ui_tool_mode() == ui.ELEMENT:
-		grid.gElements.new_element.scale *= -1
+		if len(grid.gElements._new_elements) == 1:
+			for new_element in grid.gElements._new_elements:
+				new_element.scale *= -1
 		get_viewport().set_input_as_handled()
 
 

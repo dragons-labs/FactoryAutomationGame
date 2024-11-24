@@ -101,6 +101,10 @@ func restore_tscn(save_file : String) -> void:
 func close() -> void:
 	ui.reset_editor()
 	computer_control_blocks.clear()
+	netnames.clear()
+	input_to_circuit_from_factory.clear()
+	outputs_from_circuit_to_factory.clear()
+	external_circuit_entries.clear()
 	_moving_elements.clear()
 	_scaled_element = null
 	_intersection = null
@@ -140,7 +144,7 @@ func _on_block_remove(element : Node3D) -> void:
 			info_obj.factory_signals[0],
 			info_obj.factory_signals[1],
 			info_obj.factory_signals[2],
-			element.get_meta("in_game_name"),
+			element.get_meta("in_game_name", ""),
 			element.get_meta("using_computer_id", defualt_computer_system_id),
 		)
 	on_block_remove.emit(element)
@@ -162,8 +166,8 @@ var netnames = []
 ##           because ngspice using lowercase element name to ask for voltage value
 ##     example: {
 ##         "Vcc" : ["Vcc", "Vcc", "dc 3.3"],
-##         "signal_from_factory" : ["signal_from_factory_[in]", "v_signal_from_factory"],
-##         "weak_signal_from_factory" : ["signal_from_factory_[in]", "v_signal_from_factory", "external", "100k"],
+##         "signal_from_factory" : ["signal_from_factory_@in", "v_signal_from_factory"],
+##         "weak_signal_from_factory" : ["signal_from_factory_@in", "v_signal_from_factory", "external", "100k"],
 ##     }
 ##     NOTE: internal resistance (weak output) is used only for circuit simulation, for computer block outputs are always strong
 ##  - outputs_to_factory:
@@ -171,7 +175,7 @@ var netnames = []
 ##     as 1 or 2 elements arrays: [net_name, resistor_specification]
 ##     if resistor_specification is not specified (or is null) then connected via high resistance to GND
 ##     example: {
-##         "high_z_input" : ["high_z_input[out]"],
+##         "high_z_input" : ["high_z_input@out"],
 ##         "sink_input_sample" :["sink_input_sample", "Vcc 10k"],
 ##         "source_input_sample": ["source_input_sample", "GND 10k"]
 ##     }
@@ -230,7 +234,7 @@ func register_factory_signals(inputs_from_factory : Dictionary, outputs_to_facto
 		computer_systems_configuration[computer_id].computer_output_names.append(signal_name2)
 		# if computer is running register signal in it via message bus
 		if computer_system_simulator:
-			computer_system_simulator.add_computer_output(signal_name)
+			computer_system_simulator.add_computer_output(signal_name2)
 	
 	# extra circuit entries
 	for circuit_entry in circuit_entries:
@@ -247,11 +251,11 @@ func unregister_factory_signals(inputs_from_factory : Dictionary, outputs_to_fac
 	for signal_name in inputs_from_factory:
 		var signal_name2 = name_prefix + signal_name
 		netnames.erase(input_to_circuit_from_factory[signal_name2][0])
-		input_to_circuit_from_factory.erase(signal_name2)
-		if len(input_to_circuit_from_factory[signal_name2]) < 3 or input_to_circuit_from_factory[signal_name2][2] in [null, "external"]:
+		if signal_name2 in input_to_circuit_from_factory and (len(input_to_circuit_from_factory[signal_name2]) < 3 or input_to_circuit_from_factory[signal_name2][2] in [null, "external"]):
 			computer_systems_configuration[computer_id].computer_input_names.erase(signal_name2)
 			if computer_system_simulator:
 				computer_system_simulator.remove_computer_input(signal_name2)
+		input_to_circuit_from_factory.erase(signal_name2)
 	
 	for signal_name in outputs_to_factory:
 		var signal_name2 = name_prefix + signal_name
@@ -320,7 +324,7 @@ func _create_collision_sphere():
 	PhysicsServer3D.shape_set_data(shape_rid, radius)
 	return shape_rid
 
-func _physics_process(_delta) -> void:
+func _process(_delta) -> void:
 	if _intersection_need_update:
 		var point = _viewport.get_mouse_position()
 		var ray_start = camera.project_ray_origin(point)

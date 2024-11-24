@@ -139,7 +139,7 @@ func stop():
 				break
 			if x % 10 == 0:
 				print("Wait for computer system %d (%d) exit ... %d" % [computer_system_id, _pid, x])
-			await get_tree().create_timer(0.1, true, false, true).timeout
+			await FAG_Utils.real_time_wait(0.1)
 		
 		if OS.is_process_running(_pid):
 			printerr("Kill computer system emulator %d (pid=%d)" % [computer_system_id, _pid])
@@ -159,7 +159,7 @@ func wait_for_stop():
 	for x in range(on_close_timeout * 10):
 		if running_state == IS_NOT_RUNNING:
 			return
-		await get_tree().create_timer(0.1, true, false, true).timeout
+		await FAG_Utils.real_time_wait(0.1)
 
 func _run_qemu(user_port, msg_port, vnc_port):
 	var args = [
@@ -208,7 +208,10 @@ var _msg_buf := ""
 var _pid := 0
 var _output_values = {}
 
-func _process(_delta):
+func _ready() -> void:
+	process_physics_priority = -10
+
+func _physics_process(_delta):
 	if not _user_console_stream:
 		if _user_console_server.is_connection_available():
 			_user_console_stream = _user_console_server.take_connection()
@@ -259,6 +262,9 @@ func _process(_delta):
 						msg_bus_command.emit(cmd, self)
 					pos = npos + 1
 				_msg_buf = _msg_buf.substr(pos)
+
+func time_step(time : float) -> void:
+	send_message_via_msg_bus("time " + str(time))
 
 func is_running_and_ready() -> bool:
 	return running_state & IS_READY

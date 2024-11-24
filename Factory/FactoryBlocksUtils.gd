@@ -32,6 +32,11 @@ static func calculate_object_speed(belts) -> Vector3:
 static func set_object_speed(node : Node3D, speed_vector : Vector3):
 	PhysicsServer3D.body_set_state( node.get_rid(), PhysicsServer3D.BODY_STATE_LINEAR_VELOCITY, speed_vector )
 
+static func translate_object(node : Node3D, translate_vector : Vector3):
+	var rid = node.get_rid()
+	var transform = PhysicsServer3D.body_get_state( rid, PhysicsServer3D.BODY_STATE_TRANSFORM )
+	PhysicsServer3D.body_set_state( rid, PhysicsServer3D.BODY_STATE_TRANSFORM, transform.translated(translate_vector) )
+
 
 static func on_object_enter_block__instant_interaction(node : Node3D, factory_block_belt : Area3D) -> void:
 	if node is RigidBody3D:
@@ -111,3 +116,11 @@ static func accept_object_on_block(node : Node3D, factory_block_belt : Area3D, e
 	# disable force integration and set constant speed
 	node.custom_integrator = true
 	set_object_speed(node, speed_vector)
+
+static func set_object_free(node : Node3D)-> void:
+	if node.has_meta("exclusive_belt"):
+		node.remove_meta("exclusive_belt")
+	if node.has_meta("next_belt"):
+		node.remove_meta("next_belt")
+	if node.has_meta("belts_list"):
+		node.remove_meta("belts_list")

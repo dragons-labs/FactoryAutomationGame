@@ -17,6 +17,7 @@ var netnames := [] :
 		update()
 
 func _ready() -> void:
+	get_popup().visibility_changed.connect(_on_popup_visibility_changed)
 	update()
 	
 func update() -> void:
@@ -50,6 +51,12 @@ func _on_item_selected(idx: int) -> void:
 	else:
 		value.text = get_item_text(idx)
 		value.hide()
+
+func _on_popup_visibility_changed() -> void:
+	if get_popup().visible:
+		mouse_filter = MOUSE_FILTER_STOP
+	else:
+		mouse_filter = MOUSE_FILTER_PASS
 "
 
 [node name="NetConnector" type="Node2D"]

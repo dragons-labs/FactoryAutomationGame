@@ -38,20 +38,18 @@ public:
 	void load(const godot::PackedStringArray& circuit);
 	
 	/// start (synchronous) simulation
-	/// if @a real_start is false only time calculation will be started
-	void start(bool real_start, const godot::String& simulation_time_step, const godot::String& simulation_max_time);
+	void start(const godot::String& simulation_time_step, const godot::String& simulation_max_time);
+	
+	/// when previous simulation step was successfully finished then
+	///   return true and run (in background) simulation until simulation_time < target_game_time 
+	/// otherwise do nothing and return false
+	bool try_step(double target_game_time);
 	
 	/// stop (terminate) simulation
 	void stop();
 	
 	/// stop simulation but allow data access for debugging
 	void emergency_stop();
-	
-	/// pause simulation
-	void pause();
-	
-	/// resume simulation
-	void resume();
 	
 	/// execute ngSpice command
 	int run_command(const godot::String& command);
@@ -100,36 +98,15 @@ public:
 	/// return true if simulation is running (low level info from ngspice)
 	bool is_running() { return running; }
 	
-	/// return difference between simulation and game time at last simulation sync
-	/// (if negative, game is too fast for simulation)
-	double get_time_diff() { return time_diff; }
-	
-	/// return value of game time at last simulation sync
-	double get_time_game() { return time_game; }
-	
-	/// return value of game time at last simulation sync
-	double get_raw_time_game() { return last_game_time; }
-	
 	/// return value of simulation time at last simulation sync
 	double get_time_simulation() { return time_simulation; }
 	
-	/// return sum of sleep time in current simulation
-	double get_cumulative_sleep_time() { return cumulative_sleep_time; }
-	
-	/// value used to compare with @ref time_diff to emit simulation_too_slow signal
-	double simulation_too_slow_level = -0.1;
-	CREATE_SETTER_AND_GETTER(simulation_too_slow_level, double)
-	
-	/// value used to compare with @ref time_diff to start sleep
-	double sleep_start_level = 0.05;
-	CREATE_SETTER_AND_GETTER(sleep_start_level, double)
-	
-	/// value used to compare with @ref time_diff to end sleep
-	double sleep_end_level = 0.01;
-	CREATE_SETTER_AND_GETTER(sleep_end_level, double)
+	/// game time from simulation start
+	double time_game;
+	CREATE_SETTER_AND_GETTER(time_game, double)
 	
 	/// single sleep time in milliseconds
-	int sleep_time = 8;
+	int sleep_time = 1;
 	CREATE_SETTER_AND_GETTER(sleep_time, int)
 	
 	/// control printing information from simulation
@@ -146,9 +123,6 @@ public:
 	/// @}
 	#endif
 	
-	/// Godot per-frame callback (for time game time acquisition)
-	void _process(double delta) override;
-	
 private:
 	#ifdef USE_DLOPEN
 	/// pointer to ngSpice dynamic library opened via dlopen
@@ -164,10 +138,7 @@ private:
 	static int on_sync(double time, double* deltatime, double olddeltatime, int redostep, int ident, int location, void* userdata);
 	/// @}
 	
-	/// non static callback function used by @ref on_sync
-	void on_sync2(double time);
-	double update_times();
-	
+	// simulation state
 	SimulationState simulation_state;
 	
 	/// running flag
@@ -176,24 +147,8 @@ private:
 	/// dictionary with voltage/current values for external control voltage/current sources
 	std::map<std::string, double> external_voltages_currents;
 	
-	/// simulation start time
-	double start_time;
-	/// delta time between simulation pause time and simulation start time, non zero only when simulation is paused
-	double working_time;
-	/// game time on last frame
-	double last_game_time;
-	
-	/// game time from simulation start
-	double time_game;
 	/// simulation time (from simulation start)
 	double time_simulation;
-	/// simulation vs game time difference (time_simulation - time_game)
-	double time_diff;
-	/// cumulative sleep time in simulation thread
-	double cumulative_sleep_time;
-	
-	/// last too slow signal game time (used to prevent send multiple signal in one frame / too often send signal)
-	double last_alarm_time;
 };
 
 VARIANT_ENUM_CAST(GdSpice::SimulationState);

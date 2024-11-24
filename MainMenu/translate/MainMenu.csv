@@ -1,29 +1,39 @@
-keys,en
-MAIN_MENU_RESUME_GAME,Resume Game
-MAIN_MENU_TASK_INFO,Show Task Info
-MAIN_MENU_MANUAL,Show Manual
-MAIN_MENU_SAVE_GAME,Save Game
-MAIN_MENU_START_LEVEL,Open Factory
-MAIN_MENU_LOAD_SAVE,Load Save
-MAIN_MENU_SETTINGS,Settings
-MAIN_MENU_QUIT,Quit
-MAIN_MENU_CANCEL,Cancel
-MAIN_MENU_LOAD,Load
-MAIN_MENU_SAVE,Save
-MAIN_MENU_OK,OK
-MAIN_MENU_ADD_SAVE_SLOT_TEXT,+
-MAIN_MENU_ADD_SAVE_SLOT_TOOLTIP,Add new save slot
-MAIN_MENU_SAVE_OVERWRITE_CONFIRM_TITLE,Confirm save overwrite?
-MAIN_MENU_SAVE_%s_OVERWRITE_CONFIRM_TEXT,Overwrite save: '%s'?\n\n⚠️ This action can NOT be undone ⚠️\n
-MAIN_MENU_LOADING_PLESE_WAIT,Loading ... please wait!
-MAIN_MENU_RESET_TO_DEFAULT,Reset to defaults
-MAIN_MENU_SETTINGS_PRIMARY_KEY_TOOLTIP,Primary action shortcut. Click to change.
-MAIN_MENU_SETTINGS_SECONDARY_KEY_TOOLTIP,Secondary action shortcut. Click to change.
-MAIN_MENU_SETTINGS_KEY_REMAP_TITLE,Changing key/button mapping
-MAIN_MENU_SETTINGS_UPDATE_KEY_MAPPING_FOR_%s,"Updating key/button mapping for:\n\n    %s\n\nPlease press key/button or keys/buttons combination and press OK or press Remove to remove current mapping."
-MAIN_MENU_SETTINGS_REMOVE_MAPPING,Remove
+keys,en,pl
+MAIN_MENU_RESUME_GAME,Resume Game,Wznów grę
+MAIN_MENU_TASK_INFO,Show Task Info,Informacje o zadaniu
+MAIN_MENU_MANUAL,Show Manual,Podręcznik
+MAIN_MENU_SAVE_GAME,Save Game,Zapisz grę
+MAIN_MENU_START_LEVEL,Open Factory,Nowa fabryka
+MAIN_MENU_LOAD_SAVE,Load Save,Wczytaj grę
+MAIN_MENU_SETTINGS,Settings,Ustawienia
+MAIN_MENU_QUIT,Quit,Wyjście
+MAIN_MENU_CANCEL,Cancel,Anuluj
+MAIN_MENU_LOAD,Load,Wczytaj
+MAIN_MENU_SAVE,Save,Zapisz
+MAIN_MENU_OK,OK,OK
+MAIN_MENU_ADD_SAVE_SLOT_TEXT,+,+
+MAIN_MENU_ADD_SAVE_SLOT_TOOLTIP,Add new save slot,Dodaj nowy slot zapisu
+MAIN_MENU_SAVE_OVERWRITE_CONFIRM_TITLE,Confirm save overwrite?,Potwierdź nadpisanie save'u
+MAIN_MENU_SAVE_%s_OVERWRITE_CONFIRM_TEXT,"Overwrite save: '%s'?\n\n⚠️ This action can NOT be undone ⚠️\n","Nadpisać zapis: '%s'?\n\n⚠️ Ta akcja NIE może być cofnięta ⚠️\n"
+MAIN_MENU_LOADING_PLESE_WAIT,Loading ... please wait!,Ładowanie ... proszę czekać!
+MAIN_MENU_RESET_TO_DEFAULT,Reset to defaults,Przywróć domyślne
+MAIN_MENU_SETTINGS_PRIMARY_KEY_TOOLTIP,Primary action shortcut. Click to change.,Podstawowy skrót klawiszowy dla akcji. Kliknij aby zmienić.
+MAIN_MENU_SETTINGS_SECONDARY_KEY_TOOLTIP,Secondary action shortcut. Click to change.,Dodatkowy skrót klawiszowy dla akcji. Kliknij aby zmienić.
+MAIN_MENU_SETTINGS_KEY_REMAP_TITLE,Changing key/button mapping,Zmiana mapowania klawiszy i przycisków
+MAIN_MENU_SETTINGS_UPDATE_KEY_MAPPING_FOR_%s,"Updating key/button mapping for:\n\n    %s\n\nPlease press key/button or keys/buttons combination and press OK or press 'Remove' to remove current mapping.","Aktualizacja klawisza dla:\n\n    %s\n\nProszę nacisnąć klawisz lub przycisk lub kombinację i nacisnąć OK lub nacisnąć 'Usuń' aby usunąć aktualne przypisanie."
+MAIN_MENU_SETTINGS_REMOVE_MAPPING,Remove,Usuń
 
-MAIN_MENU_UI_SETTINGS_GROUP_NAME,Main Menu
+MAIN_MENU_UI_SETTINGS_GROUP_NAME,Main Menu,Menu główne
 
-ACTION_GLOBAL_ESCAPE,Open main menu
-ACTION_GLOBAL_BREAK,Force open main menu (also when window blocking default shortcut is focused)
+ACTION_GLOBAL_ESCAPE,Open main menu,Otwórz menu główne
+ACTION_GLOBAL_BREAK,Force open main menu (also when window blocking default shortcut is focused),Wymuś otwarcie menu głównego (działa także gdy okno blokuje domyślny skrót klawiszowy)
+
+LOCALE_SETTINGS_GROUP_NAME,Locale settings,Ustawienia językowe
+LOCALE_SETTINGS_locale,Language,Język
+
+GRAPHICS_SETTINGS_GROUP_NAME,Graphics settings,Ustawienia graficzne
+ACTION_GRAPHICS_FULL_SCREEN,Switch fullscreen hot key,Przełącz pełny ekran
+GRAPHICS_SETTINGS_full_screen,Use fullscreen as default,Używaj trybu pełnoekranowego
+GRAPHICS_SETTINGS_antialiasing,Antialiasing,Antialiasing
+GRAPHICS_SETTINGS_vsync,Vsync,Vsync
+GRAPHICS_SETTINGS_ui_scale,UI scale,Skalowanie interfejsu użytkownika

@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 # Factory Automation Game
 
-Factory Automation is an open-source logic game about building factory production lines and creating an automation system for them.
+[Factory Automation](https://github.com/dragons-labs/FactoryAutomationGame/) is an open-source logic game about building factory production lines and creating an automation system for them.
 
 The game is inspired by titles such as Shapez.io, Automachef and Infinifactory. However, it puts more emphasis on creating a system to manage our production line.
 Factory Automation offers, made available as part of the gameplay progression, dedicated control blocks to create advanced control systems using:
@@ -16,12 +16,14 @@ Factory Automation offers, made available as part of the gameplay progression, d
   * creating of programs in C and Pythons
   * networking multiple computer blocks with TCP/IP
 
-## Project Status: Alpha-2
+The game offers full simulation of electronic circuits (based on ngspice) and computer systems (based on QEMU and GNU/Linux). In-game manual (about basics of electronics and programming) is available. Saving the game state, customizing keys and other settings is supported.
+
+## Project Status: Alpha-3
 
 * All core gameplay features (like circuit simulation, computer simulation, 3d factory) are in place and works.
-* Demo mission is playable and allow check / test core features, but is the only one mission available.
-* Many things (like guide texts) are placeholders.
-* It's works (but may be bugged or have missing minor features).
+* There are only 3 sample tasks (levels) and a demo level available, but they do not reflect the target task layout.
+* In-game manual (especially English version) requires verification.
+* It's works, but may be bugged or have missing minor features.
 
 ## Build Instruction (on Linux platform)
 
@@ -41,9 +43,10 @@ Factory Automation offers, made available as part of the gameplay progression, d
     a. binary files should be placed in `addons/3rdparty/gdcef/build/Linux` and (for Windows export option) in `addons/3rdparty/gdcef/build/Windows`
     b. *GDCEF* should be build with `cef_artifacts` as binary / artifact directory
 
-5. open `project.godot` in Godot 4.3 (or higher), **ignore errors** and close editor after import is complete
-6. open `project.godot` in Godot editor again (there should be no errors)
-7. run project
+5. build game manual by running `scons` in `Manual/`
+6. open `project.godot` in Godot 4.3 (or higher), **ignore errors** and close editor after import is complete
+7. open `project.godot` in Godot editor again (there should be no errors)
+8. run project
 
 You can also export project for Linux and Windows platform using `./export.sh` script (do not directly use export option in editor).
 Use `./export.sh` to export amd64 Linux version or `./export.sh Windows` to export amd64 Windows version.
@@ -101,3 +104,12 @@ To simulate computer systems, the game uses:
 ### Main Scripts Dependencies And Functions
 
 ![image](MainScriptsDependenciesAndFunctions.svg)
+
+## Similar open source projects
+
+There are several FOSS projects with similar topics (games about factory build, digital logic simulation, etc), but each of them focuses on (and expands on) a certain subset of the topic covered by Factory Automation Game (FAG). However, they can be an inspiration for FAG developers as well as a source of further entertainment for players, which is why we are posting links to them here:
+
+* [Digital-Logic-Sim](https://github.com/SebLague/Digital-Logic-Sim) (CC-BY-NC-SA-4.0, before "Version 1.0" (118f52e0) [MIT licence](https://github.com/SebLague/Digital-Logic-Sim/tree/118f52e0c329f61d3438b952c3420b72)) (Unity) and [Digital Logic Sim 2](https://github.com/UkrainianBanderasCat/Digital-Logic-Sim2) (GPL3) (Unity)
+* [Logic Circuit Simulator](https://github.com/umutsevdi/Logic-Circuit-Simulator) (GPL3) (Godot)
+* [OpenIndustryProject](https://github.com/Open-Industry-Project/Open-Industry-Project) (GPL3) (Godot)
+* [shapez (Community Edition)](https://github.com/tobspr-games/shapez-community-edition) (GPL3) (custom engine)

@@ -510,9 +510,9 @@ SPDX-License-Identifier: MIT
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      showgrid="true"
-     inkscape:zoom="0.49058808"
-     inkscape:cx="414.80828"
-     inkscape:cy="998.80128"
+     inkscape:zoom="0.98117616"
+     inkscape:cx="1606.7451"
+     inkscape:cy="739.92829"
      inkscape:window-width="1920"
      inkscape:window-height="1003"
      inkscape:window-x="0"
@@ -902,7 +902,7 @@ SPDX-License-Identifier: MIT
       <rect
          style="fill:#000000;fill-opacity:0.32;fill-rule:evenodd;stroke:none;stroke-width:1.04612;stroke-dasharray:none"
          id="rect7566-7-2-09"
-         width="145.1494"
+         width="158.54088"
          height="26.153057"
          x="271.37637"
          y="107.57403"
@@ -939,12 +939,12 @@ SPDX-License-Identifier: MIT
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.57932px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.523061"
            x="272.61426"
            y="131.88098"
-           id="tspan1203">- manage and update measurers and oscilloscopes</tspan></text>
+           id="tspan1203">- manage and update measurements and oscilloscopes</tspan></text>
     </g>
     <rect
        style="fill:none;fill-opacity:0.32;fill-rule:evenodd;stroke:#000000;stroke-width:0.523061;stroke-dasharray:none;stroke-opacity:1"
        id="rect7566-4"
-       width="233.34167"
+       width="246.05547"
        height="99.592232"
        x="269.02258"
        y="92.143738"

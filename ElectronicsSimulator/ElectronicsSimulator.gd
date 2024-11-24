@@ -17,8 +17,6 @@ signal simulation_error()
 
 @onready var gdspice := %"GdSpice+UI"
 @onready var grid_editor := %"GridEditor"
-var error_was_reported = false
-
 func serialise() -> Dictionary:
 	return grid_editor.grid.serialise()
 
@@ -67,8 +65,6 @@ func init_circuit(
 		external_nets_outputs_from_circuit_to_factory := [],
 		external_circuit_entries := []
 	) -> Array:
-		error_was_reported = false
-		
 		if gdspice.get_simulation_state() != GdSpice.NOT_STARTED:
 			gdspice.reset()
 			gdspice.stop()
@@ -91,20 +87,32 @@ func init_circuit(
 		gdspice.load(netlist_info[0])
 		return netlist_info[1]
 
-func start(real_start : bool, simulation_time_step := "10us", simulation_max_time := "600s") -> void:
-	if not real_start:
-		gdspice.start(false, simulation_time_step, simulation_max_time)
-		return
-	if gdspice.get_simulation_state() == GdSpice.READY:
-		print("Start circuit simulation")
-		gdspice.start(true, simulation_time_step, simulation_max_time)
+func start(simulation_time_step := "10us", simulation_max_time := "600s") -> void:
+	gdspice.start(simulation_time_step, simulation_max_time)
+
+func try_step(time : float) -> bool:
+	if gdspice.try_step(time):
+		gdspice.update_measurements()
+		if current_limit:
+			for fuse in gdspice.fuses:
+				var value = gdspice.get_last_value(fuse)
+				if value > current_limit or value < -current_limit:
+					overcurrent_protection.emit(fuse, value)
+		elif voltage_limit:
+			for net in gdspice.used_nets:
+				var value = gdspice.get_last_value(net)
+				if value > voltage_limit or value < -voltage_limit:
+					overvoltage_protection.emit(net, value)
+		return true
 	else:
-		printerr("Can't start, current state = %x" % gdspice.get_simulation_state())
+		if gdspice.get_simulation_state() == GdSpice.ERROR:
+			simulation_error.emit()
+		return false
 
 func stop() -> void:
 	print("Stop circuit simulation")
-	gdspice.reset()
 	gdspice.stop()
+	gdspice.reset()
 	grid_editor.ui.set_editor_enabled(true)
 	for element in grid_editor.grid.gElements.main_node.get_children():
 		for ui in element.get_child(0).get_children():
@@ -112,13 +120,6 @@ func stop() -> void:
 				ui.editable = true
 			elif ui is OptionButton:
 				ui.disabled = false
-
-# do not expose here gdspice.pause() and gdspice.resume()
-# because they are for special cases when nothing happens and we can pause
-# the simulation itself (without pausing the game) to save resources,
-# but we don't know the full internal state of the circuit so it's risky
-#
-# for normal pause/resume simulation use Engine.time_scale or/and get_tree().paused
 
 func set_input_allowed(value):
 	print("Input allowed into circuit simulator: ", value)
@@ -135,27 +136,7 @@ func _ready():
 	grid_editor.ui.get_node("%Actions/Save").tooltip_text = "ELECTRONIC_EDITOR_SAVE_TOOLTIP"
 	
 	gdspice.init()
-	gdspice.verbose = 1
-	gdspice.process_mode = Node.PROCESS_MODE_PAUSABLE
-
-func _process(_delta):
-	match gdspice.get_simulation_state():
-		GdSpice.RUNNING:
-			gdspice.update_measurers()
-			if current_limit:
-				for fuse in gdspice.fuses:
-					var value = gdspice.get_last_value(fuse)
-					if value > current_limit or value < -current_limit:
-						overcurrent_protection.emit(fuse, value)
-			elif voltage_limit:
-				for net in gdspice.used_nets:
-					var value = gdspice.get_last_value(net)
-					if value > voltage_limit or value < -voltage_limit:
-						overvoltage_protection.emit(net, value)
-		GdSpice.ERROR:
-			if not error_was_reported:
-				error_was_reported = true
-				simulation_error.emit()
+	gdspice.verbose = 2
 
 func _on_element_click(element, _long):
 	var base_element = Grid2D_BaseElement.get_from_element(element)

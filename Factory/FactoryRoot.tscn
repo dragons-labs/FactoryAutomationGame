@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://Factory/FactoryRoot.gd" id="1_88vxl"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBuilder.tscn" id="2_ncfa0"]
@@ -12,13 +12,14 @@
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Painter.tscn" id="9_xypg3"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ConveyorSplitter.tscn" id="10_gofsm"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Welder.tscn" id="11_aa"]
+[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ConveyorFastSplitter.tscn" id="11_f8ngn"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Detector.tscn" id="12_oom2c"]
 
 [node name="FactoryRoot" type="Node3D"]
 script = ExtResource("1_88vxl")
 
 [node name="FactoryBuilder" parent="." instance=ExtResource("2_ncfa0")]
-elements = Array[PackedScene]([ExtResource("4_wpvne"), ExtResource("4_ipc57"), ExtResource("5_u6lyq"), ExtResource("6_a113l"), ExtResource("7_q855b"), ExtResource("8_flw0k"), ExtResource("9_xypg3"), ExtResource("10_gofsm"), ExtResource("11_aa"), ExtResource("12_oom2c")])
+elements = Array[PackedScene]([ExtResource("4_wpvne"), ExtResource("5_u6lyq"), ExtResource("6_a113l"), ExtResource("7_q855b"), ExtResource("8_flw0k"), ExtResource("4_ipc57"), ExtResource("12_oom2c"), ExtResource("10_gofsm"), ExtResource("11_f8ngn"), ExtResource("9_xypg3"), ExtResource("11_aa")])
 
 [node name="FactoryUI" type="CanvasLayer" parent="."]
 

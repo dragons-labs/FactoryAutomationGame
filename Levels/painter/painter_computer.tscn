@@ -1,9 +1,9 @@
 [gd_scene load_steps=12 format=3]
 
-[ext_resource type="Script" path="res://Levels/demo1.gd" id="1_7y1sa"]
+[ext_resource type="Script" path="res://Levels/painter/painter_computer.gd" id="1_7y1sa"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Consumer.tscn" id="2_gbgwv"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Producer.tscn" id="3_3l6sj"]
-[ext_resource type="Script" path="res://Levels/demo1_object.gd" id="4_b36je"]
+[ext_resource type="Script" path="res://Levels/painter/painter_object.gd" id="4_b36je"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kkeuu"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -68,7 +68,7 @@ shape = SubResource("BoxShape3D_vt021")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -3)
 
 [node name="Producer" parent="FactoryBlocks" node_paths=PackedStringArray("object") instance=ExtResource("3_3l6sj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1, -2)
 object = NodePath("../../ComponentsTemplates/Object_Demo1")
 timer_period = 0.7
 

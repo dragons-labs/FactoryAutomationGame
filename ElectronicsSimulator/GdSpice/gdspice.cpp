@@ -61,10 +61,6 @@ bool GdSpice::init(const godot::String& libngspice, int _verbose) {
 	return true;
 }
 
-void GdSpice::_process(double delta) {
-	last_game_time += delta;
-}
-
 void GdSpice::load(const godot::PackedStringArray& circuit) {
 	for (int i=0; i<circuit.size(); ++i)
 		run_command("circbyline " + circuit[i]);
@@ -73,20 +69,10 @@ void GdSpice::load(const godot::PackedStringArray& circuit) {
 	simulation_state = STARTING;
 }
 
-void GdSpice::start(bool real_start, const godot::String& simulation_time_step, const godot::String& simulation_max_time) {
-	if (!real_start) {
-		set_process(true);
-		last_game_time = 0;
-		return;
-	}
+void GdSpice::start(const godot::String& simulation_time_step, const godot::String& simulation_max_time) {
 	if (simulation_state == READY) {
-		set_process(true);
-		last_game_time = 0;
-		start_time = 0;
-		last_alarm_time = 0;
-		cumulative_sleep_time = 0;
-		working_time = 0;
-		
+		godot::UtilityFunctions::print("[GdSpice] Start simulation ...");
+		time_game = 0;
 		run_command("bg_tran " + simulation_time_step + " " + simulation_max_time);
 		simulation_state = RUNNING;
 	} else {
@@ -94,9 +80,17 @@ void GdSpice::start(bool real_start, const godot::String& simulation_time_step, 
 	}
 }
 
+bool GdSpice::try_step(double target_game_time) {
+	if (simulation_state == RUNNING && time_simulation >= time_game) {
+		time_game = target_game_time;
+		return true;
+	} else {
+		return false;
+	}
+}
+
 void GdSpice::stop() {
 	if (simulation_state == NOT_STARTED) {
-		call_deferred("set_process", false);
 		return;
 	}
 	simulation_state = ENDED;
@@ -118,27 +112,6 @@ void GdSpice::emergency_stop() {
 	}
 }
 
-void GdSpice::pause() {
-	if (simulation_state == RUNNING) {
-		// run_command("bg_halt");
-		simulation_state = PAUSED;
-		working_time = last_game_time - start_time; // working time [ms] until pause
-	} else {
-		godot::UtilityFunctions::printerr("[GdSpice] Can't pause ... simulation not running");
-	}
-}
-
-void GdSpice::resume() {
-	if (simulation_state == PAUSED) {
-		start_time = last_game_time - working_time; // pretend simulation was started working_time [ms] before current moment
-		// run_command("bg_resume");
-		simulation_state = RUNNING;
-		working_time = 0;
-	} else {
-		godot::UtilityFunctions::printerr("[GdSpice] Can't resume ... simulation not paused");
-	}
-}
-
 int GdSpice::run_command(const godot::String& command) {
 	return run_command(command.utf8().get_data());
 }
@@ -154,8 +127,11 @@ int GdSpice::run_command(const char* command) {
 double GdSpice::get_last_value(const godot::String& point_name) {
 	if (simulation_state & WORKING_TYPE_STATE_MASK) {
 		auto vec = ngGet_Vec_Info(const_cast<char*>(point_name.utf8().get_data()));
-		return vec->v_realdata[vec->v_length-1];
+		if (vec->v_length > 0)
+			return vec->v_realdata[vec->v_length-1];
 	}
+	if (verbose)
+		godot::UtilityFunctions::print("[GdSpice] get_last_value for \"", point_name, "\" returned NAN");
 	return NAN;
 }
 
@@ -261,6 +237,7 @@ godot::Array GdSpice::get_timed_values_for_time_step(const godot::PackedStringAr
 }
 
 void GdSpice::set_voltages_currents(const godot::String& point_name, double value) {
+	// TODO setting new value should be delayed to successful sync (`gd_spice->time_simulation >= gd_spice->time_game` condition fulfilled in `on_sync`)
 	external_voltages_currents[point_name.utf8().get_data()] = value;
 }
 
@@ -268,10 +245,9 @@ void GdSpice::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("init"), &GdSpice::init, DEFVAL("libngspice.so"), DEFVAL(2));
 	godot::ClassDB::bind_method(godot::D_METHOD("load"), &GdSpice::load);
 	godot::ClassDB::bind_method(godot::D_METHOD("start"), &GdSpice::start, DEFVAL(true));
+	godot::ClassDB::bind_method(godot::D_METHOD("try_step"), &GdSpice::try_step);
 	godot::ClassDB::bind_method(godot::D_METHOD("stop"), &GdSpice::stop);
 	godot::ClassDB::bind_method(godot::D_METHOD("emergency_stop"), &GdSpice::emergency_stop);
-	godot::ClassDB::bind_method(godot::D_METHOD("pause"), &GdSpice::pause);
-	godot::ClassDB::bind_method(godot::D_METHOD("resume"), &GdSpice::resume);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_simulation_state"), &GdSpice::get_simulation_state);
 	godot::ClassDB::bind_method(godot::D_METHOD("run_command"), static_cast< int(GdSpice::*)(const godot::String&) >(&GdSpice::run_command));
 	godot::ClassDB::bind_method(godot::D_METHOD("get_last_value"), &GdSpice::get_last_value);
@@ -283,16 +259,10 @@ void GdSpice::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("set_voltages_currents"), &GdSpice::set_voltages_currents);
 	
 	godot::ClassDB::bind_method(godot::D_METHOD("is_running"), &GdSpice::is_running);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_time_diff"), &GdSpice::get_time_diff);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_time_game"), &GdSpice::get_time_game);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_time_simulation"), &GdSpice::get_time_simulation);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_cumulative_sleep_time"), &GdSpice::get_cumulative_sleep_time);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_raw_time_game"), &GdSpice::get_raw_time_game);
 	
 	
-	BIND_PROPERTY(GdSpice, simulation_too_slow_level, FLOAT)
-	BIND_PROPERTY(GdSpice, sleep_start_level, FLOAT)
-	BIND_PROPERTY(GdSpice, sleep_end_level, FLOAT)
+	BIND_PROPERTY(GdSpice, time_game, FLOAT)
 	BIND_PROPERTY(GdSpice, sleep_time, INT)
 	BIND_PROPERTY(GdSpice, verbose, BOOL)
 	
@@ -307,17 +277,6 @@ void GdSpice::_bind_methods() {
 	BIND_CONSTANT(WORKING_TYPE_STATE_MASK);
 	
 	ADD_SIGNAL(godot::MethodInfo("simulation_is_ready_to_run"));
-	ADD_SIGNAL(godot::MethodInfo("simulation_too_slow",
-		godot::PropertyInfo(godot::Variant::FLOAT, "time_diff"),
-		godot::PropertyInfo(godot::Variant::FLOAT, "time_game"),
-		godot::PropertyInfo(godot::Variant::FLOAT, "time_simulation")
-	));
-	ADD_SIGNAL(godot::MethodInfo("simulation_go_sleep",
-		godot::PropertyInfo(godot::Variant::FLOAT, "time_diff"),
-		godot::PropertyInfo(godot::Variant::FLOAT, "time_game"),
-		godot::PropertyInfo(godot::Variant::FLOAT, "time_simulation"),
-		godot::PropertyInfo(godot::Variant::FLOAT, "cumulative_sleep_time")
-	));
 }
 
 int GdSpice::on_thread_runs(bool not_running, int /*ident*/, void* userdata) {
@@ -375,39 +334,12 @@ int GdSpice::on_get_voltage_current_value(double* value, double time, char* node
 
 int GdSpice::on_sync(double time, double* /*deltatime*/, double /*olddeltatime*/, int /*redostep*/, int /*ident*/, int /*location*/, void* userdata) {
 	auto gd_spice = static_cast<GdSpice*>(userdata);
-	gd_spice->on_sync2(time);
+	
+	gd_spice->time_simulation = time;
+	while (gd_spice->simulation_state != RUNNING || gd_spice->time_simulation >= gd_spice->time_game) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(gd_spice->sleep_time)); // this is OK → we are sleeping in ngspice background thread, not in godot thread
+		if ((gd_spice->simulation_state & WORKING_TYPE_STATE_MASK) == 0x00) // not PAUSED, READY nor RUNNING
+			return 0;
+	}
 	return 0;
-}
-
-double GdSpice::update_times() {
-	time_game = last_game_time - start_time;
-	time_diff = time_simulation - time_game;
-	return time_diff;
-}
-
-void GdSpice::on_sync2(double time) {
-	time_simulation = time;
-	
-	while (simulation_state != RUNNING) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time)); // this is OK → we are sleeping in ngspice background thread, not in godot thread
-		if ((simulation_state & WORKING_TYPE_STATE_MASK) == 0x00) // not PAUSED, READY nor RUNNING
-			return;
-	}
-	
-	if (update_times() > sleep_start_level) {
-		if (verbose > 1) {
-			godot::UtilityFunctions::print("[GdSpice] sleep time_diff=", time_diff, " time_game=", time_game, " time_simulation=", time_simulation, " cumulative_sleep_time=", cumulative_sleep_time, " ms");
-		}
-		call_deferred("emit_signal", "simulation_go_sleep", time_diff, time_game, time_simulation, cumulative_sleep_time);
-		
-		do {
-			cumulative_sleep_time += sleep_time;
-			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time)); // this is OK → we are sleeping in ngspice background thread, not in godot thread
-		} while (update_times() > sleep_end_level && (simulation_state & WORKING_TYPE_STATE_MASK)); // don't sleep while simulation is not running type state
-	} else if (time_diff < simulation_too_slow_level) {
-		if (last_alarm_time < last_game_time + simulation_too_slow_level) {
-			last_alarm_time = last_game_time;
-			call_deferred("emit_signal", "simulation_too_slow", time_diff, time_game, time_simulation);
-		}
-	}
 }
