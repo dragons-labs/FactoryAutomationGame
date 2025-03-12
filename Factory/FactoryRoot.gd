@@ -240,10 +240,8 @@ func get_signal_value(signal_name : String) -> float:
 			value1 = circuit_simulator.gdspice.get_last_value(electric_signal)
 	
 	var value2 = null
-	var computer_id = null
 	for element in factory_builder.computer_control_blocks.values():
 		var computer_system = element.get_child(0)
-		computer_id = computer_system.computer_system_id
 		if computer_system.is_running_and_ready() and signal_name in computer_system.computer_output_names:
 			# NOTE controlling this same signal by multiple computer system is not supported here
 			value2 = computer_system.get_signal_value(signal_name, null)
@@ -266,7 +264,7 @@ func get_signal_value(signal_name : String) -> float:
 		#print("get_signal_value (electronic circuit)", signal_name, " → ", value1)
 		return value1
 	elif value2 != null and value2 != "":
-		#print("get_signal_value (computer system #", computer_id, ") ", signal_name, " → ", value2)
+		#print("get_signal_value (computer system #", computer_system.computer_system_id, ") ", signal_name, " → ", value2)
 		return float(value2)
 	else:
 		#print("get_signal_value (default) ", signal_name, " → ", 0)

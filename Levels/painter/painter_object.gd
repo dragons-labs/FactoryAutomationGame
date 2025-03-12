@@ -20,7 +20,7 @@ var factory_object_info = {
 var _material
 var _timer
 
-var tt
+var tt = 0
 func start_painting():
 	prints("start", _factory_root._factory_time)
 	tt = _factory_root._factory_time

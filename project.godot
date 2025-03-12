@@ -12,7 +12,7 @@ config_version=5
 
 config/name="FactoryAutomation"
 run/main_scene="res://ApplicationRoot.tscn"
-config/features=PackedStringArray("4.3")
+config/features=PackedStringArray("4.4")
 
 [autoload]
 
@@ -43,6 +43,10 @@ theme/custom="res://UI_theme.tres"
 [internationalization]
 
 locale/translations=PackedStringArray("res://Base/Camera/translate/Camera.en.translation", "res://Base/WorldEditorUI/translate/WorldEditorUI.en.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.en.translation", "res://ComputerSimulator/translate/ComputerSystemSimulator.en.translation", "res://MainMenu/translate/MainMenu.en.translation", "res://Manual/translate/Manual.en.translation", "res://Factory/translate/Factory.en.translation", "res://Factory/translate/Factory.pl.translation", "res://MainMenu/translate/MainMenu.pl.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.pl.translation")
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
 
 [rendering]
 

@@ -273,7 +273,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif FAG_Utils.action_exact_match_pressed("CAMERA_MOUSE_MOVE"):
 			_translate(Vector3(-event.relative.x, event.relative.y, 0) * mouse_move_step)
 		elif FAG_Utils.action_exact_match_pressed("CAMERA_MOUSE_ZOOM"):
-			_translate(Vector3(0, 0, event.relative.y*mouse_zooming_step))
+			_translate(Vector3(0, 0, event.relative.y * mouse_zooming_step))
 
 func _input(event: InputEvent) -> void:
 	if _input_disabled or process_camera_input_after_gui:
@@ -295,7 +295,7 @@ func _update_zoom(value : float):
 	_camera.fov = clamp(_camera.fov + value, 1, 179) # preventing errors in Godot code 
 
 func _update_yaw(value : float):
-	_target.rotation.y += value
+	_target.rotation.y += value  # don't use _target.rotate_y(value) due to Euler rotations combining
 
 func _update_pitch(value : float):
-	_target.rotation.x = clamp(_target.rotation.x + value, PI/-2, PI/2)
+	_target.rotation.x = clamp(_target.rotation.x + value, PI/-2, PI/2)  # don't use _target.rotate_x(value) due to Euler rotations combining

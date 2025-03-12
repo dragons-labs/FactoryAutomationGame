@@ -186,7 +186,6 @@ func _list_saves() -> void:
 func _on_add_save_slot_pressed(text := "") -> void:
 	if not text:
 		text = %NewSaveSlot/NewSaveSlotName.text
-	var item_list := item_list
 	if text and FAG_Utils.find_item_in_item_list(item_list, text) < 0:
 		var index = item_list.add_item(text)
 		item_list.set_item_metadata(index, {

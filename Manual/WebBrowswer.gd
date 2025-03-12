@@ -73,7 +73,7 @@ func _on_page_failed_loading(_aborted, _msg_err, node):
 	url_status.add_theme_color_override("font_disabled_color", Color.RED)
 	url_status.disabled = true
 
-func _on_url_text_changed(new_text: String) -> void:
+func _on_url_text_changed(_new_text: String) -> void:
 	url_status.text = tr("BUTTON_ENTER")
 	url_status.tooltip_text = tr("BUTTON_ENTER_TOOLTIP")
 	url_status.disabled = false

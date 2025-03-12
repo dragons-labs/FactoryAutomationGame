@@ -35,9 +35,9 @@ static func register_action(action_name : StringName, events_keys_info : Array, 
 		InputMap.action_add_event(action_name, event)
 	return true
 
-static func _get_prop_info(property_list : Array, name : String) -> Dictionary:
+static func _get_prop_info(property_list : Array, prop_name : String) -> Dictionary:
 	for prop_info in property_list:
-		if prop_info.name == name:
+		if prop_info.name == prop_name:
 			return prop_info
 	return {}
 
