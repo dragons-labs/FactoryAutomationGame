@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
 
-AI tools (chat GPT) have been used for text translation and editing.
+Document translated automatically using AI (chat GPT). Required verification of correctness.
 -->
 
 Program Execution

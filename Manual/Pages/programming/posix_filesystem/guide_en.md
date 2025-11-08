@@ -2,13 +2,13 @@
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
 
-AI tools (chat GPT) have been used for text translation and editing.
+Document translated automatically using AI (chat GPT). Required verification of correctness.
 -->
 
 File System
 ===========
 
-The file system has a hierarchical (tree-like) structure and starts at the root, denoted by a slash: `/`. By navigating its subdirectories, their subdirectories, and so on, we can reach any file in the system. By recording the names of the directories we pass through and separating them from each other and from the file name using slashes, we create an absolute path to the file, which always starts from the root.
+The file system has a hierarchical (tree-like) structure and starts at the root, denoted by a slash: `/`. By navigating its subdirectories, their subdirectories, and so on, we can reach any file in the system. By recording the names of the directories we pass through and separating them from each other and from the file name using slashes, we create an absolute path to the file, which always starts from the root (the first character of such a path is always `/`, which denotes the root).
 
 It is possible to express all paths from the root, but this is not always convenient. In many cases, we want to express a path relative to another directory, and for this, relative paths are used. The directory relative to which the relative path is expressed may be the directory containing the object or, more often, the current working directory.
 
@@ -18,7 +18,7 @@ A command interpreter like *bash* operates somewhere within this file structure,
 
 The working directory (*Present Working Directory*) is set independently for each running program. Typically, its initial value is set to the working directory of the shell that launched the program. It can be changed by the running program using the appropriate system function.
 
-In a shell compatible with `sh`, we can display the current working directory using the `pwd` command. It is often also shown before the prompt. We can change this directory using the `cd` command, followed by the path to the directory to be set as the working directory. This changes the directory relative to which relative paths will be interpreted in the shell and in programs launched after executing `cd`. This change does not affect programs that were previously launched and are still running in the background.
+In a shell compatible with `sh`, we can display the current working directory using the `pwd` command. It is often also shown before the prompt. We can change this directory using the `cd` command, followed by the path to the directory to be set as the working directory. This changes the directory relative to which relative paths will be interpreted in the shell and in programs launched after executing `cd`. This change does not affect programs that were previously launched and are still running in the background. A running program may also change its current working directory during execution by calling an appropriate system function.
 
 ## Relative Paths
 
@@ -57,7 +57,7 @@ A symbolic link, shown in blue in the illustration, is an entry in the directory
 
 A symbolic link functions similarly to a hard link, providing access to the same data through two different paths.
 
-For symbolic link objects, the `ls` command will show the file type as `l`, and the reported size will reflect the length of the stored path — this is the amount of data the symbolic link contains. The disk usage (reported by `du`) for a symbolic link will be zero since the link does not occupy separate disk space; it only increases the size of the directory structure.
+For symbolic link objects, the `ls` command will show the file type as `l`, and the reported size will reflect the length of the stored path — this is the amount of data the symbolic link contains. The disk usage (reported by `du`) for a symbolic link will most often be zero, because the link itself (if it is short enough) does not take up any separate space on the disk - it is saved directly in the file system structure (usually directly in the i-node).
 
 It’s important to note that symbolic links are not as similar to the object they point to as hard links are. Deleting the file a symbolic link points to or even changing the file’s location or name will result in the symbolic link becoming a broken link, and access to the data through the link will be lost. If the file the link points to is completely removed, meaning there are no files or hard links to it, the data will be deleted regardless of whether there were symbolic links pointing to it.
 
@@ -84,6 +84,6 @@ For example:
 
 ## Home Directory
 
-A tilde (`~`) is often used in paths to represent the current user's home directory, or a tilde followed by a username (`~username`) to represent the home directory of the specified user. The home directory is intended for storing the user's files (both individual program configuration files and files created or collected by the user), as defined in the user's account configuration.
+The home directory is the user's default directory (defined in their account configuration) where they have write permissions for their files and (in the form of hidden files and directories) the configuration of the programs they use is stored.
 
-As with wildcard characters, if we need to pass a tilde as part of program arguments, we must protect it from being interpreted as a special character using quotes, apostrophes, or a backslash.
+A tilde (`~`) used as the first character in a path indicates that the path is relative to our or a specified user's home directory – for example, `~/abc` is the `abc` directory in our home directory, and `~xyz/abc` is the `abc` directory in the home directory of user `xyz`.

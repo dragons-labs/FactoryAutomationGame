@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
 
-AI tools (chat GPT) have been used for text translation and editing.
+Document translated automatically using AI (chat GPT). Required verification of correctness.
 -->
 
 Basics of Programming in the "sh" Shell
@@ -63,7 +63,9 @@ echo "$variableA ${variableA}AA"
 echo '$variableA ${variableA}AA'
 ```
 
-If we want the variable to be visible to programs launched from this shell (including future Bash instances responsible for executing script code from a file), we need to export it using the `export variableA` command (note the lack of a dollar sign here). Such a variable becomes an environment variable accessible to all child processes of this shell.
+### Environment variables
+
+If we want the variable to be visible to programs launched from this shell (including future Bash instances responsible for executing script code from a file), we need to export it using the `export variableA` command. We pass the variable name to the command, not its value, so we don't use a dollar sign. . Such a variable becomes an environment variable accessible to all child processes of this shell.
 
 Environment variables can also be set without using `export` for a single new program by specifying their names and values before the command name:
 

@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
 
-AI tools (chat GPT) have been used for text translation and editing.
+Document translated automatically using AI (chat GPT). Required verification of correctness.
 -->
 
 ## Running code
@@ -320,7 +320,7 @@ if "ab" in x:
 if "ba" in x:
 	print ("'ba' is a substring of:", x)
 
-# modifying a string using indexing, e.g.
+# in Python modifying a string using indexing, e.g.
 # x[2]="X" 
 # does not work
 
@@ -375,7 +375,7 @@ print(s)
 ### Character-to-Number Conversion and Character Encoding
 
 ```Python
-# displaying characters using their Unicode code points
+# getting characters using their Unicode code points
 # - the chr() function returns a string made up of the character at the given code point
 # within strings, you can also use \uNNNN where NNNN is the character code
 # or simply place the character in a UTF8-encoded file

@@ -1,10 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
-
-AI tools (chat GPT) have been used for text editing.
-
-editing note: NEW
 -->
 
 Programowanie

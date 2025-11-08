@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
 
-AI tools (chat GPT) have been used for text translation and editing.
+Document translated automatically using AI (chat GPT). Required verification of correctness.
 -->
 
 Electronics
@@ -58,6 +58,8 @@ There is (characteristic for a given element) a relationship between the voltage
 For a significant group of materials, it takes the form:
 	*The electric current flowing between two points is directly proportional to the voltage between these points.* (**Ohm's Law**)
 However, in many other cases, this relationship may take a different form.
+
+The ratio of the voltage between the ends of an element (for which Ohm's Law applies, e.g. a resistor or an ordinary piece of wire) to the current flowing through it is called **resistance**: *R=U/I*.
 
 ### Schematic Conventions
 

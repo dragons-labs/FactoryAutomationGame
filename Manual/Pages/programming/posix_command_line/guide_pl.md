@@ -1,8 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
-
-editing note: MOVIE+PDF merged, extended
 -->
 
 Praca w terminalu
@@ -10,13 +8,13 @@ Praca w terminalu
 
 Komputer nazywany jest elektroniczną maszyną liczącą. Oznacza to że zajmuje się on głównie wykonywaniem jakiś operacji arytmetycznych, logicznych. W zależności od wyniku takich operacji może wykonywać skoki do innego miejsca, co pozwala czyli wykonanie innego zbioru instrukcji w zależności od danych lub działań użytkownika.
 
-Komputer zajmuje się jedynie wykonywaniem takich ciągów instrukcji składających się na program komputerowy. Z punktu widzenia procesora je wykonującego, mają one zawsze postać kodu maszynowego, czyli numeru instrukcji do wykonania i jej argumentów. Z punktu widzenia programisty, mogą być one reprezentowane przez złożone instrukcje języków wyższego poziomu lub wywołania funkcji bibliotecznych. Natomiast z punktu widzenia użytkownika, często są nimi całe gotowe programy, czy też jakieś konkretne funkcje w ramach danego programu.,
+Komputer zajmuje się jedynie wykonywaniem takich ciągów instrukcji składających się na program komputerowy. Z punktu widzenia procesora je wykonującego, mają one zawsze postać kodu maszynowego, czyli numeru instrukcji do wykonania i jej argumentów. Z punktu widzenia programisty, mogą być one reprezentowane przez złożone instrukcje języków wyższego poziomu lub wywołania funkcji bibliotecznych. Natomiast z punktu widzenia użytkownika, często są nimi całe gotowe programy, czy też jakieś konkretne funkcje w ramach danego programu.
 
 Zawsze jednak potrzebna jest metoda wprowadzenia takiego ciągu instrukcji oraz odebrania wyników działania programu. Dawno temu polegało to na przygotowaniu całości programu na jakimś nośniku (np. kartach perforowanych), uruchomieniu komputera, a następnie odebraniu wygenerowanych wyników na jakimś nośniku (np. w postaci wydruku). Interakcja z komputerem ograniczała się do możliwości niskopoziomowego podglądania stanu jego działania i ewentualnie możliwości wpłynięcia na działanie programu, z poziomu pulpitu technicznego.
 
 Pracę interaktywną umożliwiła dopiero komunikacja tekstowa, pozwalająca na prowadzenie swego rodzaju dialogu z komputerem, w trakcie jego pracy. Dialogu polegającego na przesyłaniu do komputera poleceń i danych oraz odbieraniu wyników jego działania. Urządzenie umożliwiające taką tekstową komunikację z komputerem nazywamy terminalem.
 
-Podstawowym sposobem wydawania poleceń w systemach typu Unix jest wpisywanie ich w terminalu. Terminal może pracować w trybie tekstowym lub może być uruchomiony (jako tzw. emulator terminala) w trybie graficznym.
+Podstawowym sposobem wydawania poleceń w systemach typu Unix jest wpisywanie ich w terminalu.
 
 ## Terminal
 
@@ -44,7 +42,7 @@ Oba programy pozwalają na edycję linii poleceń oraz korzystanie z historii, d
 
 Istotnym ułatwieniem przy wprowadzaniu poleceń jest funkcja auto uzupełniania z użyciem przycisku Tab. Obejmująca zarówno same nazwy poleceń, jak również ścieżki, a nierzadko także inne argumenty poleceń. W przypadku bash'a pojedyncze naciśnięcie klawisza Tab powoduje dopełnienie wpisywanego tekstu, jeżeli jest ono jednoznaczne. Jeżeli jest kilka możliwości, dopełniony zostanie najdłuższy jednoznaczny fragment. Dwukrotne naciśnięcie klawisza Tab spowoduje wyświetlenie dostępnych możliwości. Po ujednoznacznieniu możemy ponownie użyć klawisza Tab, aby nastąpiło dopełnienie, i tak dalej. Domyślne zachowanie zsh jest trochę inne.
 
-Warto zauważyć że taka obsługa linii poleceń i jej historii nie jest cechą terminala, tylko samej powłoki. A jako że jest to często funkcjonalność dostarczana przez dedykowaną biblioteką można ją także wielu innych programach.
+Warto zauważyć że taka obsługa linii poleceń i jej historii nie jest cechą terminala, tylko samej powłoki. A jako że jest to często funkcjonalność dostarczana przez dedykowaną bibliotekę można ją także wielu innych programach.
 
 ### screen i tmux
 

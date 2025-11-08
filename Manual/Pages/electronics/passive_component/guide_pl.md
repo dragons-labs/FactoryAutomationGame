@@ -1,8 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
-
-editing note: PDF based
 -->
 
 Elementy bierne

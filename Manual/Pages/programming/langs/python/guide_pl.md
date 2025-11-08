@@ -1,8 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
-
-editing note: NEW, VIP
 -->
 
 Podstawy programowania w Python
@@ -234,7 +232,7 @@ print("dwa kolejne =", l[1:3])
 # wypisanie wszystkich elementów
 for e in l:
 	# możemy modyfikować zmienną "e",
-	# ale nie będzie maiło to wplywu na listę
+	# ale nie będzie maiło to wpływu na listę
 	print(e)
 
 # alternatywne iterowanie po elementach
@@ -325,7 +323,7 @@ if "ab" in x:
 if "ba" in x:
 	print ("ba jest pod-napisem:", x)
 
-# nie da się modyfikować napisu z użyciem odwołań x[numer] np.
+# w Pythonie nie da się modyfikować napisu z użyciem odwołań x[numer] np.
 # x[2]="X"
 # nie zadziała
 
@@ -381,7 +379,7 @@ print(s)
 ### Konwersja znak - numer znaku i kodowania znaków
 
 ```Python
-# wypisywanie znaków z użyciem ich numeru w unikodzie
+# uzyskiwanie znaków z użyciem ich numeru w unikodzie
 # - funkcja chr() zwraca napis złożony ze znaku o podanym numerze
 # w ramach napisów można też użyć \uNNNN gdzie NNNN jest numerem znaku
 # lub po prostu umieścić dany znak w pliku kodowanym UTF8

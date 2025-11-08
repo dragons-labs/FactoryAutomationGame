@@ -1,10 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
-
-AI tools (chat GPT) have been used for text editing.
-
-editing note: NEW
 -->
 
 Programowanie
@@ -12,7 +8,7 @@ Programowanie
 
 ## Wielość języków programowania
 
-Istnienie więcej niż jednego języka programowania ma sens, gdyż pozwala na dostosowanie języka do specyfiki jego użycia - trochę innych mechanizmów będzie wymagał język przeznaczony do pracy z plikami i uruchamiania innych programów, inaczej wysokopoziomowy język skryptowy ogólnego przeznaczenia, a jeszcze inaczej niezbyt wysokopoziomowy, wydajny, język kompilowany. Warto też poznać więcej niż jedne język programowania tak aby poznane przez programistę języki pokrywały takie różne zastosowania. Nie warto jednak uczyć się kilkunastu czy więcej języków „na zapas”, gdyż po pierwsze nieużywane języki, ich szczegóły składniowe będzie się zapominać, a po drugie umiejąc programować opanowanie kolejnego (zwłaszcza niezbyt egzotycznego) języka jest kwestią kilku-kilkunastu godzin programowania posiłkując się dokumentacją tego języka i jego standardowych bibliotek.
+Istnienie więcej niż jednego języka programowania pozwala na dostosowanie języka do specyfiki jego użycia - trochę innych mechanizmów będzie wymagał język przeznaczony do pracy z plikami i uruchamiania innych programów, inaczej wysokopoziomowy język skryptowy ogólnego przeznaczenia, a jeszcze inaczej niezbyt wysokopoziomowy, wydajny, język kompilowany. Warto też poznać więcej niż jedne język programowania tak aby poznane przez programistę języki pokrywały takie różne zastosowania. Nie warto jednak uczyć się kilkunastu czy więcej języków „na zapas”, gdyż po pierwsze nieużywane języki, ich szczegóły składniowe będzie się zapominać, a po drugie umiejąc programować opanowanie kolejnego (zwłaszcza niezbyt egzotycznego) języka jest kwestią kilku-kilkunastu godzin programowania posiłkując się dokumentacją tego języka i jego standardowych bibliotek.
 
 ## Realizacja wejścia / wyjścia
 

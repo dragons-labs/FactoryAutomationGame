@@ -1,8 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
-
-editing note: VIP based, extended (intro)
 -->
 
 # Wstęp do elektroniki cyfrowej
@@ -11,7 +9,7 @@ Cyfrowość elektroniki polega na reprezentacji sygnałów w formie abstrakcyjny
 
 Liczby te zazwyczaj zapisywane są w systemie dwójkowym. Napięcie poniżej jakiejś wartości odpowiada zeru na danej cyfrze, natomiast powyżej jakiegoś poziomu jedynce. Kolejnymi cyframi są napięcia w różnych miejscach obwodu („na kolejnych przewodach”) lub w na pojedynczym przewodzie w kolejnych jednostkach czasu.
 
-Pozwala to między innymi zwiększyć odporność na zakłócenia i bezstratnie replikować taką cyfrową informację.
+Taka reprezentacja w postaci dyskretnych poziomów napięć, identyfikowanych jako zera i jedynki – wartości logicznego fałszu i prawdy, pozwala między innymi zwiększyć odporność na zakłócenia i bezstratnie replikować taką cyfrową informację.
 
 ## Algebra Boole'a
 

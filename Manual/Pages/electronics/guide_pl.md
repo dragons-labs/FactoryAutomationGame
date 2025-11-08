@@ -1,10 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
-
-AI tools (chat GPT) have been used for text editing.
-
-editing note: custom, PDF based
 -->
 
 Elektronika
@@ -16,7 +12,8 @@ Konstruowanie układów elektronicznych pozwala na przetwarzanie sygnałów w po
 
 ### Napięcie elektryczne
 
-Napięcie elektryczne *U* pomiędzy punktem A i B (jakiegoś obwodu) jest to różnica potencjału elektrycznego w punkcie A i w punkcie B. Znak napięcia zależy od kierunku w którym przechodzimy po obwodzie elektrycznym.
+Napięcie elektryczne *U* pomiędzy punktem A i B (jakiegoś obwodu) jest to różnica potencjału elektrycznego w punkcie A i w punkcie B.
+Jako że wynik odejmowania zależy od kolejności argumentów, to także znak napięcia zależy od kierunku, w którym przechodzimy po obwodzie elektrycznym.
 
 #### Potencjał elektryczny
 
@@ -60,6 +57,8 @@ Występuje (charakterystyczna dla danego elementu) zależność pomiędzy napię
 Dla znaczącej grupy materiałów ma ona postać:
 	*Prąd elektryczny płynący między dwoma punktami jest wprost proporcjonalny do napięcia między tymi punktami.* (**Prawo Ohma**)
 Jednocześnie w wielu innych przypadkach zależność ta może mieć inną postać.
+
+Stosunek napięcia pomiędzy końcami elementu (dla którego zachodzi Prawo Ohma, np. rezystora czy zwykłego kawałka przewodu) do natężenia prądu przez niego płynącego nazywamy **oporem**: *R=U/I*.
 
 ### Konwencje schematów
 

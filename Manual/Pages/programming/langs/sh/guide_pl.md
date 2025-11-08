@@ -1,8 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
-
-editing note: PDF, modified
 -->
 
 Podstawy programowania w powłoce „sh”
@@ -54,8 +52,7 @@ zmiennaA=-91
 zmiennaB="qa   z"
 zmiennaC=98.6 # to będzie traktowane jako napis a nie liczba
 ```
-
-Zwróć uwagę na brak spacji pomiędzy nazwą zmiennej a znakiem równości w operacji przypisania - jest to wymóg składniowy. Wynika to ze znaczenia spacji w składni powłoki - oddziela ona nazwy poleceń i argumenty od siebie, czyli pełni istotną funkcję składniową, odpowiadającą nawiasom okrągłym i przecinkom, używanym do oddzielania nazwy funkcji i argumentów od siebie, z wielu innych języków
+Brak spacji pomiędzy nazwą zmiennej a znakiem równości jest wymogiem składniowym. Wynika to ze znaczenia spacji w składni powłoki. Spacja oddziela nazwy poleceń i argumenty od siebie, czyli pełni istotną funkcję składniową, odpowiadającą nawiasom okrągłym i przecinkom, używanym do oddzielania nazwy funkcji i argumentów od siebie, z wielu innych języków programowania.
 
 Odwołanie do zmiennej odbywa się z użyciem znaku dolara (`$`), po którym występuje nazwa zmiennej. Nazwa może być ujęta w klamry, ale nie musi (jest to przydatne gdy nie chcemy dawać spacji pomiędzy nazwą zmiennej a np. fragmentem napisu). Rozwijaniu ulegają nazwy zmiennych znajdujące się w napisach umieszczonych w podwójnych cudzysłowach. Umieszczenie odwołania do zmiennej w podwójnych cudzysłowach zabezpiecza białe znaki (spacje nowe linie) przy przekazywaniu do funkcji i programów (w tym przy przekazywaniu do echo, celem wypisywania).
 
@@ -65,7 +62,9 @@ echo "$zmiennaA ${zmiennaA}AA"
 echo '$zmiennaA ${zmiennaA}AA'
 ```
 
-Jeżeli chcemy aby zmienna była widoczna przez programy uruchamiane z tej powłoki (w tym przez kolejne instancje bash'a, odpowiedzialne np. za wykonywanie kodu skryptu uruchamianego z pliku) należy ją wyeksportować za pomocą polecenia `export zmiennaA` (zwróć uwagę na brak dolara w tym miejscu). Taka zmienna jest dostępna jako zmienna środowiskowa dla wszystkich potomków tej powłoki.
+### Zmienne środowiskowe
+
+Jeżeli chcemy aby zmienna była widoczna przez programy uruchamiane z tej powłoki (w tym przez kolejne instancje bash'a, odpowiedzialne np. za wykonywanie kodu skryptu uruchamianego z pliku) należy ją wyeksportować za pomocą polecenia `export zmiennaA`. Do polecenia przekazujemy nazwę zmiennej a nie jej wartość, więc nie używamy znaku dolara. Taka zmienna jest dostępna jako zmienna środowiskowa dla wszystkich potomków tej powłoki.
 
 Zmienne środowiskowe mogą być także ustawiane bez użycia `export` dla pojedynczego nowego programu poprzez podanie ich nazw i wartości przed nazwą polecenia:
 
@@ -75,7 +74,7 @@ ABCD=135 EFG=098 bash -c 'echo $ABCD $EFG'
 echo $ABCD
 ```
 
-Sa one jedynie widoczne w tak uruchomionym procesie potomnym (nie mogą być użyte w bieżącej powłoce, czy jako jako argumenty w linii poleceń). Dlatego w powyższych przykładach wywoływana jest nowa powłoka która korzysta z tak ustawionych zmiennych. Takie ustawianie zmiennych jest szczególnie przydatne gdy chcemy uruchomić pojedyncze polecenie w zmienionym środowisku - np. polecenie date w innej strefie czasowej: `TZ=America/New_York date`
+Są one jedynie widoczne w tak uruchomionym procesie potomnym (nie mogą być użyte w bieżącej powłoce, czy jako jako argumenty w linii poleceń). Dlatego w powyższych przykładach wywoływana jest nowa powłoka która korzysta z tak ustawionych zmiennych. Takie ustawianie zmiennych jest szczególnie przydatne gdy chcemy uruchomić pojedyncze polecenie w zmienionym środowisku - np. polecenie date w innej strefie czasowej: `TZ=America/New_York date`
 
 ### printf
 
@@ -191,7 +190,7 @@ done
 
 ### Pętla while
 
-Pętla wile powtażana jest dopóki podany w niej warunek jest prawdziwy:
+Pętla wile powtarzana jest dopóki podany w niej warunek jest prawdziwy:
 
 ```bash
 x=0
@@ -438,7 +437,7 @@ Sedowe polecenie s przyjmuje 3 argumenty (oddzielane mogą być dowolnym znakiem
 
 Należy zwrócić uwagę na różnicę w składni wyrażenia regularnego polegającą na poprzedzaniu `(`, `)` i `+` odwrotnym ukośnikiem aby miały znaczenie specjalne (jeżeli nie chcemy tego robić możemy włączyć obsługę ERE w sed poprzez opcję `-E`).
 
-Innymi przydatnymi komendami przetwarzającymi (specyficznej postaci) napisy są polecaenia `basename` i `dirname`. Służą one do uzyskania nazwy najgłębszego elementu ścieżki oraz ścieżki bez tego najglębszego elementu. Zobacz wynik działania:
+Innymi przydatnymi komendami przetwarzającymi (specyficznej postaci) napisy są polecenia `basename` i `dirname`. Służą one do uzyskania nazwy najgłębszego elementu ścieżki oraz ścieżki bez tego najgłębszego elementu. Zobacz wynik działania:
 
 ```bash
 basename /proc/sys/net/core/
@@ -494,7 +493,7 @@ echo ${y//"bb"/"XX"}
 
 Awk jest interpreterem prostego skryptowego języka umożliwiający przetwarzanie tekstowych baz danych postaci *linia == rekord*, gdzie pola oddzielane ustalonym separatorem (można powiedzieć że łączy funkcjonalność komend takich jak grep, cut, sed z prostym językiem programowania).
 
-Wyżej zaprezentowane wypisanie 5 pola (rozdzielanego :) z pliku `/etc/passwd`  z eliminacją pustych linii oraz linii złożonych tylko ze spacji i przecinków, realizowane przy użyciu poleceń `cut` i `grep` może być zrealizowane za pomocą samego awk:
+Wyżej zaprezentowane wypisanie 5 pola (rozdzielanego dwukropkiem) z pliku `/etc/passwd`  z eliminacją pustych linii oraz linii złożonych tylko ze spacji i przecinków, realizowane przy użyciu poleceń `cut` i `grep` może być zrealizowane za pomocą samego awk:
 
 ```bash
 awk -F: '$5 !  "^[ ,]*$" {print $5}' /etc/passwd

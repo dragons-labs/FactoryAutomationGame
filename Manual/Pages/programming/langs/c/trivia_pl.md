@@ -1,10 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
-
-editing note: NEW, VIP
-
-AI tools (chat GPT) have been used for text editing.
 -->
 
 Podstawy programowania w C (tematy bardziej zaawansowane)

@@ -1,14 +1,12 @@
 <!--
 SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 SPDX-License-Identifier: MIT
-
-editing note: MOVIE+PDF merged, extended
 -->
 
 System plików
 =============
 
-System plików ma strukturę hierarchiczną (drzewiastą) i rozpoczyna się w korzeniu oznaczanym ukośnikiem: `/`. Wchodząc w jego podkatalogi, ich podkatalogi i tak dalej, możemy dojść do dowolnego pliku w systemie. Zapisując nazwy katalogów przez które przechodziliśmy i rozdzielając je od siebie oraz od nazwy pliku przy pomocy ukośników tworzymy bezwzględną ścieżkę do danego pliku, czyli taką która właśnie rozpoczyna się od tego korzenia.
+System plików ma strukturę hierarchiczną (drzewiastą) i rozpoczyna się w korzeniu oznaczanym ukośnikiem: `/`. Wchodząc w jego podkatalogi, ich podkatalogi i tak dalej, możemy dojść do dowolnego pliku w systemie. Zapisując nazwy katalogów przez które przechodziliśmy i rozdzielając je od siebie oraz od nazwy pliku przy pomocy ukośników tworzymy bezwzględną ścieżkę do danego pliku, czyli taką która właśnie rozpoczyna się od tego korzenia (pierwszym znakiem w takiej ścieżce zawsze jest `/` oznaczający właśnie korzeń).
 
 Możliwe jest wyrażanie wszystkich ścieżek od korzenia, jednak nie zawsze jest to wygodne. W wielu wypadkach chcemy móc wyrazić ścieżkę względem jakiegoś innego katalogu i w tym celu stosuje się ścieżki względne. Katalogiem względem którego, wyrażana jest ścieżka względna może być katalog, w którym znajduje się obiekt ją zawierający lub, znacznie częściej, jest to tak zwany bieżący katalog roboczy.
 
@@ -18,13 +16,13 @@ Interpreter poleceń taki jak *bash* potrafi znajdować się gdzieś w tej struk
 
 Bieżący katalog roboczy (*Present Working Directory*) jest określany niezależnie dla każdego z działających programów. Typowo pierwotna jego wartość jest ustawiana na bieżący katalog roboczy powłoki która uruchomiła dany program. Może być on zmieniony przez działający program przy użyciu odpowiedniej funkcji systemowej.
 
-W przypadku powłoki zgodnej z `sh` informację o jej bieżącym katalogu roboczym możemy wypisać przy pomocy polecenia `pwd`. Często jest ona także podawana przed znakiem zachęty. Natomiast zmiany tego katalogu możemy dokonać przy pomocy polecenia `cd`, po którym podawana jest ścieżka do katalogu który ma być ustawiony jako katalog roboczy. W ten sposób zmienimy katalog względem którego będą interpretowane ścieżki względne w danej powłoce i w programach przez nią uruchamianych po wykonaniu polecenia `cd`. Zmiana ta nie wpłynie na uruchomione wcześniej i nadal działające w tle programy.
+W przypadku powłoki zgodnej z `sh` informację o jej bieżącym katalogu roboczym możemy wypisać przy pomocy polecenia `pwd`. Często jest ona także podawana przed znakiem zachęty. Natomiast zmiany tego katalogu możemy dokonać przy pomocy polecenia `cd`, po którym podawana jest ścieżka do katalogu który ma być ustawiony jako katalog roboczy. W ten sposób zmienimy katalog względem którego będą interpretowane ścieżki względne w danej powłoce i w programach przez nią uruchamianych po wykonaniu polecenia `cd`. Zmiana ta nie wpłynie na uruchomione wcześniej i nadal działające w tle programy. Uruchomiony program w trakcie działania może także zmienić swój bieżący katalog roboczy wywołaniem odpowiedniej funkcji systemowej.
 
 ## Ścieżki względne
 
 Ścieżką względną jest dowolna ścieżka nie zaczynająca się od korzenia, czyli nie rozpoczynająca się od ukośnika.
 
-Zarówno w ścieżkach bezwzględnych jak i względnych można użyć pojedynczej kropki (`.`) oznaczającej aktualny katalog w ścieżce oraz dwóch kropek (`..`) oznaczających katalog nadżędny. W ścieżkach bezwględnych są one jednak zawsze nadmiarowe i dlatego żadko spotykane, natomiast w ścieżkach względnych pełnią bardzo istotną rolę. Dwie kropki (`..`) użyte odpowiednio wiele razy (z rozdzielającym je `/`) pozwalają wrócić ścieżką względną z dowolnego katalogu nawet aż do korzenia, a zatem dojść także do dowolnego innego pliku w naszym drzewie.
+Zarówno w ścieżkach bezwzględnych jak i względnych można użyć pojedynczej kropki (`.`) oznaczającej aktualny katalog w ścieżce oraz dwóch kropek (`..`) oznaczających katalog nadrzędny. W ścieżkach bezwględnych są one jednak zawsze nadmiarowe i dlatego rzadko spotykane, natomiast w ścieżkach względnych pełnią bardzo istotną rolę. Dwie kropki (`..`) użyte odpowiednio wiele razy (z rozdzielającym je `/`) pozwalają wrócić ścieżką względną z dowolnego katalogu nawet aż do korzenia, a zatem dojść także do dowolnego innego pliku w naszym drzewie.
 
 Pojedyncza kropka (`.`) użyteczna jest praktycznie jedynie na początku ścieżki (gdzie oznacza katalog względem którego jest interpretowana ścieżka względna, na przykład bieżący katalog roboczy). Nierzadko jest używana nawet jako cała ścieżka do aktualnego katalogu.
 
@@ -57,11 +55,11 @@ Link symboliczny, pokazany ilustracji zaznaczony kolorem niebieskim, stanowi wpi
 
 Link symboliczny funkcjonuje podobnie do linku twardego, zapewniając dostęp do tych samych danych przez dwie różne ścieżki.
 
-Dla obiektów typu link symboliczny polecenie ls będzie pokazywać typ pliku `l` a podawany rozmiar wynika z długości przechowywanej ścieżki – tyle danych zawiera sam link symboliczny. Zajętość dysku (podawana przez `du`) dla linku symbolicznego będzie wynosiła zero, gdyż sam link nie zajmuje osobnego miejsca na dysku, a jedynie zwiększa rozmiar zajmowany przez strukturę opisującą katalog.
+Dla obiektów typu link symboliczny polecenie ls będzie pokazywać typ pliku `l` a podawany rozmiar wynika z długości przechowywanej ścieżki – tyle danych zawiera sam link symboliczny. Zajętość dysku (podawana przez `du`) dla linku symbolicznego będzie najczęściej wynosiła zero, gdyż sam link (jeżeli jest odpowiednio krótki) nie zajmuje osobnego miejsca na dysku - zapisywany jest bezpośrednio w strukturze systemu plików (najczęściej bezpośrednio w i-node).
 
-Należy mieć świadomość, iż w przypadku linków symbolicznych nie mamy takiego podobieństwa linku do obiektu na który wskazuje ten link, jak w przypadku linków twardych. W przypadku linków symbolicznych, usunięcie pliku na który wskazywał link, czy też nawet zmiana lokalizacji bądź nazwy takiego pliku, prowadzi do tego że link symboliczny staje się linkiem zerwanym i tracimy dostęp do danych z wykorzystaniem tego linku. Jeżeli plik na który wskazywał link zostanie skutecznie usunięty, czyli nie będzie ani tego pliku ani linków twardych do niego to dane też zostaną usunięte, bez względu na to czy już wskazywały na nie jakieś linki symboliczne, czy nie.
+W przypadku linków symbolicznych nie ma takiego podobieństwa linku do obiektu na który wskazuje ten link, jak w przypadku linków twardych. W przypadku linków symbolicznych, usunięcie pliku na który wskazywał link, czy też nawet zmiana lokalizacji bądź nazwy takiego pliku, prowadzi do tego że link symboliczny staje się linkiem zerwanym i tracimy dostęp do danych z wykorzystaniem tego linku. Jeżeli plik na który wskazywał link zostanie skutecznie usunięty, czyli nie będzie ani tego pliku ani linków twardych do niego to dane też zostaną usunięte, bez względu na to czy już wskazywały na nie jakieś linki symboliczne, czy nie.
 
-Należy mieć także świadomość iż:
+Ponadto:
 * ścieżki względne zapisane w linku nie są interpretowane względem bieżącego katalogu roboczego, czy nawet katalogu użytego w ścieżce dostępu do linku
 a względem katalogu w którym znajduje się link
 * polecenie `ln` (używane do tworzenia linków) standardowo zapisze do tworzonego linku literalnie podaną w linii poleceń ścieżkę. Oznacza to że możemy tworzyć linki symboliczne do nieistniejących plików, ale też przez pomyłkę możemy utworzyć błędne dowiązania.
@@ -85,6 +83,6 @@ Na przykład:
 
 ## Katalog domowy
 
-Często w ścieżkach stosowana jest też tylda (`~`) oznaczająca katalog domowy aktualnego użytkownika lub tylda po której występuje nazwa użytkownika (`~nazwa`) oznaczająca katalog domowy wskazanego użytkownika. Mianem katalogu domowego określa się katalog przeznaczony na przechowywanie plików użytkownika (zarówno indywidualnej konfiguracji programów, jak i plików przez niego tworzonych bądź gromadzonych) określony w konfiguracji konta danego użytkownika.
+Mianem katalogu domowego określamy domyślny katalog użytkownika (określony w konfiguracji jego konta) w którym ma on prawo zapisu swoich plików oraz (w postaci ukrytych plików i katalogów) przechowywana jest konfiguracja używanych przez niego programów.
 
-Podobnie jak przy znakach uogólniających jeżeli mamy potrzebę przekazania tyldy wśród argumentów programu należy zabezpieczyć ją przed interpretacją jako znak specjalny z użyciem cudzysłowów, apostrofów lub odwrotnego ukośnika.
+Tylda (`~`) użyta jako pierwszy znak w ścieżce oznacza że jest ona wyrażona względem katalogu domowego naszego lub wskazanego użytkownika - np. `~/abc` to katalog `abc` w naszym katalogu domowym, a `~xyz/abc` to katalog `abc` w katalogu domowym użytkownika `xyz`.
