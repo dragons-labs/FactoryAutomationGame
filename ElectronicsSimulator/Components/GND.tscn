@@ -16,9 +16,9 @@ ui_name = "ELECTRONIC_COMPONENT_NAME_GND"
 ui_icon = ExtResource("2_48mbe")
 type = "NET"
 subtype = "GND"
-params = {
+params = Dictionary[String, Variant]({
 "NetName": "GND"
-}
+})
 metadata/_edit_lock_ = true
 
 [node name="Value" type="LineEdit" parent="Element"]

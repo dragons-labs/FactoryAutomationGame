@@ -7,7 +7,9 @@ const MANUALS_BBCODE_DIR := "res://Manual/generated-bbcode/"
 const MANUALS_CONTENTS_FILE := "res://Manual/Pages/contents.json"
 
 func show_info(object : Object, progress_save_path : String) -> void:
-	_tab_container.get_current_tab_control().get_node("RichTextLabel").text = tr("MANUAL_SELECT_TOPIC")
+	var text_area = _tab_container.get_current_tab_control().get_node("RichTextLabel")
+	if text_area:
+		text_area.text = tr("MANUAL_SELECT_TOPIC")
 	if object:
 		if _task_info_node.get_parent() != _tab_container:
 			_task_info_node.get_parent().remove_child(_task_info_node)

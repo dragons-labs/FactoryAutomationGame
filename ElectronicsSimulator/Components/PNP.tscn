@@ -29,11 +29,11 @@ image_position = Vector2(-24, 0)
 ui_name = "ELECTRONIC_COMPONENT_NAME_PNP"
 ui_icon = ExtResource("3_4lpep")
 type = "PNP"
-params = {
+params = Dictionary[String, Variant]({
 "models": {
 "PNP": ".model PNP pnp"
 }
-}
+})
 metadata/_edit_lock_ = true
 
 [node name="Value" type="LineEdit" parent="Element"]

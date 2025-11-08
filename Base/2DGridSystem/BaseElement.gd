@@ -42,7 +42,7 @@ class_name Grid2D_BaseElement
 
 @export var type : String
 @export var subtype : String
-@export var params : Dictionary[String, String]
+@export var params : Dictionary[String, Variant]
 
 
 ### get from terminal / from element

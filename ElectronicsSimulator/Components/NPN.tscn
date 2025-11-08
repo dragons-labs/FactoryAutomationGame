@@ -29,11 +29,11 @@ image_position = Vector2(-24, 0)
 ui_name = "ELECTRONIC_COMPONENT_NAME_NPN"
 ui_icon = ExtResource("3_a0umb")
 type = "NPN"
-params = {
+params = Dictionary[String, Variant]({
 "models": {
 "NPN": ".model NPN npn"
 }
-}
+})
 metadata/_edit_lock_ = true
 
 [node name="Value" type="LineEdit" parent="Element"]

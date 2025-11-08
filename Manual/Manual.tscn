@@ -39,6 +39,7 @@ metadata/_tab_index = 0
 [node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/MANUAL_TASK_INFO_TITLE"]
 auto_translate_mode = 2
 layout_mode = 2
+focus_mode = 2
 theme_override_fonts/normal_font = ExtResource("2_5vcv6")
 theme_override_fonts/mono_font = ExtResource("3_5mm3n")
 theme_override_fonts/italics_font = ExtResource("4_yctyr")
@@ -90,6 +91,7 @@ text = "BUTTON_GO_NEXT"
 [node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/MANUAL_TASK_GUIDE_TITLE"]
 auto_translate_mode = 2
 layout_mode = 2
+focus_mode = 2
 theme_override_fonts/normal_font = ExtResource("2_5vcv6")
 theme_override_fonts/mono_font = ExtResource("3_5mm3n")
 theme_override_fonts/italics_font = ExtResource("4_yctyr")
@@ -135,6 +137,7 @@ text = "BUTTON_GO_NEXT"
 [node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/MANUAL_TASK_TRIVIA_TITLE"]
 auto_translate_mode = 2
 layout_mode = 2
+focus_mode = 2
 theme_override_fonts/normal_font = ExtResource("2_5vcv6")
 theme_override_fonts/mono_font = ExtResource("3_5mm3n")
 theme_override_fonts/italics_font = ExtResource("4_yctyr")

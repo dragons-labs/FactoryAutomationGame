@@ -31,11 +31,11 @@ ui_name = "ELECTRONIC_COMPONENT_NAME_AND"
 ui_icon = ExtResource("3_kvrh0")
 type = "AND"
 subtype = "AND"
-params = {
+params = Dictionary[String, Variant]({
 "models": {
 "AND": ".model AND d_and"
 }
-}
+})
 metadata/_edit_lock_ = true
 
 [node name="Value" type="LineEdit" parent="Element"]
