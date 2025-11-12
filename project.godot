@@ -11,14 +11,16 @@ config_version=5
 [application]
 
 config/name="FactoryAutomation"
+config/version="1.0.0"
 run/main_scene="res://ApplicationRoot.tscn"
-config/features=PackedStringArray("4.4")
+config/features=PackedStringArray("4.5")
 
 [autoload]
 
 FAG_Settings="*res://Base/Singletons/Settings.gd"
 FAG_WindowManager="*res://Base/Singletons/WindowManager.gd"
 FAG_TCPEcho="*res://Base/Singletons/TCPEcho.gd"
+DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 
 [debug]
 
@@ -28,13 +30,9 @@ gdscript/warnings/static_called_on_instance=0
 
 mouse_cursor/tooltip_position_offset=Vector2(25, 25)
 
-[dotnet]
-
-project/assembly_name="EduGame"
-
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/editor_main_screen_per_tab/plugin.cfg", "res://addons/filesystem_drawer/plugin.cfg", "res://addons/godot_xterm/plugin.cfg", "res://addons/repl/plugin.cfg", "res://addons/script-ide/plugin.cfg")
+enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg", "res://addons/editor_main_screen_per_tab/plugin.cfg", "res://addons/filesystem_drawer/plugin.cfg", "res://addons/godot_xterm/plugin.cfg", "res://addons/repl/plugin.cfg", "res://addons/script-ide/plugin.cfg")
 
 [gui]
 

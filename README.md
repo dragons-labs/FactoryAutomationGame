@@ -7,6 +7,8 @@ SPDX-License-Identifier: MIT
 
 [Factory Automation](https://github.com/dragons-labs/FactoryAutomationGame/) is an open-source logic game about building factory production lines and creating an automation system for them.
 
+![Factory Automation Game](screenshot.jpg)
+
 The game is inspired by titles such as Shapez.io, Automachef and Infinifactory. However, it puts more emphasis on creating a system to manage our production line.
 Factory Automation offers, made available as part of the gameplay progression, dedicated control blocks to create advanced control systems using:
 
@@ -27,26 +29,27 @@ The game offers full simulation of electronic circuits (based on ngspice) and co
 
 ## Build Instruction (on Linux platform)
 
-1. use `git submodule update --init` to download addons dependencies
-2. build *GodotXterm* addon
+1. clone project repository: `git clone https://github.com/dragons-labs/FactoryAutomationGame/`
+2. use `git submodule update --init` to download addons dependencies
+3. build *GodotXterm* addon
 
-    a. use `addons/godot_xterm/native/build.sh`
-    b. (for Windows export option) use `scons build_library=no platform=windows arch=x86_64` in `addons/godot_xterm/native/`
+    * use `addons/godot_xterm/native/build.sh`
+    * (for Windows export option) use also `scons build_library=no platform=windows arch=x86_64` in `addons/godot_xterm/native/`
 
-3. build *GdSpice*
+4. build *GdSpice*
 
-    a. run `scons` in `ElectronicsSimulator/GdSpice/`
-    b. (for Windows export option) use `scons platform=windows arch=x86_64` in `ElectronicsSimulator/GdSpice/`
+    * run `scons` in `ElectronicsSimulator/GdSpice/`
+    * (for Windows export option) use also `scons platform=windows arch=x86_64` in `ElectronicsSimulator/GdSpice/`
 
-4. build or download binary release of *GDCEF*
+5. build or download binary release of *GDCEF*
 
-    a. binary files should be placed in `addons/3rdparty/gdcef/build/Linux` and (for Windows export option) in `addons/3rdparty/gdcef/build/Windows`
-    b. *GDCEF* should be build with `cef_artifacts` as binary / artifact directory
+    * binary files should be placed in `addons/3rdparty/gdcef/build/Linux` and (for Windows export option) in `addons/3rdparty/gdcef/build/Windows`
+    * *GDCEF* should be build with `cef_artifacts` as binary / artifact directory
 
-5. build game manual by running `scons` in `Manual/`
-6. open `project.godot` in Godot 4.3 (or higher), **ignore errors** and close editor after import is complete
-7. open `project.godot` in Godot editor again (there should be no errors)
-8. run project
+6. build game manual by running `scons` in `Manual/`
+7. open `project.godot` in Godot 4.3 (or higher), **ignore errors** and close editor after import is complete
+8. open `project.godot` in Godot editor again (there should be no errors)
+9. run project
 
 You can also export project for Linux and Windows platform using `./export.sh` script (do not directly use export option in editor).
 Use `./export.sh` to export amd64 Linux version or `./export.sh Windows` to export amd64 Windows version.

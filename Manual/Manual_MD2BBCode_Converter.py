@@ -215,8 +215,8 @@ def process_line(line, comment_is_open = False):
 	return output, comment_is_open
 
 
-code_block_re = re.compile('^(\s*)```([^`]*)$')
-first_world_format = re.compile('(\s*)(\\*|-|–|→|\\+|\\.|_|[0-9]+\\.|#{1,6})(\s+)(.*)$')
+code_block_re = re.compile('^(\\s*)```([^`]*)$')
+first_world_format = re.compile('(\\s*)(\\*|-|–|→|\\+|\\.|_|[0-9]+\\.|#{1,6})(\\s+)(.*)$')
 header = re.compile('^(---|===)')
 
 def process_lines(lines):

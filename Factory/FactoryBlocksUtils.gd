@@ -57,9 +57,9 @@ static func on_object_leave_block(node : Node3D, factory_block_belt : Area3D) ->
 		# print_verbose("exited [", factory_block_belt, "] ", node)
 		
 		# check if this belt is on node's belts lists
-		var belt_list = node.get_meta("belts_list")
-		if not belt_list:
+		if not node.has_meta("belts_list"):
 			return
+		var belt_list = node.get_meta("belts_list")
 		var index_on_belt_list = belt_list.find(factory_block_belt)
 		if index_on_belt_list >= 0:
 			# remove belt from node's belts list

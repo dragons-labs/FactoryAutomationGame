@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/ConveyorBelt.svg" id="1_8s4c1"]
 [ext_resource type="Script" path="res://Factory/FactoryBlocks/ConveyorBelt.gd" id="1_kb8ux"]
-[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/3d_models/imported/ConveyorBelt.tres" id="3_ueiua"]
+[ext_resource type="ArrayMesh" path="res://.godot/imported/ConveyorBelt.tres" id="3_ueiua"]
 
 [sub_resource type="GDScript" id="GDScript_smjxm"]
 resource_name = "FactoryBlockSettings"

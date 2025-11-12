@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/Consumer.svg" id="1_r6csw"]
 [ext_resource type="Script" path="res://Factory/FactoryBlocks/Consumer.gd" id="2_hk5bj"]
-[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/3d_models/imported/Consumer.tres" id="3_cxrsc"]
+[ext_resource type="ArrayMesh" path="res://.godot/imported/Consumer.tres" id="3_cxrsc"]
 
 [sub_resource type="GDScript" id="GDScript_smjxm"]
 resource_name = "FactoryBlockSettings"

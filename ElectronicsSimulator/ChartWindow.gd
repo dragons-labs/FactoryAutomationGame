@@ -26,7 +26,7 @@ func _ready() -> void:
 
 func _on_manual_time_enabled_button_toggled(toggled_on: bool) -> void:
 	if toggled_on:
-		var curr_time = chart.x_domain.get("ub", 0) - 0.001
+		var curr_time = chart.x_domain.ub - 0.001
 		_start_time_slider.max_value = curr_time
 		_start_time.set_value(0)
 		_end_time_slider.max_value = curr_time
@@ -36,8 +36,8 @@ func _on_manual_time_enabled_button_toggled(toggled_on: bool) -> void:
 		for i in range(0, len(chart.functions)):
 			chart.functions[i].__x = []
 			chart.functions[i].__y = []
-		chart.x_domain = {'lb':0}
-		chart.y_domain = {}
+		chart.x_domain = ChartAxisDomain.new()
+		chart.y_domain = ChartAxisDomain.new()
 		chart.load_functions(chart.functions)
 		# skip one update_measurements() call to avoid use chart when not ready 
 		skip = true

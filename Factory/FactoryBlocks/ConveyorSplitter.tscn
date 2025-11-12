@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Factory/FactoryBlocks/ConveyorSplitter.gd" id="1_kb8ux"]
 [ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/ConveyorSplitter.svg" id="1_omw6g"]
-[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/3d_models/imported/ConveyorSplitter.tres" id="3_wnwaj"]
+[ext_resource type="ArrayMesh" path="res://.godot/imported/ConveyorSplitter.tres" id="3_wnwaj"]
 
 [sub_resource type="GDScript" id="GDScript_smjxm"]
 resource_name = "FactoryBlockSettings"

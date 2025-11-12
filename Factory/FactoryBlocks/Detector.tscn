@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/Detector.svg" id="1_ne86n"]
 [ext_resource type="Script" path="res://Factory/FactoryBlocks/Detector.gd" id="2_enkqh"]
-[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/3d_models/imported/Detector.tres" id="3_txfn6"]
+[ext_resource type="ArrayMesh" path="res://.godot/imported/Detector.tres" id="3_txfn6"]
 
 [sub_resource type="GDScript" id="GDScript_smjxm"]
 resource_name = "FactoryBlockSettings"

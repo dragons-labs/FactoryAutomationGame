@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: public domain
-# SPDX-License-Identifier: 0BSD
+# SPDX-FileCopyrightText: NONE
+# SPDX-License-Identifier: CC0-1.0
 
 [submodule "addons/3rdparty/gdcef"]
 	path = addons/3rdparty/gdcef
@@ -9,8 +9,7 @@
 	url = https://github.com/fenix-hub/godot-engine.easy-charts
 [submodule "addons/3rdparty/godot-xterm"]
 	path = addons/3rdparty/godot-xterm
-	# TODO switch to official branch -> https://github.com/lihop/godot-xterm
-	url = https://github.com/rpaciorek/godot-xterm
-[submodule "addons/3rdparty/_godot-cpp"]
-	path = addons/3rdparty/_godot-cpp
-	url = https://github.com/godotengine/godot-cpp
+	url = https://github.com/lihop/godot-xterm
+#[submodule "addons/3rdparty/_godot-cpp"]
+#	path = addons/3rdparty/_godot-cpp
+#	url = https://github.com/godotengine/godot-cpp

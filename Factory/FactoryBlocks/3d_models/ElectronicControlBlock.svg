@@ -56,6 +56,16 @@ Based-On: https://commons.wikimedia.org/wiki/File:Electrical_symbols_library.svg
        id="g1049"
        transform="matrix(1.9646598,0,0,1.9689244,29.307676,25.603407)"
        style="stroke:#000000;stroke-width:0.508444;stroke-opacity:1">
+      <rect
+         stroke="#000000"
+         style="fill:#ffffff;fill-opacity:0.01;fill-rule:evenodd;stroke:none;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
+         id="rect239-6"
+         width="521.20984"
+         height="520.08093"
+         x="-14.917431"
+         y="-13.003754"
+         rx="2.9823887"
+         ry="2.4667206" />
       <g
          id="g1360"
          transform="matrix(11.136968,0,0,11.135561,1311.7232,-19.526112)"

@@ -15,9 +15,11 @@ dest_files=["res://.godot/imported/Blocks.blend-0445cb2e3a5e8506f9174cb3415c302c
 
 nodes/root_type=""
 nodes/root_name=""
+nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
 nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
 nodes/use_node_type_suffixes=true
 meshes/ensure_tangents=true
 meshes/generate_lods=true
@@ -32,6 +34,9 @@ animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
+materials/extract=0
+materials/extract_format=0
+materials/extract_path=""
 _subresources={
 "meshes": {
 "Blocks_Consumer": {
@@ -41,7 +46,8 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/Consumer.tres"
+"save_to_file/fallback_path": "res://.godot/imported/Consumer.tres",
+"save_to_file/path": "uid://o5yh8ikbts4q"
 },
 "Blocks_ControlBlock": {
 "generate/lightmap_uv": 0,
@@ -50,7 +56,8 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/ControlBlock.tres"
+"save_to_file/fallback_path": "res://.godot/imported/ControlBlock.tres",
+"save_to_file/path": "uid://cq76rvmc1vinb"
 },
 "Blocks_ConveyorBelt": {
 "generate/lightmap_uv": 0,
@@ -59,7 +66,8 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/ConveyorBelt.tres"
+"save_to_file/fallback_path": "res://.godot/imported/ConveyorBelt.tres",
+"save_to_file/path": "uid://j8r5vkukrhtj"
 },
 "Blocks_ConveyorBelt_simple": {
 "generate/lightmap_uv": 0,
@@ -68,7 +76,8 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/ConveyorBeltSimple.tres"
+"save_to_file/fallback_path": "res://.godot/imported/ConveyorBeltSimple.tres",
+"save_to_file/path": "uid://chqwiyrtjuhax"
 },
 "Blocks_ConveyorSplitter": {
 "generate/lightmap_uv": 0,
@@ -77,7 +86,8 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/ConveyorSplitter.tres"
+"save_to_file/fallback_path": "res://.godot/imported/ConveyorSplitter.tres",
+"save_to_file/path": "uid://clwuiu11ielg4"
 },
 "Blocks_ConveyorSplitterFast": {
 "generate/lightmap_uv": 0,
@@ -86,7 +96,8 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/ConveyorSplitterFast.tres"
+"save_to_file/fallback_path": "res://.godot/imported/ConveyorSplitterFast.tres",
+"save_to_file/path": "uid://rc6xw00nwnrd"
 },
 "Blocks_Detector": {
 "generate/lightmap_uv": 0,
@@ -95,7 +106,8 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/Detector.tres"
+"save_to_file/fallback_path": "res://.godot/imported/Detector.tres",
+"save_to_file/path": "uid://bsus2yiqmhe7u"
 },
 "Blocks_Painter": {
 "generate/lightmap_uv": 0,
@@ -104,7 +116,8 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/Painter.tres"
+"save_to_file/fallback_path": "res://.godot/imported/Painter.tres",
+"save_to_file/path": "uid://clg3ug7acwl75"
 },
 "Blocks_Producer": {
 "generate/lightmap_uv": 0,
@@ -113,7 +126,8 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/Producer.tres"
+"save_to_file/fallback_path": "res://.godot/imported/Producer.tres",
+"save_to_file/path": "uid://b0g3rl31p0ljl"
 },
 "Blocks_Welder": {
 "generate/lightmap_uv": 0,
@@ -122,7 +136,8 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/path": "res://Factory/FactoryBlocks/3d_models/imported/Welder.tres"
+"save_to_file/fallback_path": "res://.godot/imported/Welder.tres",
+"save_to_file/path": "uid://d0o3udek8lhnq"
 }
 }
 }
@@ -144,3 +159,4 @@ blender/materials/export_materials=1
 blender/animation/limit_playback=true
 blender/animation/always_sample=true
 blender/animation/group_tracks=true
+gltf/naming_version=0

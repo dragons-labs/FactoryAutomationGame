@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: public domain
-# SPDX-License-Identifier: 0BSD
+# SPDX-FileCopyrightText: NONE
+# SPDX-License-Identifier: CC0-1.0
 
 # Godot 4+ specific ignores
 /.godot/
@@ -16,9 +16,6 @@
 # some build / binary tools dirs
 /ComputerSimulator/OS/bin/
 /ElectronicsSimulator/GdSpice/bin/
-
-# imported meshes from blender file
-/Factory/FactoryBlocks/models/imported/*.tres
 
 # bbcode manual pages build from (custom) markdown
 /Manual/generated-bbcode/

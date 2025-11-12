@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/Welder.svg" id="1_43dem"]
 [ext_resource type="Script" path="res://Factory/FactoryBlocks/Welder.gd" id="1_kb8ux"]
-[ext_resource type="ArrayMesh" path="res://Factory/FactoryBlocks/3d_models/imported/Welder.tres" id="3_w8g46"]
+[ext_resource type="ArrayMesh" path="res://.godot/imported/Welder.tres" id="3_w8g46"]
 
 [sub_resource type="GDScript" id="GDScript_smjxm"]
 resource_name = "FactoryBlockSettings"

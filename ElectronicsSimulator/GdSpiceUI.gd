@@ -237,11 +237,7 @@ func add_graph_to_oscilloscope(win : Window, base_element : Grid2D_BaseElement):
 	var func_arr : Array[Function] = win_chart.functions
 	func_arr.append(win_chart_func)
 	win_chart.plot(func_arr, _chart_properties)
-	# some tricks to fix after reusing plot()
-	win_chart._draw()
-	await get_tree().process_frame
-	win_chart._canvas._legend.hide()
-	win_chart._canvas._legend.show()
+	win_chart.plot(func_arr, _chart_properties) # call plot twice to avoid invalid colors
 
 func _on_win_close(win : Window):
 	if win == _last_oscilloscope:
@@ -254,10 +250,10 @@ func _on_win_close(win : Window):
 
 func on_measurer_click(base_element : Grid2D_BaseElement):
 	if base_element in oscilloscopes:
-		oscilloscopes[base_element][0].get_parent().grab_focus()
+		oscilloscopes[base_element][0].grab_focus()
 	elif _last_oscilloscope and not Input.is_key_pressed(KEY_SHIFT):
 		add_graph_to_oscilloscope(_last_oscilloscope, base_element)
-		oscilloscopes[base_element][0].get_parent().grab_focus()
+		oscilloscopes[base_element][0].grab_focus()
 	else:
 		_last_oscilloscope = create_oscilloscope(base_element)
 
@@ -310,9 +306,9 @@ func _on_chart_time_range_changed(win : Window, win_chart : Chart):
 		win_chart.functions[i].__y = data[i]
 	
 	# some tricks to fix after replace values
-	win_chart.x_domain = { lb = time[0], ub = time[len(time)-1], has_decimals = true, fixed = true }
-	var y_domain = win_chart.calculate_domain(data)
-	y_domain["fixed"] = true
-	win_chart.y_domain = y_domain
+	win_chart.x_domain = ChartAxisDomain.from_bounds(time[0], time[len(time)-1])
+	win_chart.x_domain.has_decimals = true
+	win_chart.y_domain = ChartAxisDomain.from_values(data, false)
+	win_chart.y_domain.fixed = true
 	
 	win_chart.queue_redraw()

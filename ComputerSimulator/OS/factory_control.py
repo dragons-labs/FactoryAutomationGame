@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
+# SPDX-License-Identifier: MIT
+
 """Simple lib for factory input / output and time synchronization"""
 
 # TODO migrate to C library
