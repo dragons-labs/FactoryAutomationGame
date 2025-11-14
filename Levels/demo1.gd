@@ -77,10 +77,6 @@ Integer ullamcorper maximus faucibus. Fusce cursus, lacus placerat varius lacini
 ## level id, set in `init` call
 var level_id : String
 
-## list of id of levels unlocked by finished this level
-## externally set just **after** level is loaded
-var unlocks_levels : Array
-
 ## level init, call
 ##  - after:
 ##    - instantiate of level

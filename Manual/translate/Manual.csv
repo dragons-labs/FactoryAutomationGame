@@ -5,18 +5,3 @@ MANUAL_TASK_TRIVIA_TITLE,Triva
 MANUAL_EXTERNAL_TITLE,External
 MANUAL_NOTHING_TO_SHOW,"Nothing to show here. Try switch guide↔trivia or select another topic"
 MANUAL_SELECT_TOPIC,"Use menu on left to select topic"
-
-BUTTON_GO_BACK,←
-BUTTON_GO_BACK_TOOLTIP,previous page
-BUTTON_GO_NEXT,→
-BUTTON_GO_NEXT_TOOLTIP,next page
-BUTTON_REFRESH,↻
-BUTTON_REFRESH_TOOLTIP,reload page
-BUTTON_STOP,❌
-BUTTON_STOP_TOOLTIP,stop loading
-BUTTON_ENTER,↳
-BUTTON_ENTER_TOOLTIP,go to page
-URL_STATUS_OK,✔
-URL_STATUS_OK_TOOLTIP,loaded successful
-URL_STATUS_ERROR,❌
-URL_STATUS_ERROR_TOOLTIP,an error occurred while loading

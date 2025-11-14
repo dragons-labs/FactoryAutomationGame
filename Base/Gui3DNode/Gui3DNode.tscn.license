@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Robert Ryszard Paciorek <rrp@opcode.eu.org>
+# SPDX-FileCopyrightText: Copyright (c) 2014-present Godot Engine contributors.
+# SPDX-FileCopyrightText: Copyright (c) 2007-2014 Juan Linietsky, Ariel Manzur.
+# SPDX-License-Identifier: MIT
+
+# Based on https://github.com/godotengine/godot-demo-projects/tree/master/viewport/gui_in_3d

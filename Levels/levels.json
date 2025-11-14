@@ -1,7 +1,6 @@
 {
   "painter/painter_slow" : {
-    "locked": false,
-    "unlocks": ["painter/painter_fast"],
+    "unlocked_by": false,
     "name": {
       "en": "Painting factory",
       "pl": "Fabryka malująca",
@@ -12,8 +11,7 @@
     }
   },
   "painter/painter_fast" : {
-    "locked": true,
-    "unlocks": ["painter/painter_computer"],
+    "unlocked_by": [["painter/painter_slow"]],
     "name": {
       "en": "Fast painting factory",
       "pl": "Szybka fabryka malująca",
@@ -24,8 +22,7 @@
     }
   },
   "painter/painter_computer" : {
-    "locked": true,
-    "unlocks": ["demo1"],
+    "unlocked_by": [["painter/painter_fast"]],
     "name": {
       "en": "Computerized painting factory",
       "pl": "Skomputeryzowana fabryka malująca",
@@ -37,8 +34,7 @@
   },
 
   "demo1" : {
-    "locked": true,
-    "unlocks": [],
+    "unlocked_by": [["painter/painter_computer"]],
     "name": {
       "en": "Demo Level",
       "pl": "Demo fabryki",

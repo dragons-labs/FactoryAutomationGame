@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Manual/Manual.gd" id="1_ylww1"]
 [ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif.ttf" id="2_5vcv6"]
-[ext_resource type="PackedScene" path="res://Manual/WebBrowswer.tscn" id="2_6lhi2"]
+[ext_resource type="PackedScene" path="res://Base/WebBrowser/WebBrowser.tscn" id="2_6lhi2"]
 [ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSansMono.ttf" id="3_5mm3n"]
 [ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif-Italic.ttf" id="4_yctyr"]
 [ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif-BoldItalic.ttf" id="5_okvqm"]

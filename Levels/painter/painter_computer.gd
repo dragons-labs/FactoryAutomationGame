@@ -83,10 +83,6 @@ The production director wants you to redesign the paint factory layout to take a
 ## level id, set in `init` call
 var level_id : String
 
-## list of id of levels unlocked by finished this level
-## externally set just **after** level is loaded
-var unlocks_levels : Array
-
 ## level init, call
 ##  - after:
 ##    - instantiate of level

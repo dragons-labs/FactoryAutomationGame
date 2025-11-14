@@ -570,6 +570,9 @@ func _on_errormsg_ok_pressed() -> void:
 
 ### blocks and circuit elements counts and statistics
 
+func stats2string(stats : Dictionary) -> String:
+	return str(stats) # TODO do this better ... not str()
+
 var _stats = {}
 
 func _reset_stats() -> void:
@@ -661,12 +664,7 @@ func validate_product(node : RigidBody3D):
 		_stats.time = _factory_time
 		_stats.status = "success"
 		var game_progress = FAG_Utils.load_from_json_file(GAME_PROGRESS_SAVE)
-		game_progress.unlocked_levels[level_scene_node.level_id] = _stats
-		print(level_scene_node.unlocks_levels)
-		for lid in level_scene_node.unlocks_levels:
-			print(lid)
-			if not lid in game_progress.unlocked_levels:
-				game_progress.unlocked_levels[lid] = {}
+		game_progress.finished_levels[level_scene_node.level_id] = _stats
 		FAG_Utils.write_to_json_file(GAME_PROGRESS_SAVE, game_progress)
 		emergency_stop(
 			"FACTORY_PRODUCT_SUCCESS_TITLE",

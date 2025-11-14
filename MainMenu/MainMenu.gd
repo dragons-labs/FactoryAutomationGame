@@ -9,6 +9,7 @@ enum Mode {NORMAL, LOAD, LOAD_SAVE, WRITE_SAVE, SETTINGS, LOADING}
 var _current_mode : Mode
 
 @export var _factory_root : Node3D
+@export var _settings_order : Array[String]
 
 func _set_mode(mode : Mode) -> void:
 	_current_mode = mode
@@ -56,15 +57,18 @@ func _on_load_level_pressed() -> void:
 		if file_name.ends_with(".json"):
 			var levels = FAG_Utils.load_from_json_file(_factory_root.LEVELS_DIR + file_name)
 			for level_id in levels:
-				if not levels[level_id].locked or level_id in game_progress.unlocked_levels:
+				if not levels[level_id].unlocked_by or levels[level_id].unlocked_by.any(
+					func(levels_set): return levels_set.all(
+						func(level): return game_progress.finished_levels.has(level)
+					)
+				):
 					var index = item_list.add_item(
 						FAG_Utils.get_with_fallback(levels[level_id].name, lang, fallback_lang)
 					)
 					item_list.set_item_metadata(index, {
 						"id": level_id,
 						"description": FAG_Utils.get_with_fallback(levels[level_id].description, lang, fallback_lang),
-						"stats": game_progress.unlocked_levels.get(level_id, {}),
-						"unlocks": levels[level_id].unlocks
+						"stats": game_progress.finished_levels.get(level_id, {})
 					})
 	
 	_set_mode(Mode.LOAD)
@@ -85,12 +89,7 @@ func _on_settings_pressed() -> void:
 	var relative_size := Vector2(0.55, 0.55)
 	%SettingsDialog.custom_minimum_size = screen_size * relative_size
 	#%SettingsDialog.position = screen_size * (Vector2(1, 1)-relative_size) * 0.5
-	FAG_Settings.reset_settings_ui(%SettingsList)
-	var ordered_settings_group = ["MAIN_MENU_UI_SETTINGS_GROUP_NAME", "CAMERA3D_SETTINGS_GROUP_NAME", "CAMERA2D_SETTINGS_GROUP_NAME"]
-	for group_name in ordered_settings_group:
-		FAG_Settings.generate_settings_ui(group_name, %SettingsList, %KeyReampInfo)
-	FAG_Settings.generate_settings_ui_all(%SettingsList, %KeyReampInfo, ordered_settings_group)
-	
+	FAG_Settings.reinit_settings_ui(%SettingsList, %KeyReampInfo, _settings_order)
 	_set_mode(Mode.SETTINGS)
 
 
@@ -124,12 +123,12 @@ func _on_action_remap_cancel_pressed() -> void:
 func _on_item_list_item_selected(index: int) -> void:
 	if _current_mode == Mode.LOAD:
 		var level_info = item_list.get_item_metadata(index)
-		%LoadDialog_ItemInfo.text = level_info.description + "\n\n" + str(level_info.stats) # TODO do this better ... not str()
+		%LoadDialog_ItemInfo.text = level_info.description + "\n\n" + _factory_root.stats2string(level_info.stats)
 	elif _current_mode == Mode.LOAD_SAVE:
 		var metadata = item_list.get_item_metadata(index)
 		var save_info = FAG_Utils.load_from_json_file(metadata.path + _factory_root.SAVE_INFO_FILE)
 		metadata["level"] = save_info.level
-		%LoadDialog_ItemInfo.text = str(save_info.stats) # TODO do this better ... not str()
+		%LoadDialog_ItemInfo.text = _factory_root.stats2string(save_info.stats)
 
 func _on_load_pressed() -> void:
 	var selected = item_list.get_selected_items()
@@ -140,19 +139,9 @@ func _on_load_pressed() -> void:
 		if _current_mode == Mode.LOAD:
 			var level_info = item_list.get_item_metadata(selected[0])
 			_factory_root.load_level(level_info.id)
-			_factory_root.level_scene_node.level_id = level_info.id
-			_factory_root.level_scene_node.unlocks_levels = level_info.unlocks
 		elif _current_mode == Mode.LOAD_SAVE:
 			var metadata = item_list.get_item_metadata(selected[0])
 			_factory_root.restore(metadata.path)
-			var level_info : Dictionary
-			for file_name in DirAccess.get_files_at(_factory_root.LEVELS_DIR):
-				if file_name.ends_with(".json"):
-					var levels = FAG_Utils.load_from_json_file(_factory_root.LEVELS_DIR + file_name)
-					if metadata.level in levels:
-						level_info = levels[metadata.level]
-						break
-			_factory_root.level_scene_node.unlocks_levels = level_info.unlocks
 		_factory_root.set_visibility(true)
 		_hide()
 
@@ -242,7 +231,7 @@ func _ready():
 	get_tree().set_auto_accept_quit(false)
 	if not FileAccess.file_exists(_factory_root.GAME_PROGRESS_SAVE):
 		FAG_Utils.write_to_json_file(_factory_root.GAME_PROGRESS_SAVE, {
-			"unlocked_levels": {},
+			"finished_levels": {},
 			"unlocked_manuals": ["game", "game/credits"]
 		})
 	call_deferred("_show")

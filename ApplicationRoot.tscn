@@ -1,10 +1,10 @@
 [gd_scene load_steps=6 format=3]
 
 [ext_resource type="PackedScene" path="res://Factory/FactoryRoot.tscn" id="1_lan0v"]
-[ext_resource type="PackedScene" path="res://Manual/Manual.tscn" id="3_7xrpt"]
-[ext_resource type="Script" path="res://Base/GraphicsSettings.gd" id="4_53lq8"]
 [ext_resource type="PackedScene" path="res://MainMenu/MainMenu.tscn" id="4_bwojk"]
-[ext_resource type="Script" path="res://Base/LocaleSettings.gd" id="6_i3xsi"]
+[ext_resource type="PackedScene" path="res://Manual/Manual.tscn" id="3_7xrpt"]
+[ext_resource type="Script" path="res://Base/LocaleSettings.gd" id="3_vwh6e"]
+[ext_resource type="Script" path="res://Base/GraphicsSettings.gd" id="4_f2ney"]
 
 [node name="ApplicationRoot" type="Node"]
 process_mode = 3
@@ -14,14 +14,15 @@ unique_name_in_owner = true
 
 [node name="MainMenu" parent="." node_paths=PackedStringArray("_factory_root") instance=ExtResource("4_bwojk")]
 _factory_root = NodePath("../FactoryRoot")
+_settings_order = Array[String](["LOCALE_SETTINGS_GROUP_NAME", "GRAPHICS_SETTINGS_GROUP_NAME", "MAIN_MENU_UI_SETTINGS_GROUP_NAME", "CAMERA3D_SETTINGS_GROUP_NAME", "CAMERA2D_SETTINGS_GROUP_NAME"])
+
+[node name="LocaleSettings" type="Node" parent="MainMenu"]
+script = ExtResource("3_vwh6e")
+
+[node name="GraphicsSettings" type="Node" parent="MainMenu"]
+script = ExtResource("4_f2ney")
 
 [node name="Manual" parent="." instance=ExtResource("3_7xrpt")]
 unique_name_in_owner = true
 scaling_3d_scale = 2.0
 oversampling_override = 1.0
-
-[node name="GraphicsSettings" type="Node" parent="."]
-script = ExtResource("4_53lq8")
-
-[node name="LocaleSettings" type="Node" parent="."]
-script = ExtResource("6_i3xsi")

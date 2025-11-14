@@ -128,7 +128,7 @@ func generate_settings_ui(group_name : String, ui_parent : Control, ui_remap_inf
 	var setting_ui_template = ui_parent.get_node("Setting")
 	var action_ui_template = ui_parent.get_node("Action")
 	var group_ui_template = ui_parent.get_node("Group")
-	# WARNING: all above chidren of ui_parent must be hidden when calling reset_settings_ui()
+	# WARNING: all above children of ui_parent must be hidden when calling reset_settings_ui()
 	#          before calls generate_settings_ui() / generate_settings_ui_all()
 	#          (e.g. hidden via scene editor setting)
 	#          otherwise may be deleted and caused crash in this function
@@ -162,9 +162,12 @@ func reset_settings_ui(ui_parent : Control) -> void:
 			ui_parent.remove_child(c)
 			c.queue_free()
 
-func generate_settings_ui_all(ui_parent : Control, ui_remap_info : Control, skip := []) -> void:
+func reinit_settings_ui(ui_parent : Control, ui_remap_info : Control, ordered := []) -> void:
+	reset_settings_ui(ui_parent)
+	for group_name in ordered:
+		FAG_Settings.generate_settings_ui(group_name, ui_parent, ui_remap_info)
 	for group_name in _all_settings:
-		if not group_name in skip:
+		if not group_name in ordered:
 			generate_settings_ui(group_name, ui_parent, ui_remap_info)
 
 var action_rempaing = []
