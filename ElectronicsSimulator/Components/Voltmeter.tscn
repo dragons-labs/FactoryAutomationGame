@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://Base/2DGridSystem/BaseElement.gd" id="1_1kyli"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/voltmeter.svg" id="2_jd6qm"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/voltmeter-icon.svg" id="3_amnas"]
+[ext_resource type="Script" uid="uid://cyherby5n5jm3" path="res://Utils/2DGridSystem/BaseElement.gd" id="1_1kyli"]
+[ext_resource type="Texture2D" uid="uid://cb6vic6410o2q" path="res://ElectronicsSimulator/Components/images/voltmeter.svg" id="2_jd6qm"]
+[ext_resource type="Texture2D" uid="uid://dlht2v1i147ee" path="res://ElectronicsSimulator/Components/images/voltmeter-icon.svg" id="3_amnas"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mpsrt"]
 

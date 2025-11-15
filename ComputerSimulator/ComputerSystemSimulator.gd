@@ -8,13 +8,13 @@ extends Node
 enum Mode {TERMINAL = 1, UI_CODE_EDITOR = 2, GRAPHICAL_VNC = 4}
 
 ## path to kernel image
-@export var kernel_image_path : String = "res://qemu_img/linux-noinitrd.bzImage"
+@export var kernel_image_path := "res://qemu_img/linux-noinitrd.bzImage"
 
 ## path to (read-only) root fs image
-@export var rootfs_image_path : String = "res://qemu_img/rootfs.img"
+@export var rootfs_image_path := "res://qemu_img/rootfs.img"
 
 ## size of memory for emulated system (including kernel memory)
-@export var memory_size = "192M"
+@export var memory_size := "192M"
 
 ## gameplay ID used to selecting of computer system set of input/output signals, disk images, etc
 @export var computer_system_id := 0
@@ -26,13 +26,17 @@ enum Mode {TERMINAL = 1, UI_CODE_EDITOR = 2, GRAPHICAL_VNC = 4}
 @export var virtfs := {}
 
 ## initial list controller inputs names (factory can also add controller inputs on fly by settings it value)
-@export var computer_input_names = []
+@export var computer_input_names := []
 
 ## initial list controller outputs name (factory can also add controller inputs on fly by call [code]add_computer_output[/code])
-@export var computer_output_names = []
+@export var computer_output_names := []
 
 ## time (in seconds) to waiting for emulator quit after poweroff command, before will be killed
-@export var on_close_timeout = 10
+@export var on_close_timeout := 10
+
+## port number for TCP echo service used for create local network for this computer
+## (all computers in one network should use the same echo service on the same tcp port)
+@export var tcp_echo_service_port := 0
 
 ## emit on receive message bus command
 signal msg_bus_command(command : String, sender : Variant)
@@ -53,7 +57,8 @@ func configure(system_id, configuration : Dictionary) -> void:
 			"kernel_image_path", "rootfs_image_path",
 			"writable_disk_image", "virtfs",
 			"computer_input_names", "computer_output_names",
-			"memory_size"
+			"memory_size",
+			"tcp_echo_service_port"
 		]:
 		if setting_name in configuration:
 			set(setting_name, configuration[setting_name])
@@ -172,7 +177,8 @@ func _run_qemu(user_port, msg_port, vnc_port):
 		# "-netdev", "dgram,id=n1,remote.type=inet,remote.host=::1,remote.port=4617", "-device", "model=virtio,netdev=n1,mac=52:54:%02x:%02x:%02x:%02x" % [
 		# NOTE: qemu do not support IPv6 multicast (in socket nor in dgram) and IPv4 mulicast do not provide host-scope address space (like ffx1::/16 in IPv6)
 		#       so (to avoid send packets outside host) use tcp with own tcp echo server
-		"-nic", "socket,connect=127.0.0.1:%d,model=virtio,mac=52:54:%02x:%02x:%02x:%02x" % [ FAG_TCPEcho.get_port(),
+		"-nic", "socket,connect=127.0.0.1:%d,model=virtio,mac=52:54:%02x:%02x:%02x:%02x" % [
+			tcp_echo_service_port,
 			(computer_system_id>>24)&0xff, (computer_system_id>>16)&0xff, (computer_system_id>>8)&0xff, (computer_system_id>>0)&0xff
 		]
 	]

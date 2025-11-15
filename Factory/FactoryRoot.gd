@@ -202,7 +202,6 @@ func close() -> void:
 	await stop_simulations()
 	factory_builder.close()
 	circuit_simulator.close()
-	FAG_TCPEcho.stop()
 	if level_scene_node:
 		_factory_state = FACTORY_STOP | ON_CHANGE
 		remove_child(level_scene_node)
@@ -672,4 +671,4 @@ func validate_product(node : RigidBody3D):
 		)
 
 func _on_show_task_info() -> void:
-	get_tree().current_scene.get_node("%Manual").show_info(level_scene_node, GAME_PROGRESS_SAVE)
+	FAG_Settings.get_root_subnode("%Manual").show_info(level_scene_node, GAME_PROGRESS_SAVE)

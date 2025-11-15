@@ -10,7 +10,7 @@
 
 extends RigidBody3D
 
-@onready var _factory_root := get_tree().current_scene.get_node("%FactoryRoot")
+@onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
 
 var factory_object_info = {
 	"type": "box",

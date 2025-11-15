@@ -17,9 +17,8 @@ config/features=PackedStringArray("4.5")
 
 [autoload]
 
-FAG_Settings="*res://Base/Singletons/Settings.gd"
-FAG_WindowManager="*res://Base/Singletons/WindowManager.gd"
-FAG_TCPEcho="*res://Base/Singletons/TCPEcho.gd"
+FAG_Settings="*res://Utils/Settings/Settings.gd"
+FAG_WindowManager="*res://Utils/WindowManager.gd"
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 
 [debug]
@@ -40,7 +39,7 @@ theme/custom="res://UI_theme.tres"
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://Base/Camera/translate/Camera.en.translation", "res://Base/WorldEditorUI/translate/WorldEditorUI.en.translation", "res://Base/WebBrowser/translate/WebBrowser.en.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.en.translation", "res://ComputerSimulator/translate/ComputerSystemSimulator.en.translation", "res://MainMenu/translate/MainMenu.en.translation", "res://Manual/translate/Manual.en.translation", "res://Factory/translate/Factory.en.translation", "res://Factory/translate/Factory.pl.translation", "res://MainMenu/translate/MainMenu.pl.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.pl.translation")
+locale/translations=PackedStringArray("res://Utils/Camera/translate/Camera.en.translation", "res://Utils/WorldEditorUI/translate/WorldEditorUI.en.translation", "res://Utils/WebBrowser/translate/WebBrowser.en.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.en.translation", "res://ComputerSimulator/translate/ComputerSystemSimulator.en.translation", "res://MainMenu/translate/MainMenu.en.translation", "res://Manual/translate/Manual.en.translation", "res://Factory/translate/Factory.en.translation", "res://Factory/translate/Factory.pl.translation", "res://MainMenu/translate/MainMenu.pl.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.pl.translation")
 
 [physics]
 

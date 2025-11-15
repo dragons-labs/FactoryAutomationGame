@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://Base/2DGridSystem/BaseElement.gd" id="1_u44q1"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/GND.svg" id="2_48mbe"]
+[ext_resource type="Script" uid="uid://cyherby5n5jm3" path="res://Utils/2DGridSystem/BaseElement.gd" id="1_u44q1"]
+[ext_resource type="Texture2D" uid="uid://bnv53h8hx8ee7" path="res://ElectronicsSimulator/Components/images/GND.svg" id="2_48mbe"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mpsrt"]
 

@@ -1,10 +1,10 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=8 format=3 uid="uid://bjwtrw03sth6x"]
 
-[ext_resource type="Script" path="res://Factory/FactoryBuilder.gd" id="1_51ivo"]
-[ext_resource type="Script" path="res://Base/Camera/Camera3DControl.gd" id="2_2dv8j"]
-[ext_resource type="PackedScene" path="res://Base/WorldEditorUI/WorldEditorUI.tscn" id="3_iwf3v"]
-[ext_resource type="PackedScene" path="res://ElectronicsSimulator/ElectronicsSimulator.tscn" id="10_hxh5h"]
-[ext_resource type="PackedScene" path="res://ComputerSimulator/ComputerSystemSimulator.tscn" id="11_thamu"]
+[ext_resource type="Script" uid="uid://d2cst4c3yga53" path="res://Factory/FactoryBuilder.gd" id="1_51ivo"]
+[ext_resource type="Script" uid="uid://bu8k11vgifi26" path="res://Utils/Camera/Camera3DControl.gd" id="2_2dv8j"]
+[ext_resource type="PackedScene" uid="uid://ccjlqcswjr2vw" path="res://Utils/WorldEditorUI/WorldEditorUI.tscn" id="3_iwf3v"]
+[ext_resource type="PackedScene" uid="uid://b2xtqfv5n7gyt" path="res://ElectronicsSimulator/ElectronicsSimulator.tscn" id="10_hxh5h"]
+[ext_resource type="PackedScene" uid="uid://ccu02jb7hng1k" path="res://ComputerSimulator/ComputerSystemSimulator.tscn" id="11_thamu"]
 
 [sub_resource type="GDScript" id="GDScript_gx28t"]
 script/source = "extends Window

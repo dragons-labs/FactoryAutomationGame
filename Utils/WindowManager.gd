@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
+"""singleton (autoload) utils class for management in game windows"""
+
 extends Node
 
 signal embeded_window_focus_changed(win : Window, focus : bool)

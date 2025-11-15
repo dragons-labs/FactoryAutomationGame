@@ -1,7 +1,7 @@
 [gd_scene load_steps=18 format=3 uid="uid://b2xtqfv5n7gyt"]
 
 [ext_resource type="Script" uid="uid://hx6v1sevg03" path="res://ElectronicsSimulator/ElectronicsSimulator.gd" id="1_agd56"]
-[ext_resource type="PackedScene" uid="uid://ch0q6t7xl5sry" path="res://Base/2DGridSystem/GridEditor.tscn" id="1_jcjma"]
+[ext_resource type="PackedScene" uid="uid://ch0q6t7xl5sry" path="res://Utils/2DGridSystem/GridEditor.tscn" id="1_jcjma"]
 [ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/GND.tscn" id="3_d4gdo"]
 [ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/PNP.tscn" id="4_di5qe"]
 [ext_resource type="PackedScene" path="res://ElectronicsSimulator/Components/NetConnector.tscn" id="4_x8v0y"]

@@ -9,7 +9,8 @@ extends Area3D
 ## conveyor belt linear speed [m/s]
 @export var speed := 1.0
 
-@onready var _factory_root := get_tree().current_scene.get_node("%FactoryRoot")
+@onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
+@onready var _name_prefix := FAG_FactoryBlocksUtils.handle_name_prefix(self, $"../Label3D")
 
 var belt_speed_vector # used by FAG_FactoryBlocksUtils
 var y_top_minus_offset # used by FAG_FactoryBlocksUtils
@@ -17,7 +18,6 @@ var y_top_minus_offset # used by FAG_FactoryBlocksUtils
 var _object = null
 var _waiting_object = null
 var _new_accepted_object := false
-var _name_prefix := ""
 
 func _ready():
 	body_entered.connect(_on_object_enter_block)
@@ -26,11 +26,6 @@ func _ready():
 	_factory_root.factory_process.connect(_on_factory_process)
 	_factory_root.factory_stop.connect(_on_factory_start_stop)
 	FAG_FactoryBlocksUtils.on_block_transform_updated(self)
-	
-	_name_prefix = get_parent().get_meta("in_game_name", "")
-	$"../Label3D".text = _name_prefix
-	if _name_prefix:
-		_name_prefix += "_"
 
 func _on_factory_start_stop() -> void:
 	if not is_inside_tree():

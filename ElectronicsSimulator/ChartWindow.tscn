@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dlwq4kmdb3bhs" path="res://addons/easy_charts/control_charts/chart.tscn" id="1_878kg"]
 [ext_resource type="Script" uid="uid://buuplk6vmj0lt" path="res://ElectronicsSimulator/ChartWindow.gd" id="1_xg4ig"]
-[ext_resource type="Script" uid="uid://sip6m3sdhfpc" path="res://Base/SliderWithValue.gd" id="2_33vtm"]
+[ext_resource type="Script" uid="uid://sip6m3sdhfpc" path="res://Utils/SliderWithValue.gd" id="2_33vtm"]
 
 [node name="ChartWindow" type="Window"]
 disable_3d = true

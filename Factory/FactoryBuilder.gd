@@ -35,6 +35,7 @@ signal on_block_remove(block: Node3D)
 @onready var developer_mode := false
 
 var computer_control_blocks = {}
+var computer_networks = {}
 
 
 ### Save / Restore
@@ -100,6 +101,8 @@ func restore_tscn(save_file : String) -> void:
 
 func close() -> void:
 	ui.reset_editor()
+	for echo_service in computer_networks:
+		computer_networks[echo_service].stop()
 	computer_control_blocks.clear()
 	netnames.clear()
 	input_to_circuit_from_factory.clear()
@@ -302,6 +305,13 @@ func _setup_computer_control_blocks(element : Node3D) -> void:
 	# and start computer simulation
 	var computer_system_simulator = computer_ui_window_node.get_child(0)
 	if computer_id in computer_systems_configuration:
+		
+		var nedwork_id = computer_systems_configuration[computer_id].get("nedwork_id", 0)
+		if not nedwork_id in computer_networks:
+			computer_networks[nedwork_id] = FAG_TCPEcho.new()
+			add_child(computer_networks[nedwork_id])
+		computer_systems_configuration[computer_id].tcp_echo_service_port = computer_networks[nedwork_id].get_port()
+		
 		computer_system_simulator.configure(computer_id, computer_systems_configuration[computer_id])
 		computer_system_simulator.start()
 	else:

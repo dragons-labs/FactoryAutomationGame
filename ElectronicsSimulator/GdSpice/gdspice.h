@@ -6,7 +6,7 @@
 #include <godot_cpp/variant/string.hpp>
 #include <map>
 
-#include "../../Base/godot_api_utils.h"
+#include "../../Utils/godot_api_utils.h"
 
 #ifdef USE_DLOPEN
 extern "C" {

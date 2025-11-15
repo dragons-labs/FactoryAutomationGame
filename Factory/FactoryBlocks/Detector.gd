@@ -3,20 +3,15 @@
 
 extends Area3D
 
-@onready var _factory_root := get_tree().current_scene.get_node("%FactoryRoot")
+@onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
+@onready var _name_prefix := FAG_FactoryBlocksUtils.handle_name_prefix(self, $"../Label3D")
 
 var _object = null
-var _name_prefix := ""
 
 func _ready():
 	body_entered.connect(_on_object_enter_block)
 	body_exited.connect(_on_object_exit_block)
 	_factory_root.factory_start.connect(_on_factory_start)
-	
-	_name_prefix = get_parent().get_meta("in_game_name", "")
-	$"../Label3D".text = _name_prefix
-	if _name_prefix:
-		_name_prefix += "_"
 
 func _on_factory_start() -> void:
 	if not is_inside_tree():

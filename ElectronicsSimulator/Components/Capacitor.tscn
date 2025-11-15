@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://Base/2DGridSystem/BaseElement.gd" id="1_3q3q6"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/capacitor.svg" id="2_ke6rh"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/capacitor-icon.svg" id="3_5sqy2"]
+[ext_resource type="Script" uid="uid://cyherby5n5jm3" path="res://Utils/2DGridSystem/BaseElement.gd" id="1_3q3q6"]
+[ext_resource type="Texture2D" uid="uid://digxaui1h364k" path="res://ElectronicsSimulator/Components/images/capacitor.svg" id="2_ke6rh"]
+[ext_resource type="Texture2D" uid="uid://iennofir5nsv" path="res://ElectronicsSimulator/Components/images/capacitor-icon.svg" id="3_5sqy2"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mpsrt"]
 

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://b6h4chjut5bay"]
 
-[ext_resource type="Script" uid="uid://nljsly5d68vo" path="res://Base/WebBrowser/WebBrowser.gd" id="1_dfpua"]
+[ext_resource type="Script" uid="uid://nljsly5d68vo" path="res://Utils/WebBrowser/WebBrowser.gd" id="1_dfpua"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bsl1o"]
 bg_color = Color(0.800491, 0.800491, 0.800491, 1)
@@ -9,12 +9,12 @@ bg_color = Color(0.800491, 0.800491, 0.800491, 1)
 offset_right = 1152.0
 offset_bottom = 648.0
 script = ExtResource("1_dfpua")
-backend = 1
 
 [node name="GDCef" type="GDCef" parent="."]
 unique_name_in_owner = true
 
 [node name="UI" type="MarginContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5

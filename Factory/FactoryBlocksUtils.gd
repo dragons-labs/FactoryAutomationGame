@@ -4,6 +4,13 @@
 extends RefCounted
 class_name FAG_FactoryBlocksUtils 
 
+static func handle_name_prefix(object : Object, label: Label3D = null) -> String:
+	var name_prefix = object.get_parent().get_meta("in_game_name", "")
+	if label:
+		label.text = name_prefix
+	if name_prefix:
+		name_prefix += "_"
+	return name_prefix
 
 static func on_block_transform_updated(factory_block_belt : Area3D):
 	var speed = 1.0

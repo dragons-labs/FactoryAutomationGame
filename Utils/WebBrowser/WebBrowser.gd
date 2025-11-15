@@ -7,28 +7,50 @@
 
 extends Control
 
-enum ModeEnum {Webview, GDCEF}
-@export var backend: ModeEnum
+enum ModeEnum {Default, GDCEF, GodotWRY}
+@export var backend := ModeEnum.Default :
+	set(new_value):
+		backend = new_value
+		if _display:
+			if backend == ModeEnum.Default:
+				if "create_browser" in _gdcef:
+					backend = ModeEnum.GDCEF
+				elif "visible" in _webview:
+					backend == ModeEnum.GodotWRY
+				else:
+					printerr("WARNING: Can't find web browser backend")
+			if backend == ModeEnum.GodotWRY:
+				_browser = _webview
+				_display.visible = false
+				#_browser.connect("ipc_message", _on_ipc_message)
+			elif backend == ModeEnum.GDCEF:
+				if "visible" in _webview:
+					_webview.visible = false
+				_init_GDCef()
+	get():
+		return backend
 
+@export var ui_visible := true :
+	set(new_value):
+		ui_visible = new_value
+		if _ui:
+			_ui.visible = new_value
+	get():
+		return ui_visible
+
+@onready var _ui := %UI
 @onready var _url_bar := %URL
 @onready var _url_status := %URL_Status
 @onready var _display := %DisplayTexture
 @onready var _webview := %WebView
+@onready var _gdcef := %GDCef
 
 var _browser
 
 func _ready() -> void:
-	if backend == ModeEnum.Webview:
-		_browser = _webview
-		_display.visible = false
-		_display = null
-		#_browser.connect("ipc_message", _on_ipc_message)
-	
-	elif backend == ModeEnum.GDCEF:
-		if "visible" in _webview:
-			_webview.visible = false
-		_webview = null
-		_init_GDCef(%GDCef)
+	# call setters
+	ui_visible = ui_visible
+	backend = backend
 	
 	_url_status.add_theme_stylebox_override("disabled", _url_status.get_theme_stylebox("normal"))
 
@@ -95,20 +117,20 @@ func _on_page_failed_loading(_aborted, _msg_err, node):
 
 #region  GDCef specific
 
-func _init_GDCef(gdcef):
-	if not gdcef.initialize({
+func _init_GDCef():
+	if not _gdcef.initialize({
 			"incognito":true,
 			"locale":"en-US",
 			"enable_media_stream": true,
 			"artifacts": "res://cef_artifacts",
 			"exported_artifacts": FAG_Utils.globalize_path("cef_artifacts" if OS.get_name() != "Windows" else ""), # TODO TEST without "cef_artifacts" dir for Windows platform
 	}):
-		printerr("GDCef init error: ", gdcef.get_error())
+		printerr("GDCef init error: ", _gdcef.get_error())
 		return
 	
-	_browser = gdcef.create_browser("", _display, {"javascript":true})
+	_browser = _gdcef.create_browser("", _display, {"javascript":true})
 	if not _browser:
-		printerr("GDCef create error: ", gdcef.get_error())
+		printerr("GDCef create error: ", _gdcef.get_error())
 		return
 	_browser.connect("on_page_loaded", _on_page_loaded)
 	_browser.connect("on_page_failed_loading", _on_page_failed_loading)

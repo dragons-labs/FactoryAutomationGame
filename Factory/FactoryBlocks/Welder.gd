@@ -9,7 +9,7 @@ extends Area3D
 ## conveyor belt linear speed [m/s]
 @export var speed := 1.0
 
-@onready var _factory_root := get_tree().current_scene.get_node("%FactoryRoot")
+@onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
 @onready var _second_input := $"../Area3DIn2"
 
 var belt_speed_vector # used by FAG_FactoryBlocksUtils

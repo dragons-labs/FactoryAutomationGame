@@ -3,7 +3,7 @@
 
 extends Area3D
 
-@onready var _factory_root := get_tree().current_scene.get_node("%FactoryRoot")
+@onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
 
 func _ready() -> void:
 	body_entered.connect(FAG_FactoryBlocksUtils.on_object_enter_block__delayed_interaction.bind(self))

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cy3s4cxl70a76" path="res://Factory/FactoryRoot.gd" id="1_88vxl"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBuilder.tscn" id="2_ncfa0"]
-[ext_resource type="Script" uid="uid://sip6m3sdhfpc" path="res://Base/SliderWithValue.gd" id="3_g2qw6"]
+[ext_resource type="Script" uid="uid://sip6m3sdhfpc" path="res://Utils/SliderWithValue.gd" id="3_g2qw6"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ConveyorBelt.tscn" id="4_ipc57"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/SimpleBlock.tscn" id="4_wpvne"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Producer.tscn" id="5_u6lyq"]

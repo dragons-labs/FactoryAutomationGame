@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://Base/2DGridSystem/BaseElement.gd" id="1_u44q1"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/pnp.svg" id="2_bb3gi"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/pnp-icon.svg" id="3_4lpep"]
+[ext_resource type="Script" uid="uid://cyherby5n5jm3" path="res://Utils/2DGridSystem/BaseElement.gd" id="1_u44q1"]
+[ext_resource type="Texture2D" uid="uid://c8esasu1e3efs" path="res://ElectronicsSimulator/Components/images/pnp.svg" id="2_bb3gi"]
+[ext_resource type="Texture2D" uid="uid://bnc21kbxkt2cq" path="res://ElectronicsSimulator/Components/images/pnp-icon.svg" id="3_4lpep"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mpsrt"]
 

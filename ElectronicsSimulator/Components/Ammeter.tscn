@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://Base/2DGridSystem/BaseElement.gd" id="1_8x2ox"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/ammeter-mA.svg" id="2_ljxp6"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/ammeter-icon.svg" id="3_om3ob"]
+[ext_resource type="Script" uid="uid://cyherby5n5jm3" path="res://Utils/2DGridSystem/BaseElement.gd" id="1_8x2ox"]
+[ext_resource type="Texture2D" uid="uid://bif0vbdxh2ymj" path="res://ElectronicsSimulator/Components/images/ammeter-mA.svg" id="2_ljxp6"]
+[ext_resource type="Texture2D" uid="uid://75q2mtygy0o3" path="res://ElectronicsSimulator/Components/images/ammeter-icon.svg" id="3_om3ob"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mpsrt"]
 

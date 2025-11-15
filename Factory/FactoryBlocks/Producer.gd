@@ -5,20 +5,16 @@ extends Node3D
 
 @export var object : RigidBody3D
 @export var timer_period := 1.0
-@onready var _factory_root := get_tree().current_scene.get_node("%FactoryRoot")
+
+@onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
+@onready var _name_prefix := FAG_FactoryBlocksUtils.handle_name_prefix(self, $Label3D)
 
 var _object_is_ready := false
-var _name_prefix := ""
 var _timer = null
 
 func _ready() -> void:
 	_factory_root.factory_stop.connect(_on_factory_stop)
 	_factory_root.factory_start.connect(_on_factory_start)
-	
-	_name_prefix = get_meta("in_game_name", "")
-	$Label3D.text = _name_prefix
-	if _name_prefix:
-		_name_prefix += "_"
 
 func _on_timer_timeout(delay : float) -> void:
 	if _factory_root.get_signal_value(_name_prefix + "producer_control_enabled") > 2:

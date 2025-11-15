@@ -3,6 +3,8 @@
 
 extends Node
 
+class_name FAG_TCPEcho
+
 func get_port() -> int:
 	if not _listen_port:
 		_server.listen(0)

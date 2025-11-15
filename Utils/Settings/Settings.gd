@@ -1,6 +1,13 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
+"""singleton (autoload) utils class for management game settings, provides function for:
+	- register settings
+	- obtain settings values from config
+	- generate settings menu
+	- save and read settings to/from configuration file
+"""
+
 extends Node
 
 signal keymap_update()
@@ -64,6 +71,11 @@ static func set_default_controls_and_create_actions(tr_prefix : String, actions_
 		register_action(action_name, actions_list[action_name])
 		actions[action_name] = [actions_list[action_name], tr_prefix + action_name]
 	return actions
+
+# return selected child of game root node
+# (placed in Settings not utils because get_tree need be called on node in scene)
+func get_root_subnode(node : String) -> Node:
+	return get_tree().current_scene.get_node(node)
 
 
 var _all_settings := {}

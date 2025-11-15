@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://Base/2DGridSystem/BaseElement.gd" id="1_ngujn"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/resistor.svg" id="2_wc2eb"]
-[ext_resource type="Texture2D" path="res://ElectronicsSimulator/Components/images/resistor-icon.svg" id="3_m4flp"]
+[ext_resource type="Script" uid="uid://cyherby5n5jm3" path="res://Utils/2DGridSystem/BaseElement.gd" id="1_ngujn"]
+[ext_resource type="Texture2D" uid="uid://bxjfm1h64l6sr" path="res://ElectronicsSimulator/Components/images/resistor.svg" id="2_wc2eb"]
+[ext_resource type="Texture2D" uid="uid://d2we408k5egiw" path="res://ElectronicsSimulator/Components/images/resistor-icon.svg" id="3_m4flp"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mpsrt"]
 

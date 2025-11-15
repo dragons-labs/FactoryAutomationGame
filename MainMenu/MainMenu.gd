@@ -82,7 +82,7 @@ func _on_load_save_pressed() -> void:
 	_set_mode(Mode.LOAD_SAVE)
 
 func _on_show_task_info() -> void:
-	get_tree().current_scene.get_node("%Manual").show_info(_factory_root.level_scene_node, _factory_root.GAME_PROGRESS_SAVE)
+	FAG_Settings.get_root_subnode("%Manual").show_info(_factory_root.level_scene_node, _factory_root.GAME_PROGRESS_SAVE)
 
 func _on_settings_pressed() -> void:
 	var screen_size := Vector2(get_tree().root.size)
