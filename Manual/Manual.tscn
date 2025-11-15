@@ -1,12 +1,12 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=11 format=3 uid="uid://54n2ntuoy5i0"]
 
-[ext_resource type="Script" path="res://Manual/Manual.gd" id="1_ylww1"]
-[ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif.ttf" id="2_5vcv6"]
-[ext_resource type="PackedScene" path="res://Base/WebBrowser/WebBrowser.tscn" id="2_6lhi2"]
-[ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSansMono.ttf" id="3_5mm3n"]
-[ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif-Italic.ttf" id="4_yctyr"]
-[ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif-BoldItalic.ttf" id="5_okvqm"]
-[ext_resource type="FontFile" path="res://Manual/fonts/DejaVuSerif-Bold.ttf" id="6_atu38"]
+[ext_resource type="Script" uid="uid://bo8haugaxkymk" path="res://Manual/Manual.gd" id="1_ylww1"]
+[ext_resource type="FontFile" uid="uid://c0ytsvxfowinm" path="res://Manual/fonts/DejaVuSerif.ttf" id="2_5vcv6"]
+[ext_resource type="PackedScene" uid="uid://b6h4chjut5bay" path="res://Base/WebBrowser/WebBrowser.tscn" id="2_6lhi2"]
+[ext_resource type="FontFile" uid="uid://chvt2iaskqlvm" path="res://Manual/fonts/DejaVuSansMono.ttf" id="3_5mm3n"]
+[ext_resource type="FontFile" uid="uid://ce8pve6jrxblf" path="res://Manual/fonts/DejaVuSerif-Italic.ttf" id="4_yctyr"]
+[ext_resource type="FontFile" uid="uid://br55kkwh37aqy" path="res://Manual/fonts/DejaVuSerif-BoldItalic.ttf" id="5_okvqm"]
+[ext_resource type="FontFile" uid="uid://bnnv8pvgk63sy" path="res://Manual/fonts/DejaVuSerif-Bold.ttf" id="6_atu38"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l5dbs"]
 
@@ -16,6 +16,7 @@
 
 [node name="Manual" type="Window"]
 auto_translate_mode = 1
+oversampling_override = 1.0
 initial_position = 3
 size = Vector2i(800, 420)
 current_screen = 0
@@ -41,10 +42,10 @@ auto_translate_mode = 2
 layout_mode = 2
 focus_mode = 2
 theme_override_fonts/normal_font = ExtResource("2_5vcv6")
-theme_override_fonts/mono_font = ExtResource("3_5mm3n")
-theme_override_fonts/italics_font = ExtResource("4_yctyr")
-theme_override_fonts/bold_italics_font = ExtResource("5_okvqm")
 theme_override_fonts/bold_font = ExtResource("6_atu38")
+theme_override_fonts/bold_italics_font = ExtResource("5_okvqm")
+theme_override_fonts/italics_font = ExtResource("4_yctyr")
+theme_override_fonts/mono_font = ExtResource("3_5mm3n")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_l5dbs")
 bbcode_enabled = true
 selection_enabled = true
@@ -93,10 +94,10 @@ auto_translate_mode = 2
 layout_mode = 2
 focus_mode = 2
 theme_override_fonts/normal_font = ExtResource("2_5vcv6")
-theme_override_fonts/mono_font = ExtResource("3_5mm3n")
-theme_override_fonts/italics_font = ExtResource("4_yctyr")
-theme_override_fonts/bold_italics_font = ExtResource("5_okvqm")
 theme_override_fonts/bold_font = ExtResource("6_atu38")
+theme_override_fonts/bold_italics_font = ExtResource("5_okvqm")
+theme_override_fonts/italics_font = ExtResource("4_yctyr")
+theme_override_fonts/mono_font = ExtResource("3_5mm3n")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_1u4wq")
 bbcode_enabled = true
 selection_enabled = true
@@ -139,10 +140,10 @@ auto_translate_mode = 2
 layout_mode = 2
 focus_mode = 2
 theme_override_fonts/normal_font = ExtResource("2_5vcv6")
-theme_override_fonts/mono_font = ExtResource("3_5mm3n")
-theme_override_fonts/italics_font = ExtResource("4_yctyr")
-theme_override_fonts/bold_italics_font = ExtResource("5_okvqm")
 theme_override_fonts/bold_font = ExtResource("6_atu38")
+theme_override_fonts/bold_italics_font = ExtResource("5_okvqm")
+theme_override_fonts/italics_font = ExtResource("4_yctyr")
+theme_override_fonts/mono_font = ExtResource("3_5mm3n")
 theme_override_styles/focus = SubResource("StyleBoxLine_emoyf")
 bbcode_enabled = true
 selection_enabled = true
@@ -151,6 +152,7 @@ selection_enabled = true
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+metadata/_tab_index = 3
 
 [connection signal="meta_clicked" from="TabContainer/MANUAL_TASK_INFO_TITLE/RichTextLabel" to="." method="_on_rich_text_label_meta_clicked"]
 [connection signal="item_selected" from="TabContainer/MANUAL_TASK_GUIDE_TITLE/TreeParent/Tree" to="." method="_on_tree_item_selected"]

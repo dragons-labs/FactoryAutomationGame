@@ -1,8 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=4 format=3 uid="uid://ccu02jb7hng1k"]
 
 [ext_resource type="Theme" path="res://ComputerSimulator/ui_theme/terminal_theme_xterm.tres" id="1_efv1g"]
-[ext_resource type="Script" path="res://ComputerSimulator/ComputerSystemSimulator.gd" id="2_xu8fq"]
-[ext_resource type="Script" path="res://Base/VNC.gd" id="3_0aypa"]
+[ext_resource type="Script" uid="uid://c30fxrvoegipu" path="res://ComputerSimulator/ComputerSystemSimulator.gd" id="2_xu8fq"]
+[ext_resource type="Script" uid="uid://dght7htmnn1pb" path="res://Base/VNC.gd" id="3_0aypa"]
 
 [node name="ComputerSystemSimulator" type="Control"]
 layout_mode = 3

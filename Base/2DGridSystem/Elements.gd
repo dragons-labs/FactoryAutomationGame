@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-class_name Grid2D_Elements
+class_name FAG_2DGrid_Elements
  
 signal on_element_add(element: Node2D)
 signal on_element_remove(element: Node2D)
@@ -34,12 +34,12 @@ func serialise() -> Array:
 	var save_data = []
 	for element in main_node.get_children():
 		var values := {}
-		for info_node in Grid2D_BaseElement.get_from_element(element).get_children():
+		for info_node in FAG_2DGrid_BaseElement.get_from_element(element).get_children():
 			if info_node is LineEdit and info_node.text:
 				values[info_node.name] = info_node.text
 		
 		save_data.append({
-			"type": Grid2D_BaseElement.get_from_element(element).subtype,
+			"type": FAG_2DGrid_BaseElement.get_from_element(element).subtype,
 			"values": values,
 			"position": element.position,
 			"rotation": element.rotation,
@@ -63,7 +63,7 @@ func restore(data : Array, elements : Dictionary, offset := Vector2.ZERO, duplic
 		element.rotation = element_info.rotation
 		element.scale = FAG_Utils.Vector2_from_JSON(element_info.scale)
 		
-		for info_node in Grid2D_BaseElement.get_from_element(element).get_children():
+		for info_node in FAG_2DGrid_BaseElement.get_from_element(element).get_children():
 			if info_node.name in element_info.values:
 				info_node.text = element_info.values[info_node.name]
 		
@@ -82,7 +82,7 @@ func store_infos() -> void:
 	# for tscn save mode
 	for element in main_node.get_children():
 		var info := {}
-		for info_node in Grid2D_BaseElement.get_from_element(element).get_children():
+		for info_node in FAG_2DGrid_BaseElement.get_from_element(element).get_children():
 			if info_node is LineEdit and info_node.text:
 				info[info_node.name] = info_node.text
 		if info:
@@ -94,7 +94,7 @@ func restore_infos_and_emit_element_add__finish(element : Node2D) -> void:
 	# for tscn restore mode
 	if element.has_meta("grid_element_info"):
 		var info = element.get_meta("grid_element_info")
-		for info_node in Grid2D_BaseElement.get_from_element(element).get_children():
+		for info_node in FAG_2DGrid_BaseElement.get_from_element(element).get_children():
 			if info_node.name in info:
 				info_node.text = info[info_node.name]
 	on_element_add.emit(element)
@@ -114,7 +114,7 @@ func add_elements__init(elements : Array, point : Vector2, duplicate := true, at
 	for element in elements:
 		var new_element = element.duplicate() if duplicate else element
 		_new_elements[new_element] = point if at_cursor_position else new_element.position
-		Grid2D_BaseElement.get_from_element(new_element).set_active(false)
+		FAG_2DGrid_BaseElement.get_from_element(new_element).set_active(false)
 		main_node.add_child(new_element)
 	add_element__update(point)
 
@@ -124,7 +124,7 @@ func add_element__finish(point : Vector2) -> void:
 	undo_redo.create_action("Grid Element: Add")
 	for new_element in _new_elements:
 		var element = new_element.duplicate() # BUG: https://github.com/godotengine/godot/issues/92880
-		Grid2D_BaseElement.get_from_element(element).set_active(true)
+		FAG_2DGrid_BaseElement.get_from_element(element).set_active(true)
 		undo_redo.add_do_reference(element)
 		undo_redo.add_do_method(_add_element.bind(element))
 		undo_redo.add_undo_method(_remove_element.bind(element))
@@ -212,8 +212,8 @@ func rotate_elements(elements : Array, angle : float, pivot = null, start_undo_r
 		if pivot != null:
 			undo_redo.add_do_property(element, "position", FAG_Utils.rotate_around_pivot(element.position, pivot, angle))
 			undo_redo.add_undo_property(element, "position", element.position)
-		undo_redo.add_do_method(Grid2D_BaseElement.get_from_element(element).on_transform_updated.bind())
-		undo_redo.add_undo_method(Grid2D_BaseElement.get_from_element(element).on_transform_updated.bind())
+		undo_redo.add_do_method(FAG_2DGrid_BaseElement.get_from_element(element).on_transform_updated.bind())
+		undo_redo.add_undo_method(FAG_2DGrid_BaseElement.get_from_element(element).on_transform_updated.bind())
 	
 	if finish_undo_redo_action:
 		undo_redo.commit_action()
@@ -242,8 +242,8 @@ func mirror_elements(elements : Array, pivot = null, start_undo_redo_action = tr
 			element.position = FAG_Utils.mirror_y(element.position, pivot)
 			undo_redo.add_do_property(element, "position", element.position)
 		
-		undo_redo.add_do_method(Grid2D_BaseElement.get_from_element(element).on_transform_updated.bind())
-		undo_redo.add_undo_method(Grid2D_BaseElement.get_from_element(element).on_transform_updated.bind())
+		undo_redo.add_do_method(FAG_2DGrid_BaseElement.get_from_element(element).on_transform_updated.bind())
+		undo_redo.add_undo_method(FAG_2DGrid_BaseElement.get_from_element(element).on_transform_updated.bind())
 	
 	if finish_undo_redo_action:
 		undo_redo.commit_action()
@@ -258,7 +258,7 @@ func get_all_elements() -> Array:
 func find_element_by_point(point : Vector2, skip_element : Node2D = null) -> Node2D:
 	for element in main_node.get_children():
 		if element != skip_element:
-			var image = Grid2D_BaseElement.get_from_element(element).get_node("Image")
+			var image = FAG_2DGrid_BaseElement.get_from_element(element).get_node("Image")
 			if image.get_rect().has_point(image.to_local(point)):
 				return element
 	return null
@@ -266,7 +266,7 @@ func find_element_by_point(point : Vector2, skip_element : Node2D = null) -> Nod
 func find_elements_on_area(area : Rect2) -> Array:
 	var ret = []
 	for element in main_node.get_children():
-		var image = Grid2D_BaseElement.get_from_element(element).get_node("Image")
+		var image = FAG_2DGrid_BaseElement.get_from_element(element).get_node("Image")
 		if (image.global_transform * image.get_rect()).intersects(area):
 			ret.append(element)
 	return ret
@@ -275,7 +275,7 @@ func find_all_terminals_by_point(point : Vector2, squared_distance : float, skip
 	var res : Array[Node2D]
 	for element in main_node.get_children():
 		if element != skip_element:
-			for terminal in Grid2D_BaseElement.get_from_element(element).get_node("Connections").get_children():
+			for terminal in FAG_2DGrid_BaseElement.get_from_element(element).get_node("Connections").get_children():
 				if terminal.global_position.distance_squared_to(point) <= squared_distance:
 					res.append(terminal)
 	return res

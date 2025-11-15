@@ -1,6 +1,6 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=6 format=3 uid="uid://cy0brqivxb2l1"]
 
-[ext_resource type="Script" path="res://Base/Gui3DNode/Gui3DNode.gd" id="1"]
+[ext_resource type="Script" uid="uid://b3fu5j8fmepqm" path="res://Base/Gui3DNode/Gui3DNode.gd" id="1"]
 
 [sub_resource type="QuadMesh" id="1"]
 

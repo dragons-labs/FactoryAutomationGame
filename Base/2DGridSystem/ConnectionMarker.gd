@@ -3,7 +3,7 @@
 
 @tool
 extends Node2D
-class_name Grid2D_ConnectionMarker
+class_name FAG_2DGrid_ConnectionMarker
 
 @export var color := Color.WHITE
 @export var radius := 5

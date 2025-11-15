@@ -139,6 +139,6 @@ func _ready():
 	gdspice.verbose = 2
 
 func _on_element_click(element, _long):
-	var base_element = Grid2D_BaseElement.get_from_element(element)
+	var base_element = FAG_2DGrid_BaseElement.get_from_element(element)
 	if base_element.type == "Meter":
 		gdspice.on_measurer_click(base_element)

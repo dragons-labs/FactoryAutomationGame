@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-class_name Grid2D_Lines
+class_name FAG_2DGrid_Lines
 
 
 ### Constructor and requires read-only properties values
@@ -529,7 +529,7 @@ func update_connections() -> void:
 				if line.has_node(marker_node_name):
 					marker = line.get_node(marker_node_name)
 				else:
-					marker = Grid2D_ConnectionMarker.new()
+					marker = FAG_2DGrid_ConnectionMarker.new()
 					marker.name = marker_node_name
 					marker.color = line_color
 					marker.radius = line.width * marker_radius_multipler

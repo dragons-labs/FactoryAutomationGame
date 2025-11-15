@@ -3,7 +3,7 @@
 
 @tool
 extends Node2D
-class_name Grid2D_BaseElement
+class_name FAG_2DGrid_BaseElement
 
 @export_group("Grid Element Settings")
 
@@ -47,12 +47,12 @@ class_name Grid2D_BaseElement
 
 ### get from terminal / from element
 
-static func get_from_terminal(terminal : Node2D) -> Grid2D_BaseElement:
+static func get_from_terminal(terminal : Node2D) -> FAG_2DGrid_BaseElement:
 	return terminal.get_parent().get_parent()
 
-static func get_from_element(element : Node2D) -> Grid2D_BaseElement:
-	return element.get_child(0) # child(0) should be Grid2D_BaseElement ...
-	# we do not use Grid2D_BaseElement directly as element to hide element configuration
+static func get_from_element(element : Node2D) -> FAG_2DGrid_BaseElement:
+	return element.get_child(0) # child(0) should be FAG_2DGrid_BaseElement ...
+	# we do not use FAG_2DGrid_BaseElement directly as element to hide element configuration
 
 
 ### get value / get netname
@@ -121,7 +121,7 @@ func _update_connections() -> void:
 	var i = 0
 	for point in connections:
 		i += 1
-		var new_node = Grid2D_ConnectionMarker.new()
+		var new_node = FAG_2DGrid_ConnectionMarker.new()
 		new_node.name = "T" + str(i)
 		new_node.color = connection_color
 		new_node.radius = connection_radius

@@ -1,9 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=5 format=3 uid="uid://ch0q6t7xl5sry"]
 
-[ext_resource type="Script" path="res://Base/2DGridSystem/GridEditor.gd" id="1_ekobs"]
-[ext_resource type="Script" path="res://Base/Camera/Camera2DControl.gd" id="4_fpxj2"]
-[ext_resource type="Script" path="res://Base/VisualGrid.gd" id="8_d3qpe"]
-[ext_resource type="PackedScene" path="res://Base/WorldEditorUI/WorldEditorUI.tscn" id="9_sp5h3"]
+[ext_resource type="Script" uid="uid://ft6xum3s0uak" path="res://Base/2DGridSystem/GridEditor.gd" id="1_ekobs"]
+[ext_resource type="Script" uid="uid://d14oklta8qpeq" path="res://Base/Camera/Camera2DControl.gd" id="4_fpxj2"]
+[ext_resource type="Script" uid="uid://c7o4im4v8s701" path="res://Base/VisualGrid.gd" id="8_d3qpe"]
+[ext_resource type="PackedScene" uid="uid://ccjlqcswjr2vw" path="res://Base/WorldEditorUI/WorldEditorUI.tscn" id="9_sp5h3"]
 
 [node name="GridEditor" type="Node2D"]
 script = ExtResource("1_ekobs")

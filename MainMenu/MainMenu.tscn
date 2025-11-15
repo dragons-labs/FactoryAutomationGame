@@ -1,7 +1,7 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=7 format=3 uid="uid://d4j3lg6cly74v"]
 
-[ext_resource type="Script" path="res://MainMenu/MainMenu.gd" id="1_w7oy2"]
-[ext_resource type="Script" path="res://Base/SliderWithValue.gd" id="2_lpt12"]
+[ext_resource type="Script" uid="uid://c56rsrwixpp15" path="res://MainMenu/MainMenu.gd" id="1_w7oy2"]
+[ext_resource type="Script" uid="uid://sip6m3sdhfpc" path="res://Base/SliderWithValue.gd" id="2_lpt12"]
 
 [sub_resource type="GDScript" id="GDScript_2ji10"]
 resource_name = "SettingsGroup"

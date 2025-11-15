@@ -28,7 +28,7 @@ signal on_element_click(element: Node2D, long: bool)
 ### Init
 
 @onready var undo_redo := UndoRedo.new()
-@onready var grid := Grid2D_World.new(%Nodes, undo_redo, grid_size)
+@onready var grid := FAG_2DGrid_World.new(%Nodes, undo_redo, grid_size)
 @onready var ui := %WorldEditorUI
 
 func _init() -> void:
@@ -189,7 +189,7 @@ func _on_do_on_raycast_selection_finish(raycast_result : Variant) -> void:
 		_selected_elements_and_segments_valid = true
 		
 		for element in _selected_elements:
-			var base_element = Grid2D_BaseElement.get_from_element(element)
+			var base_element = FAG_2DGrid_BaseElement.get_from_element(element)
 			base_element.get_node("Image").modulate = ui._selection_box.fill_color
 			for connection in base_element.get_node("Connections").get_children():
 				connection.modulate = ui._selection_box.fill_color
@@ -206,7 +206,7 @@ func _on_do_on_raycast_selection_finish(raycast_result : Variant) -> void:
 
 func _on_selection_box_has_been_hidden() -> void:
 	for element in _selected_elements:
-		var base_element = Grid2D_BaseElement.get_from_element(element)
+		var base_element = FAG_2DGrid_BaseElement.get_from_element(element)
 		base_element.get_node("Image").modulate = Color.WHITE
 		for connection in base_element.get_node("Connections").get_children():
 			connection.modulate = Color.WHITE

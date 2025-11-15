@@ -26,7 +26,7 @@ func reset():
 	_last_on_process_time = -1
 
 func get_ngspice_netlist(
-		grid : Grid2D_World,
+		grid : FAG_2DGrid_World,
 		external_nets_input_to_circuit_from_factory : Array,
 		external_nets_outputs_from_circuit_to_factory : Array,
 		external_circuit_entries : Array
@@ -101,7 +101,7 @@ func get_ngspice_netlist(
 	# add elements from grid editor and create models list
 	var models = {}
 	for j in range(len(all_elements)):
-		var base_element = Grid2D_BaseElement.get_from_element(all_elements[j])
+		var base_element = FAG_2DGrid_BaseElement.get_from_element(all_elements[j])
 		if "models" in base_element.params:
 			models.merge(base_element.params.models)
 		var entry = base_element.get_netlist_entry(netlist, j)
@@ -158,7 +158,7 @@ var oscilloscopes = {}
 var _oscilloscope_id = 0
 var _last_oscilloscope = null
 
-func _create_graph_function(win : Window, base_element : Grid2D_BaseElement) -> Function:
+func _create_graph_function(win : Window, base_element : FAG_2DGrid_BaseElement) -> Function:
 	var value = [0]
 	var time = [0]
 	if get_simulation_state() in [GdSpice.RUNNING, GdSpice.PAUSED]:
@@ -203,7 +203,7 @@ func _create_graph_function(win : Window, base_element : Grid2D_BaseElement) -> 
 	
 	return win_chart_func
 
-func create_oscilloscope(base_element : Grid2D_BaseElement):
+func create_oscilloscope(base_element : FAG_2DGrid_BaseElement):
 	if not base_element in measurements:
 		return
 	
@@ -227,7 +227,7 @@ func create_oscilloscope(base_element : Grid2D_BaseElement):
 	
 	return win
 
-func add_graph_to_oscilloscope(win : Window, base_element : Grid2D_BaseElement):
+func add_graph_to_oscilloscope(win : Window, base_element : FAG_2DGrid_BaseElement):
 	if not base_element in measurements:
 		return
 	
@@ -248,7 +248,7 @@ func _on_win_close(win : Window):
 	win.get_parent().remove_child(win)
 	win.queue_free()
 
-func on_measurer_click(base_element : Grid2D_BaseElement):
+func on_measurer_click(base_element : FAG_2DGrid_BaseElement):
 	if base_element in oscilloscopes:
 		oscilloscopes[base_element][0].grab_focus()
 	elif _last_oscilloscope and not Input.is_key_pressed(KEY_SHIFT):

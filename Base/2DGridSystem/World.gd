@@ -1,31 +1,31 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-class_name Grid2D_World
+class_name FAG_2DGrid_World
 
 
 ### Constructor and requires read-only properties values
 
 var gParent : Node2D = null
-var gLines : Grid2D_Lines = null
-var gElements : Grid2D_Elements = null
+var gLines : FAG_2DGrid_Lines = null
+var gElements : FAG_2DGrid_Elements = null
 
 func _init(base_node_, undo_redo_, grid_size_) -> void:
 	gParent = base_node_
 	
-	# init Grid2D_Lines
+	# init FAG_2DGrid_Lines
 	var lines_node = Node2D.new()
 	lines_node.name = "Lines"
 	gParent.add_child(lines_node)
 	lines_node.owner = gParent
-	gLines = Grid2D_Lines.new(lines_node, gParent, undo_redo_, grid_size_)
+	gLines = FAG_2DGrid_Lines.new(lines_node, gParent, undo_redo_, grid_size_)
 	
-	# init Grid2D_Elements
+	# init FAG_2DGrid_Elements
 	var elements_node = Node2D.new()
 	elements_node.name = "Elements"
 	gParent.add_child(elements_node)
 	elements_node.owner = gParent
-	gElements = Grid2D_Elements.new(elements_node, gParent, undo_redo_, grid_size_)
+	gElements = FAG_2DGrid_Elements.new(elements_node, gParent, undo_redo_, grid_size_)
 
 
 ### Save / Restore system
@@ -67,7 +67,7 @@ func restore_tscn(save_file : String, offset := Vector2.ZERO, ui = null) -> void
 func _restore_subnodes(source : Node2D, destination : Node2D, owner : Node2D, offset := Vector2.ZERO, ui = null) -> void:
 	for n in source.get_children():
 		if ui:
-			var subtype = Grid2D_BaseElement.get_from_element(n).subtype
+			var subtype = FAG_2DGrid_BaseElement.get_from_element(n).subtype
 			if subtype:
 				var button = ui._elements_dict[subtype][1]
 				if button.visible == false or button.disabled == true:
@@ -154,7 +154,7 @@ class NetList:
 	
 	func find_connected_nets(net, nets = []):
 		for terminal in net.terminals:
-			for net2 in Grid2D_BaseElement.get_from_terminal(terminal).get_terminals_nets(self):
+			for net2 in FAG_2DGrid_BaseElement.get_from_terminal(terminal).get_terminals_nets(self):
 				if net2 and not net2 in nets:
 					nets.append(net2)
 					find_connected_nets(net2, nets)
@@ -173,7 +173,7 @@ class NetList:
 				not_connected_nets.append(net)
 		return not_connected_nets
 	
-	func recursive_add_line_to_net(net : Net, line : Line2D, all_lines : Grid2D_Lines) -> void:
+	func recursive_add_line_to_net(net : Net, line : Line2D, all_lines : FAG_2DGrid_Lines) -> void:
 		net.lines.append(line)
 		var squared_radius = line.width * line.width * all_lines.marker_radius_multipler * all_lines.marker_radius_multipler
 		# line can connect to other line only on own endpoints, so check both endpoints
@@ -256,7 +256,7 @@ func get_netlist() -> NetList:
 	
 	# add terminals and names to the previously created nets and create terminal-terminal (no lines) nets
 	for element in gElements.main_node.get_children():
-		var base_element = Grid2D_BaseElement.get_from_element(element)
+		var base_element = FAG_2DGrid_BaseElement.get_from_element(element)
 		var squared_radius = base_element.connection_radius * base_element.connection_radius
 		var netname = base_element.get_netname()
 		
@@ -286,7 +286,7 @@ func get_netlist() -> NetList:
 					# add names from all directly connected elements
 					# (we do not repeat this if/elif branch for other elements)
 					for conn_terminal in conn_terminals:
-						var conn_netname = Grid2D_BaseElement.get_from_terminal(conn_terminal).get_netname()
+						var conn_netname = FAG_2DGrid_BaseElement.get_from_terminal(conn_terminal).get_netname()
 						if conn_netname and not conn_netname in net.names:
 							net.names.append(conn_netname)
 					

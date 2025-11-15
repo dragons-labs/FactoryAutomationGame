@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=3 format=3 uid="uid://b6h4chjut5bay"]
 
-[ext_resource type="Script" path="res://Base/WebBrowser/WebBrowser.gd" id="1_dfpua"]
+[ext_resource type="Script" uid="uid://nljsly5d68vo" path="res://Base/WebBrowser/WebBrowser.gd" id="1_dfpua"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bsl1o"]
 bg_color = Color(0.800491, 0.800491, 0.800491, 1)

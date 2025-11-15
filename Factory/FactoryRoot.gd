@@ -602,7 +602,7 @@ func _update_block_count(block: Node3D, val: int) -> void:
 	_stats.status = "not started"
 
 func _update_circuit_element_count(element: Node2D, val: int) -> void:
-	var base_element = Grid2D_BaseElement.get_from_element(element)
+	var base_element = FAG_2DGrid_BaseElement.get_from_element(element)
 	
 	if not base_element.type in ["NET", "Meter"]:
 		_stats.circuit_element_count += val
