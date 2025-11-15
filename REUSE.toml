@@ -5,3 +5,9 @@ version = 1
 path = ["**/.uid", "**/.import"]
 SPDX-FileCopyrightText = "NONE"
 SPDX-License-Identifier = "CC0-1.0"
+
+# empty files
+[[annotations]]
+path = ["**/.gdignore"]
+SPDX-FileCopyrightText = "NONE"
+SPDX-License-Identifier = "CC0-1.0"

@@ -10,6 +10,9 @@
 [submodule "addons/3rdparty/godot-xterm"]
 	path = addons/3rdparty/godot-xterm
 	url = https://github.com/lihop/godot-xterm
+[submodule "addons/3rdparty/limbo_console"]
+	path = addons/3rdparty/limbo_console
+	url = https://github.com/limbonaut/limbo_console
 #[submodule "addons/3rdparty/_godot-cpp"]
 #	path = addons/3rdparty/_godot-cpp
 #	url = https://github.com/godotengine/godot-cpp

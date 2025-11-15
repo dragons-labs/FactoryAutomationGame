@@ -281,6 +281,7 @@ func set_signal_value(signal_name : String, value : float) -> void:
 ### factory timers
 
 class FactoryTimer:
+	var paused := false
 	var _period : float
 	var _time_left : float
 	
@@ -299,6 +300,8 @@ class FactoryTimer:
 			_period = time
 	
 	func update(delta : float) -> bool:
+		if paused:
+			return false
 		_time_left -= delta
 		if _time_left <= 0:
 			timeout.emit(_time_left)
@@ -623,6 +626,8 @@ func _update_circuit_element_count(element: Node2D, val: int) -> void:
 
 ### init
 
+var _console_read_set
+
 func _ready() -> void:
 	set_visibility(false)
 	_factory_state = FACTORY_STOP
@@ -643,12 +648,56 @@ func _ready() -> void:
 	circuit_simulator.simulation_error.connect(_on_simulation_error)
 	
 	_reset_stats()
+	
+	_console_read_set = FAG_ConsoleReadSet.new(self, "factory", ["check_win_loss_conditions"])
+	
+	LimboConsole.register_command(_factory_producer, "factory producer", "Perform operation on all (default) or selected (last argument) producers.")
+	LimboConsole.add_argument_autocomplete_source("factory producer", 0, func(): return ["start", "stop", "step", "set_time"])
+	
+	LimboConsole.register_command(_factory_clear, "factory clear", "Remove all products")
+	
+	LimboConsole.register_command(pause_factory, "pause", "Pause")
+	LimboConsole.register_command(unpause_factory, "unpause", "Unpause")
+
+
+### console commands
+
+func _factory_producer(operation : String, arg = null, in_game_name = null):
+	if operation in ["start", "stop", "step"]:
+		in_game_name = arg
+	if in_game_name != null:
+		in_game_name = str(in_game_name)
+	
+	for node in get_tree().get_nodes_in_group("FactoryProducers"):
+		if in_game_name == null or in_game_name == node.get_meta("in_game_name", ""):
+			match operation:
+				"start":
+					node._timer.paused = false
+				"stop":
+					node._timer.paused = true
+				"step":
+					node._release_object()
+				"set_time":
+					node.timer_period = float(arg)
+
+func _factory_clear():
+	for node in objects_root.get_children():
+		node.queue_free()
 
 
 ### misc / utils
 
+var check_win_loss_conditions = true
+
+func production_timeout():
+	if check_win_loss_conditions:
+		emergency_stop(
+			"FACTORY_PRODUCT_FAILURE_TITLE",
+			"FACTORY_PRODUCT_TIMEOUT_TEXT"
+		)
+	
 func validate_product(node : RigidBody3D):
-	if not _factory_state & FACTORY_RUNNING:
+	if not check_win_loss_conditions or not _factory_state & FACTORY_RUNNING:
 		return
 	
 	var status = level_scene_node.validate_product(node)

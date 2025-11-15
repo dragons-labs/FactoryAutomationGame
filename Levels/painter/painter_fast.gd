@@ -146,7 +146,4 @@ func _on_factory_stop() -> void:
 	print("STOP")
 
 func _on_timer_timeout(_val : float) -> void:
-	_factory_root.emergency_stop(
-		"FACTORY_PRODUCT_FAILURE_TITLE",
-		"FACTORY_PRODUCT_TIMEOUT_TEXT"
-	)
+	_factory_root.production_timeout()

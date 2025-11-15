@@ -1,7 +1,7 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=7 format=3 uid="uid://cskpx42qtrwba"]
 
-[ext_resource type="Script" path="res://Factory/FactoryBlocks/ConveyorSplitter.gd" id="1_kb8ux"]
-[ext_resource type="Texture2D" path="res://Factory/FactoryBlocks/images/ConveyorSplitter.svg" id="1_omw6g"]
+[ext_resource type="Script" uid="uid://b5c7qywf7gwes" path="res://Factory/FactoryBlocks/ConveyorSplitter.gd" id="1_kb8ux"]
+[ext_resource type="Texture2D" uid="uid://dlb8llxt1rnj7" path="res://Factory/FactoryBlocks/images/ConveyorSplitter.svg" id="1_omw6g"]
 [ext_resource type="ArrayMesh" path="res://.godot/imported/ConveyorSplitter.tres" id="3_wnwaj"]
 
 [sub_resource type="GDScript" id="GDScript_smjxm"]
@@ -58,7 +58,7 @@ size = Vector3(1, 0.5, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_vlpht"]
 size = Vector3(1, 0.5, 1)
 
-[node name="ConveyorSplitter" type="Node3D"]
+[node name="ConveyorSplitter" type="Node3D" groups=["FactoryBelts"]]
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)

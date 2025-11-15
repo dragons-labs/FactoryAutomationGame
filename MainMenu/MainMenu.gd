@@ -57,7 +57,7 @@ func _on_load_level_pressed() -> void:
 		if file_name.ends_with(".json"):
 			var levels = FAG_Utils.load_from_json_file(_factory_root.LEVELS_DIR + file_name)
 			for level_id in levels:
-				if not levels[level_id].unlocked_by or levels[level_id].unlocked_by.any(
+				if unlocked_all_levels or not levels[level_id].unlocked_by or levels[level_id].unlocked_by.any(
 					func(levels_set): return levels_set.all(
 						func(level): return game_progress.finished_levels.has(level)
 					)
@@ -216,6 +216,15 @@ func _notification(what):
 		_on_quit_pressed()
 
 
+### Console commands
+
+var unlocked_all_levels := false
+
+func _unlocked_all_levels():
+	unlocked_all_levels = true
+	LimboConsole.info("All levels unlocked reopen \"" + tr("MAIN_MENU_START_LEVEL") + "\" menu to see results")
+
+
 ### Init / Open / BackTo main menu
 
 func _init():
@@ -224,6 +233,8 @@ func _init():
 		"GLOBAL_BREAK":  [{"key": KEY_PAUSE, "shift": true}, {"key": KEY_PAUSE, "ctrl": true}],
 	})
 	FAG_Settings.register_settings(self, "MAIN_MENU_UI_SETTINGS_GROUP_NAME", {}, default_controls)
+	
+	LimboConsole.register_command(_unlocked_all_levels, "unlock_all_levels", "Unlock all levels")
 
 @onready var item_list := %LoadDialog_ItemList
 
@@ -243,6 +254,10 @@ func _input(event: InputEvent):
 	elif event.is_action_pressed("GLOBAL_BREAK", false, true):
 		_show()
 	elif event.is_action_pressed("GLOBAL_ESCAPE"):
+		if LimboConsole.is_open() and event is InputEventKey and event.physical_keycode == KEY_ESCAPE:
+			LimboConsole.close_console()
+			get_viewport().set_input_as_handled()
+			return
 		if visible and _current_mode == Mode.NORMAL and _factory_root.is_loaded():
 			_hide()
 		else:
