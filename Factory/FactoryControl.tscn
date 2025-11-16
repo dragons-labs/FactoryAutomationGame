@@ -1,0 +1,56 @@
+[gd_scene load_steps=6 format=3 uid="uid://bs8dvw28ifomo"]
+
+[ext_resource type="Script" uid="uid://bmt818dgrqcpi" path="res://Factory/FactoryControl.gd" id="1_rx7uo"]
+[ext_resource type="PackedScene" uid="uid://b2xtqfv5n7gyt" path="res://ElectronicsSimulator/ElectronicsSimulator.tscn" id="2_5sn07"]
+[ext_resource type="PackedScene" uid="uid://ccu02jb7hng1k" path="res://ComputerSimulator/ComputerSystemSimulator.tscn" id="3_8pluw"]
+
+[sub_resource type="GDScript" id="GDScript_5ag1o"]
+script/source = "extends Window
+
+func _ready() -> void:
+	FAG_WindowManager.init_window(self)
+	close_requested.connect(_on_close_requested)
+
+func _on_close_requested():
+	FAG_WindowManager.set_windows_visibility_recursive(self, false)
+"
+
+[sub_resource type="GDScript" id="GDScript_mvkar"]
+script/source = "extends Window
+
+func _ready() -> void:
+	FAG_WindowManager.init_window(self, true)
+	close_requested.connect(_on_close_requested)
+
+func _on_close_requested():
+	FAG_WindowManager.set_windows_visibility_recursive(self, false)
+"
+
+[node name="FactoryControl" type="Node"]
+script = ExtResource("1_rx7uo")
+
+[node name="ElectronicsSimulatorWindow" type="Window" parent="."]
+unique_name_in_owner = true
+disable_3d = true
+scaling_3d_scale = 2.0
+title = "ELECTRONIC_EDITOR_WINDOW_TITLE"
+initial_position = 4
+size = Vector2i(800, 500)
+visible = false
+script = SubResource("GDScript_5ag1o")
+
+[node name="ElectronicsSimulator" parent="ElectronicsSimulatorWindow" instance=ExtResource("2_5sn07")]
+unique_name_in_owner = true
+
+[node name="ComputerSystemSimulatorWindow" type="Window" parent="."]
+unique_name_in_owner = true
+disable_3d = true
+scaling_3d_scale = 2.0
+initial_position = 3
+size = Vector2i(640, 440)
+current_screen = 0
+visible = false
+wrap_controls = true
+script = SubResource("GDScript_mvkar")
+
+[node name="ComputerSystemSimulator" parent="ComputerSystemSimulatorWindow" instance=ExtResource("3_8pluw")]

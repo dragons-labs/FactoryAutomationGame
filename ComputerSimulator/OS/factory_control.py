@@ -18,8 +18,8 @@ def get_factory_value(value_name):
 		return float(file.read())
 
 def set_factory_value(value_name, value):
-	"""set control block output value"""
-	with open("/dev/factory_control/inputs/" + value_name, 'w') as file:
+	"""set control block output value, use empty string as value to unset output (switch in high impedance mode)"""
+	with open("/dev/factory_control/output/" + value_name, 'w') as file:
 		file.write(str(value))
 
 def factory_sleep(value):

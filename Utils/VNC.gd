@@ -39,7 +39,6 @@ func init() -> int:
 			printerr("[VNC] Init error")
 			return 0
 	
-	display = display
 	display.connect("gui_input", _on_gui_input)
 	display.connect("focus_exited", _on_focus_exited)
 	display.connect("focus_entered", _on_focus_entered)

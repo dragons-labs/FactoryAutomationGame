@@ -22,23 +22,19 @@ var _timer
 
 var tt = 0
 func start_painting():
-	prints("start", _factory_root._factory_time)
-	tt = _factory_root._factory_time
 	_is_painted = true
 	_material = StandardMaterial3D.new() # TODO this should be done in better way ... but it's for test only
 	$FactoryElementVisual.set_surface_override_material(0, _material)
 	_material.albedo_color = factory_object_info.color
-	_timer = _factory_root.create_timer(0.4, false)
+	_timer = _factory_root.factory_control.create_timer(0.4, false)
 	_timer.timeout.connect(_on_timer_timeout)
 	
 func _on_timer_timeout(_delay : float) -> void:
-	prints("paint ", _delay, factory_object_info.color.r)
 	if _is_painted and factory_object_info.color.r >= 0.2:
 		factory_object_info.color.r -= 0.2
 		_material.albedo_color = factory_object_info.color
 
 func end_painting():
-	prints("end", _factory_root._factory_time, _factory_root._factory_time-tt)
 	_is_painted = false
 
 var _is_painted = false

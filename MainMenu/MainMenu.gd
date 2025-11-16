@@ -208,7 +208,8 @@ func _hide():
 
 func _on_quit_pressed() -> void:
 	print("Quit request")
-	await _factory_root.stop_simulations()
+	get_tree().paused = true
+	await _factory_root.factory_control.close()
 	get_tree().quit()
 
 func _notification(what):

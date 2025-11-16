@@ -18,13 +18,15 @@ var y_top_minus_offset # used by FAG_FactoryBlocksUtils
 var _object = null
 var _waiting_object = null
 var _new_accepted_object := false
+var _factory_control = null
 
 func _ready():
 	body_entered.connect(_on_object_enter_block)
 	body_exited.connect(_on_object_exit_block)
 	_factory_root.factory_start.connect(_on_factory_start_stop)
-	_factory_root.factory_process.connect(_on_factory_process)
 	_factory_root.factory_stop.connect(_on_factory_start_stop)
+	_factory_control = _factory_root.factory_control
+	_factory_control.factory_tick.connect(_on_factory_process)
 	FAG_FactoryBlocksUtils.on_block_transform_updated(self)
 
 func _on_factory_start_stop() -> void:
@@ -36,7 +38,7 @@ func _on_factory_start_stop() -> void:
 	_waiting_object = null
 	_new_accepted_object = false
 	
-	_factory_root.set_signal_value(_name_prefix + "splitter_object_inside", 0)
+	_factory_control.set_signal_value(_name_prefix + "splitter_object_inside", 0)
 
 func _on_object_enter_block(node : Node3D) -> void:
 	if node is RigidBody3D:
@@ -54,16 +56,16 @@ func transfer_object_to_factory_block(node : RigidBody3D):
 	FAG_FactoryBlocksUtils.set_object_speed(node, Vector3.ZERO)
 	_object = node
 	_new_accepted_object = true
-	_factory_root.set_signal_value(_name_prefix + "splitter_object_inside", 3.3)
+	_factory_control.set_signal_value(_name_prefix + "splitter_object_inside", 3.3)
 
 func _on_factory_process(_time : float, _delta_time : float):
 	if _new_accepted_object:
 		var direction = 0
-		if _factory_root.get_signal_value(_name_prefix + "splitter_redirect_forward") > 2:
+		if _factory_control.get_signal_value(_name_prefix + "splitter_redirect_forward") > 2:
 			direction += 1
-		elif _factory_root.get_signal_value(_name_prefix + "splitter_redirect_to_left") > 2:
+		elif _factory_control.get_signal_value(_name_prefix + "splitter_redirect_to_left") > 2:
 			direction += 2
-		elif _factory_root.get_signal_value(_name_prefix + "splitter_redirect_to_right") > 2:
+		elif _factory_control.get_signal_value(_name_prefix + "splitter_redirect_to_right") > 2:
 			direction += 4
 		
 		if direction in [1, 2, 4]:
@@ -82,7 +84,7 @@ func _on_object_exit_block(node : Node3D) -> void:
 		return
 	
 	print(_object, " splitter exit")
-	_factory_root.set_signal_value(_name_prefix + "splitter_object_inside", 0)
+	_factory_control.set_signal_value(_name_prefix + "splitter_object_inside", 0)
 	
 	# transfer object to next conveyor
 	FAG_FactoryBlocksUtils.on_object_leave_block(_object, self)

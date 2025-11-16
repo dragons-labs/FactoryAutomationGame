@@ -105,7 +105,7 @@ void GdSpice::stop() {
 }
 
 void GdSpice::emergency_stop() {
-	if (simulation_state & WORKING_TYPE_STATE_MASK) {
+	if (simulation_state & WORKING_TYPE_STATE_MASK || simulation_state == MANUAL_ERROR) {
 		simulation_state = MANUAL_ERROR;
 	} else {
 		simulation_state = ERROR;

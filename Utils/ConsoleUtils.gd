@@ -11,7 +11,7 @@ func _init(object, name : String, variables : Array[String]):
 	_name = name
 	
 	LimboConsole.register_command(_set_variable, _name + " set", "set variable in " + _name)
-	LimboConsole.add_argument_autocomplete_source("factory set", 0, func(): return variables )
+	LimboConsole.add_argument_autocomplete_source(_name + " set", 0, func(): return variables )
 	
 	LimboConsole.register_command(_read_variable, _name + " read", "read variable from " + _name)
 

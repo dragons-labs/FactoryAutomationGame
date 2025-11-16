@@ -1,6 +1,7 @@
-[gd_scene load_steps=15 format=3 uid="uid://cr1jneq81cpn2"]
+[gd_scene load_steps=16 format=3 uid="uid://cr1jneq81cpn2"]
 
 [ext_resource type="Script" uid="uid://cy3s4cxl70a76" path="res://Factory/FactoryRoot.gd" id="1_88vxl"]
+[ext_resource type="PackedScene" uid="uid://bs8dvw28ifomo" path="res://Factory/FactoryControl.tscn" id="2_cmtbq"]
 [ext_resource type="PackedScene" uid="uid://bjwtrw03sth6x" path="res://Factory/FactoryBuilder.tscn" id="2_ncfa0"]
 [ext_resource type="Script" uid="uid://sip6m3sdhfpc" path="res://Utils/SliderWithValue.gd" id="3_g2qw6"]
 [ext_resource type="PackedScene" uid="uid://sktig4kf4kgv" path="res://Factory/FactoryBlocks/ConveyorBelt.tscn" id="4_ipc57"]
@@ -18,8 +19,11 @@
 [node name="FactoryRoot" type="Node3D"]
 script = ExtResource("1_88vxl")
 
-[node name="FactoryBuilder" parent="." instance=ExtResource("2_ncfa0")]
+[node name="FactoryBuilder" parent="." node_paths=PackedStringArray("factory_control") instance=ExtResource("2_ncfa0")]
 elements = Array[PackedScene]([ExtResource("4_wpvne"), ExtResource("5_u6lyq"), ExtResource("6_a113l"), ExtResource("7_q855b"), ExtResource("8_flw0k"), ExtResource("4_ipc57"), ExtResource("12_oom2c"), ExtResource("10_gofsm"), ExtResource("11_f8ngn"), ExtResource("9_xypg3"), ExtResource("11_aa")])
+factory_control = NodePath("../FactoryControl")
+
+[node name="FactoryControl" parent="." instance=ExtResource("2_cmtbq")]
 
 [node name="FactoryUI" type="CanvasLayer" parent="."]
 

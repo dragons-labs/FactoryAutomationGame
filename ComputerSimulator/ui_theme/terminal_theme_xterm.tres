@@ -1,9 +1,9 @@
-[gd_resource type="Theme" load_steps=6 format=3]
+[gd_resource type="Theme" load_steps=6 format=3 uid="uid://bd6w0urvwbcha"]
 
-[ext_resource type="FontFile" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-bold-2.304.ttf" id="1_mbo6f"]
-[ext_resource type="FontFile" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-bold_italic-2.304.ttf" id="2_c2xfa"]
-[ext_resource type="FontFile" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-italic-2.304.ttf" id="3_xdeda"]
-[ext_resource type="FontFile" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-regular-2.304.ttf" id="4_s8yr6"]
+[ext_resource type="FontFile" uid="uid://dihdb4hqwudnj" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-bold-2.304.ttf" id="1_mbo6f"]
+[ext_resource type="FontFile" uid="uid://ct8qfkga3naom" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-bold_italic-2.304.ttf" id="2_c2xfa"]
+[ext_resource type="FontFile" uid="uid://cqntieu02m2i4" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-italic-2.304.ttf" id="3_xdeda"]
+[ext_resource type="FontFile" uid="uid://omosp05fr1lq" path="res://ComputerSimulator/ui_theme/fonts/jet_brains_mono_nl-regular-2.304.ttf" id="4_s8yr6"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7vxvs"]
 
@@ -33,4 +33,5 @@ Terminal/fonts/bold_font = ExtResource("1_mbo6f")
 Terminal/fonts/bold_italics_font = ExtResource("2_c2xfa")
 Terminal/fonts/italics_font = ExtResource("3_xdeda")
 Terminal/fonts/normal_font = ExtResource("4_s8yr6")
+Terminal/styles/focus = SubResource("StyleBoxEmpty_7vxvs")
 Terminal/styles/normal = SubResource("StyleBoxEmpty_7vxvs")

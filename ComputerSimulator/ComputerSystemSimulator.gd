@@ -54,6 +54,7 @@ var running_state : int = IS_NOT_RUNNING
 func configure(system_id, configuration : Dictionary) -> void:
 	computer_system_id = system_id
 	for setting_name in [
+			"mode",
 			"kernel_image_path", "rootfs_image_path",
 			"writable_disk_image", "virtfs",
 			"computer_input_names", "computer_output_names",
@@ -79,7 +80,7 @@ func start():
 	
 	# configure TabContainer
 	
-	var parent_min_size : Vector2i
+	var parent_min_size := Vector2i(135,20)
 	var number_of_tabs := 0
 	
 	if mode & Mode.TERMINAL:
@@ -89,7 +90,6 @@ func start():
 		terminal.size_changed.connect(_on_size_changed)
 		terminal.gui_input.connect(_on_gui_mouse_input)
 		terminal.visibility_changed.connect(_on_visibility_changed)
-		parent_min_size = Vector2i(135,20)
 	else:
 		terminal.get_parent().reparent(%TabContainer.get_parent(), false)
 		terminal.visible = false
@@ -109,7 +109,6 @@ func start():
 		vnc_client.get_parent().reparent(%TabContainer, false)
 		vnc_client.reverse = true
 		vnc_port = vnc_client.init()
-		parent_min_size = Vector2i(740,570)
 	else:
 		vnc_client.get_parent().reparent(%TabContainer.get_parent(), false)
 		vnc_client.visible = false
@@ -117,9 +116,11 @@ func start():
 	if number_of_tabs > 1:
 		%TabContainer.tabs_visible = true
 		%TabContainer.current_tab = 1
+	else:
+		%TabContainer.tabs_visible = false
+		%TabContainer.current_tab = 0
 	
 	if get_parent() is Window:
-		# print_verbose("Setting minimum parent size = ", parent_min_size)
 		get_parent().min_size = parent_min_size
 	
 	# start qemu
@@ -216,6 +217,9 @@ var _output_values = {}
 
 func _ready() -> void:
 	process_physics_priority = -10
+	# do not set focus to tab bar ... it require mouse to switch tabs
+	# (because terminal and VNC windows never return focus via keybord)
+	%TabContainer.get_tab_bar().focus_mode = 0
 
 func _physics_process(_delta):
 	if not _user_console_stream:
@@ -263,7 +267,10 @@ func _physics_process(_delta):
 						computer_system_is_run_and_ready.emit()
 					elif cmd.begins_with("set_output_value"):
 						var cmd_split = cmd.split(" ", 2)
-						_output_values[cmd_split[1]] = cmd_split[2]
+						if cmd_split[2] == "":
+							_output_values.erase(cmd_split[1])
+						else:
+							_output_values[cmd_split[1]] = cmd_split[2]
 					elif cmd != "":
 						msg_bus_command.emit(cmd, self)
 					pos = npos + 1

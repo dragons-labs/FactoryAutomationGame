@@ -28,7 +28,7 @@ const object_subtype := \"ProducerBlock\"
 # value of `in_game_name` meta (if set and not empty) with `_`
 # will be used as prefix for signals names
 #
-# see FactoryBuilder.register_factory_signals for details
+# see FactoryControl.register_factory_signals for details
 #
 # *) required for player addable blocks with input/output signal
 #    for factory control system

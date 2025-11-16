@@ -25,7 +25,7 @@ func _ready():
 	_second_input.body_entered.connect(_on_object_enter_block.bind(1))
 	body_exited.connect(_on_object_exit_block)
 	_factory_root.factory_start.connect(_on_factory_start)
-	_factory_root.factory_process.connect(_on_factory_process)
+	_factory_root.factory_tick.factory_process.connect(_on_factory_process)
 	FAG_FactoryBlocksUtils.on_block_transform_updated(self)
 
 func _on_factory_start() -> void:
@@ -61,7 +61,7 @@ func transfer_object_to_factory_block(node : RigidBody3D):
 	node.custom_integrator = true
 	FAG_FactoryBlocksUtils.set_object_speed(node, Vector3.ZERO)
 	_new_accepted_object = true
-	#_factory_root.set_signal_value(get_meta("in_game_name", "") + "object_inside", 3.3)
+	#_factory_root.factory_control.set_signal_value(get_meta("in_game_name", "") + "object_inside", 3.3)
 
 func _on_factory_process(_time : float, _delta_time : float):
 	if _new_accepted_object and _object[0] and _object[1]:

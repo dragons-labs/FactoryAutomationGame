@@ -1,35 +1,19 @@
-[gd_scene load_steps=8 format=3 uid="uid://bjwtrw03sth6x"]
+[gd_scene load_steps=4 format=3 uid="uid://bjwtrw03sth6x"]
 
 [ext_resource type="Script" uid="uid://d2cst4c3yga53" path="res://Factory/FactoryBuilder.gd" id="1_51ivo"]
 [ext_resource type="Script" uid="uid://bu8k11vgifi26" path="res://Utils/Camera/Camera3DControl.gd" id="2_2dv8j"]
 [ext_resource type="PackedScene" uid="uid://ccjlqcswjr2vw" path="res://Utils/WorldEditorUI/WorldEditorUI.tscn" id="3_iwf3v"]
-[ext_resource type="PackedScene" uid="uid://b2xtqfv5n7gyt" path="res://ElectronicsSimulator/ElectronicsSimulator.tscn" id="10_hxh5h"]
-[ext_resource type="PackedScene" uid="uid://ccu02jb7hng1k" path="res://ComputerSimulator/ComputerSystemSimulator.tscn" id="11_thamu"]
-
-[sub_resource type="GDScript" id="GDScript_gx28t"]
-script/source = "extends Window
-
-func _ready() -> void:
-	FAG_WindowManager.init_window(self)
-	close_requested.connect(_on_close_requested)
-
-func _on_close_requested():
-	FAG_WindowManager.set_windows_visibility_recursive(self, false)
-"
-
-[sub_resource type="GDScript" id="GDScript_i7hjm"]
-script/source = "extends Window
-
-func _ready() -> void:
-	FAG_WindowManager.init_window(self, true)
-	close_requested.connect(_on_close_requested)
-
-func _on_close_requested():
-	FAG_WindowManager.set_windows_visibility_recursive(self, false)
-"
 
 [node name="FactoryBuilder" type="Node3D"]
 script = ExtResource("1_51ivo")
+elements = null
+computer_systems_configuration = null
+defualt_computer_system_id = null
+grid_size = null
+ray_length = null
+attachable_objects_collision_mask = null
+blocking_space_objects_collision_mask = null
+mouse_y_distance_per_scale_step = null
 
 [node name="WorldEditorUI" parent="." instance=ExtResource("3_iwf3v")]
 unique_name_in_owner = true
@@ -44,32 +28,6 @@ fov = 40.0
 near = 0.01
 far = 400.0
 script = ExtResource("2_2dv8j")
-
-[node name="ElectronicsSimulatorWindow" type="Window" parent="."]
-unique_name_in_owner = true
-disable_3d = true
-scaling_3d_scale = 2.0
-title = "ELECTRONIC_EDITOR_WINDOW_TITLE"
-initial_position = 4
-size = Vector2i(800, 500)
-visible = false
-script = SubResource("GDScript_gx28t")
-
-[node name="ElectronicsSimulator" parent="ElectronicsSimulatorWindow" instance=ExtResource("10_hxh5h")]
-unique_name_in_owner = true
-
-[node name="ComputerSystemSimulatorWindow" type="Window" parent="."]
-unique_name_in_owner = true
-disable_3d = true
-scaling_3d_scale = 2.0
-initial_position = 3
-size = Vector2i(640, 440)
-current_screen = 0
-visible = false
-wrap_controls = true
-script = SubResource("GDScript_i7hjm")
-
-[node name="ComputerSystemSimulator" parent="ComputerSystemSimulatorWindow" instance=ExtResource("11_thamu")]
 
 [node name="GetNameDialog" type="PanelContainer" parent="."]
 unique_name_in_owner = true

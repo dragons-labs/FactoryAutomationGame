@@ -151,6 +151,10 @@ static func copy_sparse(src: String, dst: String) -> void:
 # misc
 #
 
+static func array_get(array : Array, index : int, default = null) -> Variant:
+	# like Array.get() in Godot 4.5, but without generating error and with settable default value
+	return array[index] if len(array) > index else default
+
 static func get_with_fallback(values : Dictionary, key : String, fallback_key : String) -> Variant:
 	var val = values.get(key, null)
 	if not val:

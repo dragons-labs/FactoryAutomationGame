@@ -23,7 +23,7 @@ func start_painting():
 	$FactoryElementVisual.set_surface_override_material(0, material)
 	material.albedo_color = factory_object_info.color
 	while _is_painted:
-		await _factory_root.create_timer(0.4).timeout
+		await _factory_root.factory_control.create_timer(0.4).timeout
 		if _is_painted and factory_object_info.color.r >= 0.2:
 			factory_object_info.color.r -= 0.2
 			material.albedo_color = factory_object_info.color

@@ -22,7 +22,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 current_tab = 0
-tabs_visible = false
 
 [node name="COMPUTER_SYSTEM_SIMULATION_TERMINAL" type="PanelContainer" parent="TabContainer"]
 layout_mode = 2
@@ -58,5 +57,6 @@ metadata/_tab_index = 2
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 2
+expand_mode = 1
 script = ExtResource("3_0aypa")
 port = 0

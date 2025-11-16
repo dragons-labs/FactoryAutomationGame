@@ -87,11 +87,11 @@ var level_id : String
 ##    - set value of factory_builder.computer_systems_configuration based on level data
 ##  - before:
 ##    - add level to scene tree
-## should call factory_root.factory_builder.register_factory_signals() to register factory inputs and outputs signals
+## should call factory_root.factory_control.register_factory_signals() to register factory inputs and outputs signals
 func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 	level_id = id
 	
-	factory_root.factory_builder.register_factory_signals(
+	factory_root.factory_control.register_factory_signals(
 		# (global level) outputs to control blocks
 		{
 			"Vcc" : ["Vcc", "Vcc", "dc 3.3"],
@@ -112,7 +112,7 @@ func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 	_factory_root.factory_start.connect(_on_factory_start)
 	_factory_root.factory_stop.connect(_on_factory_stop)
 	if not from_save:
-		_factory_root.circuit_simulator.restore(
+		_factory_root.factory_control.circuit_simulator.restore(
 			FAG_Utils.load_from_json_file(
 				get_script().resource_path.get_base_dir() + "/painter_slow.circuit"
 			)
@@ -140,7 +140,7 @@ var _valid_product_counter = 0
 func _on_factory_start() -> void:
 	_valid_product_counter = 0
 	print("START")
-	_factory_root.create_timer(11).timeout.connect(_on_timer_timeout)
+	_factory_root.factory_control.create_timer(11).timeout.connect(_on_timer_timeout)
 
 func _on_factory_stop() -> void:
 	print("STOP")

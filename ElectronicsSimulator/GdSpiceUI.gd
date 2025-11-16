@@ -52,8 +52,8 @@ func get_ngspice_netlist(
 	
 	# create strong nets (voltage sources) / external outputs
 	for ext_output in external_nets_input_to_circuit_from_factory:
-		var source_definition = "external" if (len(ext_output) < 3 or ext_output[2] == null) else ext_output[2]
-		var internal_resistance = "0.001" if (len(ext_output) < 4 or ext_output[3] == null) else ext_output[3]
+		var source_definition = FAG_Utils.array_get(ext_output, 2, "external")
+		var internal_resistance = FAG_Utils.array_get(ext_output, 3, "0.001")
 		circuit.append("%s __RAW_%s_ 0 %s" % [ext_output[1], ext_output[0], source_definition])
 		circuit.append("R_%s_INTERNAL_ __RAW_%s_ %s %s" % [ext_output[1], ext_output[0], ext_output[0], internal_resistance])
 		fuses.append(ext_output[1] + "#branch")
@@ -61,10 +61,7 @@ func get_ngspice_netlist(
 	
 	# create external inputs
 	for ext_intput in external_nets_outputs_from_circuit_to_factory:
-		if len(ext_intput) == 1 or ext_intput[1] == null:
-			circuit.append("R_%s %s GND 10G" % [ext_intput[0], ext_intput[0]])
-		else:
-			circuit.append("R_%s %s %s" % [ext_intput[0], ext_intput[0], ext_intput[1]])
+		circuit.append("R_%s %s %s" % [ext_intput[0], ext_intput[0], FAG_Utils.array_get(ext_intput, 1, "GND 10G")])
 	
 	# create rest of external circuit
 	circuit.append_array(external_circuit_entries)
