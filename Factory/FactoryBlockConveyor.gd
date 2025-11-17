@@ -1,51 +1,26 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-extends RefCounted
-class_name FAG_FactoryBlocksUtils 
+class_name FAG_FactoryBlockConveyor extends FAG_FactoryBlock
 
-static func handle_name_prefix(object : Object, label: Label3D = null) -> String:
-	var name_prefix = object.get_parent().get_meta("in_game_name", "")
-	if label:
-		label.text = name_prefix
-	if name_prefix:
-		name_prefix += "_"
-	return name_prefix
+## if `true` blocks the new influence of other conveyors until the object is on this conveyor
+@export var exclusive_owner := false
 
-static func on_block_transform_updated(factory_block_belt : Area3D):
-	var speed = 1.0
-	if "speed" in factory_block_belt:
-		speed = factory_block_belt.speed
-	if factory_block_belt.get_parent().scale.z < 0:
-		speed *= -1
-	factory_block_belt.belt_speed_vector = factory_block_belt.get_parent().quaternion * factory_block_belt.quaternion * Vector3(speed, 0, 0)
-	factory_block_belt.y_top_minus_offset =  factory_block_belt.global_position.y + factory_block_belt.get_child(0).shape.size.y * 0.5 - 0.025
+## conveyor belt linear speed [m/s] ... it's externally used to calculate belt_speed_vector
+@export var speed := 1.0
+
+var belt_speed_vector
+var y_top_minus_offset
+
+func on_block_transform_updated(detection_area : Area3D, root = self):
+	var _speed = speed
+	if root.scale.z < 0:
+		_speed *= -1
+	belt_speed_vector = root.quaternion * detection_area.quaternion * Vector3(_speed, 0, 0)
+	y_top_minus_offset =  detection_area.global_position.y + detection_area.get_child(0).shape.size.y * 0.5 - 0.025
 
 
-static func _abs_max(a : Variant, b : Variant) -> Variant:
-	if abs(a) > abs(b):
-		return a
-	else:
-		return b
-
-static func calculate_object_speed(belts) -> Vector3:
-	var speed_vector = Vector3.ZERO
-	for belt in belts:
-		speed_vector.x = _abs_max(speed_vector.x, belt.belt_speed_vector.x)
-		speed_vector.y = _abs_max(speed_vector.y, belt.belt_speed_vector.y)
-		speed_vector.z = _abs_max(speed_vector.z, belt.belt_speed_vector.z)
-	return speed_vector
-
-static func set_object_speed(node : Node3D, speed_vector : Vector3):
-	PhysicsServer3D.body_set_state( node.get_rid(), PhysicsServer3D.BODY_STATE_LINEAR_VELOCITY, speed_vector )
-
-static func translate_object(node : Node3D, translate_vector : Vector3):
-	var rid = node.get_rid()
-	var transform = PhysicsServer3D.body_get_state( rid, PhysicsServer3D.BODY_STATE_TRANSFORM )
-	PhysicsServer3D.body_set_state( rid, PhysicsServer3D.BODY_STATE_TRANSFORM, transform.translated(translate_vector) )
-
-
-static func on_object_enter_block__instant_interaction(node : Node3D, factory_block_belt : Area3D) -> void:
+static func on_object_enter_block__instant_interaction(node : Node3D, factory_block_belt : Node3D) -> void:
 	if node is RigidBody3D:
 		# print_verbose("entered [", factory_block_belt, "] ", node)
 		
@@ -54,12 +29,12 @@ static func on_object_enter_block__instant_interaction(node : Node3D, factory_bl
 		else:
 			factory_block_belt.transfer_object_to_factory_block(node)
 
-static func on_object_enter_block__delayed_interaction(node : Node3D, factory_block_belt : Area3D) -> void:
+static func on_object_enter_block__delayed_interaction(node : Node3D, factory_block_belt : Node3D) -> void:
 	if node is RigidBody3D:
 		# print_verbose("entered [", factory_block_belt, "] ", node)
 		node.set_meta("next_belt", factory_block_belt)
 
-static func on_object_leave_block(node : Node3D, factory_block_belt : Area3D) -> void:
+static func on_object_leave_block(node : Node3D, factory_block_belt : FAG_FactoryBlockConveyor) -> void:
 	if node is RigidBody3D:
 		# print_verbose("exited [", factory_block_belt, "] ", node)
 		
@@ -96,7 +71,7 @@ static func on_object_leave_block(node : Node3D, factory_block_belt : Area3D) ->
 		elif node.has_meta("next_belt") and node.get_meta("next_belt") == factory_block_belt:
 			node.remove_meta("next_belt")
 
-static func accept_object_on_block(node : Node3D, factory_block_belt : Area3D, exclusive_owner : bool, speed_vector : Variant = null) -> void:
+static func accept_object_on_block(node : Node3D, factory_block_belt : FAG_FactoryBlockConveyor, exclusive_owner : bool, speed_vector : Variant = null) -> void:
 	# print_verbose("adding [", self, "] ", node)
 	
 	if exclusive_owner:
@@ -109,7 +84,7 @@ static func accept_object_on_block(node : Node3D, factory_block_belt : Area3D, e
 	
 	# calculate speed (from all belts)
 	if speed_vector == null:
-		speed_vector = FAG_FactoryBlocksUtils.calculate_object_speed(belt_list)
+		speed_vector = calculate_object_speed(belt_list)
 	
 	# fix y position - this fixes the problem of catching quickly falling objects:
 	# - we want to have all objects just below the top edge of the trigger (not on top of this belt
@@ -124,6 +99,7 @@ static func accept_object_on_block(node : Node3D, factory_block_belt : Area3D, e
 	node.custom_integrator = true
 	set_object_speed(node, speed_vector)
 
+
 static func set_object_free(node : Node3D)-> void:
 	if node.has_meta("exclusive_belt"):
 		node.remove_meta("exclusive_belt")
@@ -131,3 +107,19 @@ static func set_object_free(node : Node3D)-> void:
 		node.remove_meta("next_belt")
 	if node.has_meta("belts_list"):
 		node.remove_meta("belts_list")
+
+static func calculate_object_speed(belts) -> Vector3:
+	var speed_vector = Vector3.ZERO
+	for belt in belts:
+		speed_vector.x = FAG_Utils.abs_max(speed_vector.x, belt.belt_speed_vector.x)
+		speed_vector.y = FAG_Utils.abs_max(speed_vector.y, belt.belt_speed_vector.y)
+		speed_vector.z = FAG_Utils.abs_max(speed_vector.z, belt.belt_speed_vector.z)
+	return speed_vector
+
+static func set_object_speed(node : Node3D, speed_vector : Vector3):
+	PhysicsServer3D.body_set_state( node.get_rid(), PhysicsServer3D.BODY_STATE_LINEAR_VELOCITY, speed_vector )
+
+static func translate_object(node : Node3D, translate_vector : Vector3):
+	var rid = node.get_rid()
+	var transform = PhysicsServer3D.body_get_state( rid, PhysicsServer3D.BODY_STATE_TRANSFORM )
+	PhysicsServer3D.body_set_state( rid, PhysicsServer3D.BODY_STATE_TRANSFORM, transform.translated(translate_vector) )

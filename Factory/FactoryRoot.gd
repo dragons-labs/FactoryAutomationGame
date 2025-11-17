@@ -69,12 +69,11 @@ func load_level(level_id : String, save_dir := "") -> void:
 	
 	# run register_factory_signals on static blocks
 	for element in level_scene_node.get_node("FactoryBlocks").get_children():
-		var info_obj = factory_builder.get_info_from_block(element)
-		if "factory_signals" in info_obj:
+		if "factory_signals" in element:
 			factory_control.register_factory_signals(
-				info_obj.factory_signals[0],
-				info_obj.factory_signals[1],
-				info_obj.factory_signals[2],
+				element.factory_signals[0],
+				element.factory_signals[1],
+				element.factory_signals[2],
 				element.get_meta("in_game_name", ""),
 				element.get_meta("using_computer_id", factory_builder.defualt_computer_system_id),
 			)
@@ -432,9 +431,8 @@ func _reset_stats() -> void:
 func _update_block_count(block: Node3D, val: int) -> void:
 	_stats.block_count += val
 	
-	var info_obj = factory_builder.get_info_from_block(block)
-	if "object_subtype" in info_obj:
-		var object_subtype = info_obj.object_subtype
+	if "object_subtype" in block:
+		var object_subtype = block.object_subtype
 		_stats.block_count_per_type[object_subtype] = _stats.block_count_per_type.get(object_subtype, 0) + val
 		
 		if level_scene_node.block_count_updated(

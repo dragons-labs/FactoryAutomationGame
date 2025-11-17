@@ -189,3 +189,9 @@ static func real_time_wait(time : float, parent : Node = null) -> void:
 		await parent.get_tree().create_timer(time, true, false, true).timeout
 	else:
 		await Engine.get_main_loop().create_timer(time, true, false, true).timeout
+
+static func abs_max(a : Variant, b : Variant) -> Variant:
+	if abs(a) > abs(b):
+		return a
+	else:
+		return b

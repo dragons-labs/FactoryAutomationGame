@@ -1,13 +1,27 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-extends Node3D
+extends FAG_FactoryBlock
+
+const factory_signals = [
+	# block outputs (to control system)
+	{
+		"producer_object_ready"   : ["producer_object_ready_@in", "v_producer_object_ready"],
+	},
+	# block inputs (from control system)
+	{
+		"producer_control_enabled" : ["producer_control_enabled_@out"],
+		"producer_release_object" : ["producer_release_object_@out"],
+	},
+	# extra circuit elements for this block
+	[]
+]
 
 @export var object : RigidBody3D
 @export var timer_period := 1.0
 
 @onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
-@onready var _name_prefix := FAG_FactoryBlocksUtils.handle_name_prefix(self, $Label3D)
+@onready var _name_prefix := FAG_FactoryBlock.handle_name_prefix(self, $Label3D)
 
 var _object_is_ready := false
 var _timer = null

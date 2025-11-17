@@ -1,19 +1,11 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-extends Area3D
+extends FAG_FactoryBlockConveyor
 
-## if `true` blocks the new influence of other conveyors until the object is on this conveyor
-@export var exclusive_owner := false
-
-## conveyor belt linear speed [m/s]
-@export var speed := 1.0
-
+@onready var _area := $Area3D
 @onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
-@onready var _second_input := $"../Area3DIn2"
-
-var belt_speed_vector # used by FAG_FactoryBlocksUtils
-var y_top_minus_offset # used by FAG_FactoryBlocksUtils
+@onready var _second_input := $Area3DIn2
 
 var _object = [null, null]
 var _object_to_get = [null, null]
@@ -21,12 +13,15 @@ var _waiting_object = [null, null]
 var _new_accepted_object := false
 
 func _ready():
-	body_entered.connect(_on_object_enter_block.bind(0))
+	_area.body_entered.connect(_on_object_enter_block.bind(0))
 	_second_input.body_entered.connect(_on_object_enter_block.bind(1))
-	body_exited.connect(_on_object_exit_block)
+	_area.body_exited.connect(_on_object_exit_block)
 	_factory_root.factory_start.connect(_on_factory_start)
-	_factory_root.factory_tick.factory_process.connect(_on_factory_process)
-	FAG_FactoryBlocksUtils.on_block_transform_updated(self)
+	_factory_root.factory_control.factory_tick.connect(_on_factory_process)
+	on_transform_update()
+
+func on_transform_update():
+	on_block_transform_updated(_area)
 
 func _on_factory_start() -> void:
 	if not is_inside_tree():
@@ -45,7 +40,7 @@ func _on_object_enter_block(node : Node3D, index) -> void:
 		
 		# if object is inside splitter then stop incoming object before really enter to splitter
 		if _object[index]:
-			FAG_FactoryBlocksUtils.set_object_speed(node, Vector3.ZERO)
+			FAG_FactoryBlockConveyor.set_object_speed(node, Vector3.ZERO)
 			_waiting_object[index] = node
 
 func transfer_object_to_factory_block(node : RigidBody3D):
@@ -59,7 +54,7 @@ func transfer_object_to_factory_block(node : RigidBody3D):
 	
 	print(node, " welder enter")
 	node.custom_integrator = true
-	FAG_FactoryBlocksUtils.set_object_speed(node, Vector3.ZERO)
+	FAG_FactoryBlockConveyor.set_object_speed(node, Vector3.ZERO)
 	_new_accepted_object = true
 	#_factory_root.factory_control.set_signal_value(get_meta("in_game_name", "") + "object_inside", 3.3)
 
@@ -85,7 +80,7 @@ func _on_factory_process(_time : float, _delta_time : float):
 				visual_object1.position = Vector3(0, 0.5, 0)
 			_object[1].queue_free()
 		
-		FAG_FactoryBlocksUtils.accept_object_on_block(_object[0], self, true, belt_speed_vector)
+		FAG_FactoryBlockConveyor.accept_object_on_block(_object[0], self, true, belt_speed_vector)
 
 func _on_object_exit_block(node : Node3D) -> void:
 	if node != _object[0]:
@@ -94,7 +89,7 @@ func _on_object_exit_block(node : Node3D) -> void:
 	print(_object[0], " welder exit")
 	
 	# transfer object to next conveyor
-	FAG_FactoryBlocksUtils.on_object_leave_block(_object[0], self)
+	FAG_FactoryBlockConveyor.on_object_leave_block(_object[0], self)
 	
 	# allow get next objects
 	_object = [null, null]
@@ -102,9 +97,9 @@ func _on_object_exit_block(node : Node3D) -> void:
 	# allow enter for next (waiting) objects
 	for i in range(2):
 		if _waiting_object[i]:
-			FAG_FactoryBlocksUtils.set_object_speed(
+			FAG_FactoryBlockConveyor.set_object_speed(
 				_waiting_object[i],
-				FAG_FactoryBlocksUtils.calculate_object_speed(_waiting_object[i].get_meta("belts_list", []))
+				FAG_FactoryBlockConveyor.calculate_object_speed(_waiting_object[i].get_meta("belts_list", []))
 			)
 			_object_to_get[i] = _waiting_object[i]
 			_waiting_object[i] = null

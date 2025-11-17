@@ -1,34 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://sktig4kf4kgv"]
+[gd_scene load_steps=6 format=3 uid="uid://sktig4kf4kgv"]
 
 [ext_resource type="Texture2D" uid="uid://bowtkul33wffj" path="res://Factory/FactoryBlocks/images/ConveyorBelt.svg" id="1_8s4c1"]
 [ext_resource type="Script" uid="uid://g1xvh1y74qj1" path="res://Factory/FactoryBlocks/ConveyorBelt.gd" id="1_kb8ux"]
 [ext_resource type="ArrayMesh" path="res://.godot/imported/ConveyorBelt.tres" id="3_ueiua"]
-
-[sub_resource type="GDScript" id="GDScript_smjxm"]
-resource_name = "FactoryBlockSettings"
-script/source = "extends PhysicsBody3D
-
-### FactoryBlock external info
-
-# for WorldEditorUI: must be on first child of root node
-@export var ui_name : String
-@export var ui_icon : Texture2D
-
-# for Builder3D: must be on first child of root node
-# (and this must be PhysicsBody3D node used to place element in world)
-# NOTE: parent (root) node name will be used as block identifier in UI
-#       (as button name) AND should be equal to `object_subtype` value
-#       for the correct operation of the block number limiter
-const object_type := \"FactoryBlock\"
-const object_subtype := \"ConveyorBelt\"
-@onready var physics_rids = [get_rid()]
-
-# optional functions for Builder3D:
-func on_transform_update():
-	FAG_FactoryBlocksUtils.on_block_transform_updated($\"../Area3D\")
-	FAG_FactoryBlocksUtils.on_block_transform_updated($\"../Area3D2\")
-	FAG_FactoryBlocksUtils.on_block_transform_updated($\"../Area3D3\")
-"
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_45hpx"]
 size = Vector3(1, 0.5, 0.79)
@@ -36,39 +10,50 @@ size = Vector3(1, 0.5, 0.79)
 [sub_resource type="BoxShape3D" id="BoxShape3D_r063x"]
 size = Vector3(0.11, 0.5, 0.79)
 
-[node name="ConveyorBelt" type="Node3D" groups=["FactoryBelts"]]
+[node name="ConveyorBelt" type="Node3D" node_paths=PackedStringArray("_area", "_root") groups=["FactoryBelts"]]
+script = ExtResource("1_kb8ux")
+_area = NodePath("Area3D")
+_root = NodePath(".")
+ui_name = "FACTORY_BLOCK_NAME_ConveyorBelt"
+ui_icon = ExtResource("1_8s4c1")
+object_subtype = "ConveyorBelt"
+metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
-script = SubResource("GDScript_smjxm")
-ui_name = "FACTORY_BLOCK_NAME_ConveyorBelt"
-ui_icon = ExtResource("1_8s4c1")
 
 [node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
 shape = SubResource("BoxShape3D_45hpx")
 
 [node name="Area3D" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
-script = ExtResource("1_kb8ux")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
 shape = SubResource("BoxShape3D_45hpx")
 
-[node name="Area3D2" type="Area3D" parent="."]
+[node name="Area3D_2" type="Area3D" parent="." node_paths=PackedStringArray("_area", "_root")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0.3, 0)
 script = ExtResource("1_kb8ux")
+_area = NodePath(".")
+_root = NodePath("..")
 exclusive_owner = true
+object_type = "Part"
+object_subtype = "Part of ConveyorBelt"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D2"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D_2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.44, 0, 0)
 shape = SubResource("BoxShape3D_r063x")
 
-[node name="Area3D3" type="Area3D" parent="."]
+[node name="Area3D_3" type="Area3D" parent="." node_paths=PackedStringArray("_area", "_root")]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0.3, 0)
 script = ExtResource("1_kb8ux")
+_area = NodePath(".")
+_root = NodePath("..")
 exclusive_owner = true
+object_type = "Part"
+object_subtype = "Part of ConveyorBelt"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D3"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D_3"]
 transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, -0.44, 0, 0)
 shape = SubResource("BoxShape3D_r063x")
 

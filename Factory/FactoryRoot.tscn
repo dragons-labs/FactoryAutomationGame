@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bjwtrw03sth6x" path="res://Factory/FactoryBuilder.tscn" id="2_ncfa0"]
 [ext_resource type="Script" uid="uid://sip6m3sdhfpc" path="res://Utils/SliderWithValue.gd" id="3_g2qw6"]
 [ext_resource type="PackedScene" uid="uid://sktig4kf4kgv" path="res://Factory/FactoryBlocks/ConveyorBelt.tscn" id="4_ipc57"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/SimpleBlock.tscn" id="4_wpvne"]
+[ext_resource type="PackedScene" uid="uid://nw7mcpisrwv6" path="res://Factory/FactoryBlocks/SimpleBlock.tscn" id="4_wpvne"]
 [ext_resource type="PackedScene" uid="uid://b5boyct3stll1" path="res://Factory/FactoryBlocks/Producer.tscn" id="5_u6lyq"]
 [ext_resource type="PackedScene" uid="uid://ilbgjjdg2jch" path="res://Factory/FactoryBlocks/Consumer.tscn" id="6_a113l"]
 [ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ElectronicControlBlock.tscn" id="7_q855b"]

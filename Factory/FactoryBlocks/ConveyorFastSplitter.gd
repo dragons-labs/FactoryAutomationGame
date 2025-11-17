@@ -1,19 +1,24 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-extends Area3D
+extends FAG_FactoryBlockConveyor
 
-## if `true` blocks the new influence of other conveyors until the object is on this conveyor
-@export var exclusive_owner := false
+const factory_signals = [
+	# block outputs (to control system)
+	{
+		"splitter_object_inside"   : ["splitter_object_inside_@in", "v_splitter_object_inside"],
+	},
+	# block inputs (from control system)
+	{
+		"splitter_push" : ["splitter_push_@out"],
+	},
+	# extra circuit elements for this block
+	[]
+]
 
-## conveyor belt linear speed [m/s]
-@export var speed := 1.0
-
+@onready var _area := $Area3D
 @onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
-@onready var _name_prefix := FAG_FactoryBlocksUtils.handle_name_prefix(self, $"../Label3D")
-
-var belt_speed_vector # used by FAG_FactoryBlocksUtils
-var y_top_minus_offset # used by FAG_FactoryBlocksUtils
+@onready var _name_prefix := FAG_FactoryBlock.handle_name_prefix(self, $Label3D)
 
 var _pusher : Node3D
 var _pusher_area_objects := []
@@ -21,13 +26,16 @@ var _pusher_is_active := false
 var _factory_control = null
 
 func _ready():
-	body_entered.connect(FAG_FactoryBlocksUtils.on_object_enter_block__instant_interaction.bind(self))
-	body_exited.connect(FAG_FactoryBlocksUtils.on_object_leave_block.bind(self))
+	_area.body_entered.connect(FAG_FactoryBlockConveyor.on_object_enter_block__instant_interaction.bind(self))
+	_area.body_exited.connect(FAG_FactoryBlockConveyor.on_object_leave_block.bind(self))
 	_factory_root.factory_start.connect(_on_factory_start_stop)
 	_factory_root.factory_stop.connect(_on_factory_start_stop)
 	_factory_control = _factory_root.factory_control
 	_factory_control.factory_tick.connect(_on_factory_process)
-	FAG_FactoryBlocksUtils.on_block_transform_updated(self)
+	on_transform_update()
+
+func on_transform_update():
+	on_block_transform_updated(_area)
 
 func _on_factory_start_stop() -> void:
 	if not is_inside_tree():
@@ -41,7 +49,7 @@ func _on_factory_start_stop() -> void:
 
 func transfer_object_to_factory_block(node : RigidBody3D):
 	# object entered into this block (but it may still be influenced by the previous one, if `belt_list` meta is not empty)
-	FAG_FactoryBlocksUtils.accept_object_on_block(node, self, exclusive_owner)
+	FAG_FactoryBlockConveyor.accept_object_on_block(node, self, exclusive_owner)
 
 
 func _on_pusher_area_3d_body_entered(body: Node3D) -> void:
@@ -70,9 +78,9 @@ func _on_factory_process(_time : float, _delta_time : float):
 			_pusher.visible = true
 			_pusher.process_mode = PROCESS_MODE_INHERIT
 			for obj in _pusher_area_objects:
-				FAG_FactoryBlocksUtils.set_object_free(obj)
-				FAG_FactoryBlocksUtils.set_object_speed(obj, Vector3.ZERO)
-				FAG_FactoryBlocksUtils.translate_object(obj, get_parent().quaternion * Vector3(0, 0, -1))
+				FAG_FactoryBlockConveyor.set_object_free(obj)
+				FAG_FactoryBlockConveyor.set_object_speed(obj, Vector3.ZERO)
+				FAG_FactoryBlockConveyor.translate_object(obj, get_parent().quaternion * Vector3(0, 0, -1))
 			_pusher_area_objects.clear()
 			_factory_control.set_signal_value(_name_prefix + "splitter_object_inside", 0)
 	else:

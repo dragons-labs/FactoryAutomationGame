@@ -1,54 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://by2y4eoj5dd6"]
+[gd_scene load_steps=8 format=3 uid="uid://by2y4eoj5dd6"]
 
 [ext_resource type="Script" uid="uid://dyevq4f2sus4q" path="res://Factory/FactoryBlocks/ConveyorFastSplitter.gd" id="1_kb8ux"]
 [ext_resource type="Texture2D" uid="uid://dlb8llxt1rnj7" path="res://Factory/FactoryBlocks/images/ConveyorSplitter.svg" id="1_omw6g"]
 [ext_resource type="ArrayMesh" path="res://.godot/imported/ConveyorSplitterFast.tres" id="3_nt83r"]
-
-[sub_resource type="GDScript" id="GDScript_smjxm"]
-resource_name = "FactoryBlockSettings"
-script/source = "extends PhysicsBody3D
-
-### FactoryBlock external info
-
-# for WorldEditorUI: must be on first child of root node
-@export var ui_name : String
-@export var ui_icon : Texture2D
-
-# for Builder3D: must be on first child of root node
-# (and this must be PhysicsBody3D node used to place element in world)
-# NOTE: parent (root) node name will be used as block identifier in UI
-#       (as button name) AND should be equal to `object_subtype` value
-#       for the correct operation of the block number limiter
-const object_type := \"FactoryBlock\"
-const object_subtype := \"ConveyorFastSplitter\"
-@onready var physics_rids = [get_rid()]
-
-# (optional*) definition of input / output signal for this block
-#
-# value of `in_game_name` meta (if set and not empty) with `_`
-# will be used as prefix for signals names
-#
-# see FactoryControl.register_factory_signals for details
-#
-# *) required for player addable blocks with input/output signal
-#    for factory control system
-const factory_signals = [
-	# block outputs (to control system)
-	{
-		\"splitter_object_inside\"   : [\"splitter_object_inside_@in\", \"v_splitter_object_inside\"],
-	},
-	# block inputs (from control system)
-	{
-		\"splitter_push\" : [\"splitter_push_@out\"],
-	},
-	# extra circuit elements for this block
-	[]
-]
-
-# optional functions for Builder3D:
-func on_transform_update():
-	FAG_FactoryBlocksUtils.on_block_transform_updated($\"../Area3D\")
-"
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wwg4c"]
 size = Vector3(1, 0.5, 1)
@@ -63,19 +17,20 @@ size = Vector3(0.05, 0.5, 1)
 size = Vector3(0.2, 0.5, 1)
 
 [node name="ConveyorFastSplitter" type="Node3D" groups=["FactoryBelts"]]
+script = ExtResource("1_kb8ux")
+ui_name = "FACTORY_BLOCK_NAME_ConveyorFastSplitter"
+ui_icon = ExtResource("1_omw6g")
+object_subtype = "ConveyorFastSplitter"
+metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
-script = SubResource("GDScript_smjxm")
-ui_name = "FACTORY_BLOCK_NAME_ConveyorFastSplitter"
-ui_icon = ExtResource("1_omw6g")
 
 [node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
 shape = SubResource("BoxShape3D_wwg4c")
 
 [node name="Area3D" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
-script = ExtResource("1_kb8ux")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
 shape = SubResource("BoxShape3D_vlpht")
@@ -110,5 +65,5 @@ skeleton = NodePath("")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.652998, 0)
 billboard = 1
 
-[connection signal="body_entered" from="PusherArea3D" to="Area3D" method="_on_pusher_area_3d_body_entered"]
-[connection signal="body_exited" from="PusherArea3D" to="Area3D" method="_on_pusher_area_3d_body_exited"]
+[connection signal="body_entered" from="PusherArea3D" to="." method="_on_pusher_area_3d_body_entered"]
+[connection signal="body_exited" from="PusherArea3D" to="." method="_on_pusher_area_3d_body_exited"]

@@ -1,22 +1,30 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-extends Area3D
+extends FAG_FactoryBlockConveyor
 
-## if `true` blocks the new influence of other conveyors until the object is on this conveyor
-@export var exclusive_owner := false
+@export var _area : Area3D
+@export var _root : FAG_FactoryBlockConveyor
 
-## conveyor belt linear speed [m/s]
-@export var speed := 1.0
-
-var belt_speed_vector # used by FAG_FactoryBlocksUtils
-var y_top_minus_offset # used by FAG_FactoryBlocksUtils
+var _area1
+var _area2
+var _area3
 
 func _ready():
-	body_entered.connect(FAG_FactoryBlocksUtils.on_object_enter_block__instant_interaction.bind(self))
-	body_exited.connect(FAG_FactoryBlocksUtils.on_object_leave_block.bind(self))
+	_area.body_entered.connect(FAG_FactoryBlockConveyor.on_object_enter_block__instant_interaction.bind(self))
+	_area.body_exited.connect(FAG_FactoryBlockConveyor.on_object_leave_block.bind(self))
 	
-	FAG_FactoryBlocksUtils.on_block_transform_updated(self)
+	if has_node("Area3D"):
+		_area1 = $Area3D
+		_area2 = $Area3D_2
+		_area3 = $Area3D_3
+	
+	on_block_transform_updated(_area, _root)
+
+func on_transform_update():
+	_root.on_block_transform_updated(_area1, _root)
+	_area2.on_block_transform_updated(_area2, _root)
+	_area3.on_block_transform_updated(_area3, _root)
 
 func transfer_object_to_factory_block(node : RigidBody3D):
-	FAG_FactoryBlocksUtils.accept_object_on_block(node, self, exclusive_owner)
+	FAG_FactoryBlockConveyor.accept_object_on_block(node, self, exclusive_owner)

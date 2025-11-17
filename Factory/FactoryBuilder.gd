@@ -41,7 +41,7 @@ func serialise() -> Array:
 		if node == _new_element:
 			continue
 		var node_data = {
-			"type": node.get_child(0).object_subtype,
+			"type": node.object_subtype,
 			"position": node.position,
 			"rotation": node.rotation,
 			"scale": node.scale,
@@ -110,28 +110,26 @@ func _remove_subnodes(destination : Node3D) -> void:
 ### Block add / remove callbacks
 
 func _on_block_add(element : Node3D) -> void:
-	var info_obj = get_info_from_block(element)
-	if "object_subtype" in info_obj and info_obj.object_subtype == "ComputerControlBlock":
+	if "object_subtype" in element and element.object_subtype == "ComputerControlBlock":
 		factory_control.setup_computer_control_blocks(element)
-	elif "factory_signals" in info_obj:
+	elif "factory_signals" in element:
 		factory_control.register_factory_signals(
-			info_obj.factory_signals[0],
-			info_obj.factory_signals[1],
-			info_obj.factory_signals[2],
+			element.factory_signals[0],
+			element.factory_signals[1],
+			element.factory_signals[2],
 			element.get_meta("in_game_name", ""),
 			element.get_meta("using_computer_id", defualt_computer_system_id),
 		)
 	on_block_add.emit(element)
 
 func _on_block_remove(element : Node3D) -> void:
-	var info_obj = get_info_from_block(element)
-	if "object_subtype" in info_obj and info_obj.object_subtype == "ComputerControlBlock":
+	if "object_subtype" in element and element.object_subtype == "ComputerControlBlock":
 		factory_control.remove_computer_control_blocks(element)
-	elif "factory_signals" in info_obj:
+	elif "factory_signals" in element:
 		factory_control.unregister_factory_signals(
-			info_obj.factory_signals[0],
-			info_obj.factory_signals[1],
-			info_obj.factory_signals[2],
+			element.factory_signals[0],
+			element.factory_signals[1],
+			element.factory_signals[2],
 			element.get_meta("in_game_name", ""),
 			element.get_meta("using_computer_id", defualt_computer_system_id),
 		)
@@ -160,9 +158,9 @@ func _process(_delta) -> void:
 		var ray_end = ray_start + camera.project_ray_normal(point) * ray_length
 		var exclude = []
 		if _new_element:
-			exclude.append_array(_new_element.get_child(0).physics_rids)
+			exclude.append_array(_new_element.physics_rids)
 		for element in _moving_elements:
-			exclude.append_array(element.get_child(0).physics_rids)
+			exclude.append_array(element.physics_rids)
 		var ray_query := PhysicsRayQueryParameters3D.create(ray_start, ray_end, attachable_objects_collision_mask, exclude)
 		_intersection = get_world_3d().direct_space_state.intersect_ray(ray_query)
 		
@@ -232,8 +230,7 @@ func _on_element_add__update(_point = null) -> void:
 func _on_element_add__finish(_point = null) -> void:
 	if _intersection:
 		_on_element_add__update()
-		var info_obj = get_info_from_block(_new_element)
-		if "factory_signals" in info_obj:
+		if "factory_signals" in _new_element:
 			ui.input_allowed = false
 			camera.disable_input()
 			%GetNameInput.text = ""
@@ -275,8 +272,7 @@ func _on_do_on_raycast_result(_mode: int, point: Vector2, raycast_result: Varian
 		ui.SELECT:
 			_moving_elements[raycast_result] = raycast_result.position
 		ui.SCALE_IN_PROGRESS:
-			var info_obj = get_info_from_block(raycast_result)
-			if "object_subtype" in info_obj and info_obj.object_subtype == "ConveyorBelt":
+			if "object_subtype" in raycast_result and raycast_result.object_subtype == "ConveyorBelt":
 				var rotated_normal = Quaternion.from_euler(raycast_result.global_rotation) * _intersection.normal
 				if not is_zero_approx(rotated_normal.x):
 					_scaled_element = raycast_result
@@ -340,11 +336,10 @@ func _on_do_move_finish() -> void:
 
 func _on_do_on_raycast_selection_finish(raycast_result: Variant) -> void:
 	if raycast_result: #  <=>  if "on_click" event:
-		var info_obj = get_info_from_block(raycast_result)
-		if "object_subtype" in info_obj:
-			if info_obj.object_subtype == "ElectronicControlBlock":
+		if "object_subtype" in raycast_result:
+			if raycast_result.object_subtype == "ElectronicControlBlock":
 				FAG_WindowManager.set_windows_visibility_recursive(factory_control.circuit_simulator_window, true)
-			elif info_obj.object_subtype == "ComputerControlBlock":
+			elif raycast_result.object_subtype == "ComputerControlBlock":
 				var computer_id = raycast_result.get_meta("computer_id")
 				FAG_WindowManager.set_windows_visibility_recursive(factory_control.computer_control_blocks[computer_id], true)
 	_moving_elements.clear()
@@ -409,10 +404,9 @@ func _ready() -> void:
 func _get_block_from_raycast(_point):
 	if _intersection:
 		var block := get_block_from_collider(_intersection.collider)
-		var info_obj = get_info_from_block(block)
-		if "object_type" in info_obj and (
-			info_obj.object_type == "FactoryBlock" or
-			(developer_mode and info_obj.object_type == "FactoryStaticBlock")
+		if "object_type" in block and (
+			block.object_type == "FactoryBlock" or
+			(developer_mode and block.object_type == "FactoryStaticBlock")
 		):
 			return block
 	return null
@@ -425,11 +419,8 @@ func set_visibility(value : bool) -> void:
 ### Utils
 
 func _on_element_transform_update(element):
-	if element.get_child(0).has_method("on_transform_update"):
-		element.get_child(0).on_transform_update()
+	if element.has_method("on_transform_update"):
+		element.on_transform_update()
 
 static func get_block_from_collider(element : PhysicsBody3D) -> Node3D:
 	return element.get_parent()
-	
-static func get_info_from_block(element: Node3D) -> Variant:
-	return element.get_child(0)
