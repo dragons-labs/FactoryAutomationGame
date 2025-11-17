@@ -219,12 +219,12 @@ func add_element(element : PackedScene) -> void:
 	button.visible = true
 	button.shortcut = null
 	# iterate over properties of first child of root node
-	# (node index == 1 => second node in packed scene)
-	for i in range(state.get_node_property_count(1)):
-		if state.get_node_property_name(1, i) == "ui_name":
-			button.tooltip_text = state.get_node_property_value(1, i)
-		if state.get_node_property_name(1, i) == "ui_icon":
-			button.icon = state.get_node_property_value(1, i)
+	# (node index == 0 => first (root) node in packed scene)
+	for i in range(state.get_node_property_count(0)):
+		if state.get_node_property_name(0, i) == "ui_name":
+			button.tooltip_text = state.get_node_property_value(0, i)
+		if state.get_node_property_name(0, i) == "ui_icon":
+			button.icon = state.get_node_property_value(0, i)
 	_ui_add_elements_container.add_child(button)
 	_set_no_input_transparent_ui(button)
 	_elements_dict[button.name] = [element, button]

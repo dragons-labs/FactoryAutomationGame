@@ -189,9 +189,8 @@ func _on_do_on_raycast_selection_finish(raycast_result : Variant) -> void:
 		_selected_elements_and_segments_valid = true
 		
 		for element in _selected_elements:
-			var base_element = FAG_2DGrid_BaseElement.get_from_element(element)
-			base_element.get_node("Image").modulate = ui._selection_box.fill_color
-			for connection in base_element.get_node("Connections").get_children():
+			element.get_node("Image").modulate = ui._selection_box.fill_color
+			for connection in element.get_node("Connections").get_children():
 				connection.modulate = ui._selection_box.fill_color
 		for segment in _selected_segmetnts:
 			segment.line.modulate = ui._selection_box.fill_color
@@ -206,9 +205,8 @@ func _on_do_on_raycast_selection_finish(raycast_result : Variant) -> void:
 
 func _on_selection_box_has_been_hidden() -> void:
 	for element in _selected_elements:
-		var base_element = FAG_2DGrid_BaseElement.get_from_element(element)
-		base_element.get_node("Image").modulate = Color.WHITE
-		for connection in base_element.get_node("Connections").get_children():
+		element.get_node("Image").modulate = Color.WHITE
+		for connection in element.get_node("Connections").get_children():
 			connection.modulate = Color.WHITE
 	for segment in _selected_segmetnts:
 		segment.line.modulate = Color.WHITE

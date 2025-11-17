@@ -6,8 +6,6 @@
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mpsrt"]
 
 [node name="GND" type="Node2D"]
-
-[node name="Element" type="Node2D" parent="."]
 script = ExtResource("1_u44q1")
 connections = PackedVector2Array(0, 0)
 image_texture = ExtResource("2_48mbe")
@@ -21,7 +19,7 @@ params = Dictionary[String, Variant]({
 })
 metadata/_edit_lock_ = true
 
-[node name="Value" type="LineEdit" parent="Element"]
+[node name="Value" type="LineEdit" parent="."]
 visible = false
 offset_left = -30.0
 offset_top = 44.0
@@ -33,4 +31,4 @@ alignment = 1
 max_length = 12
 caret_blink = true
 
-[connection signal="text_submitted" from="Element/Value" to="Element/Value" method="release_focus" unbinds=1]
+[connection signal="text_submitted" from="Value" to="Value" method="release_focus" unbinds=1]

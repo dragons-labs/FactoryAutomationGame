@@ -67,9 +67,8 @@ func restore_tscn(save_file : String, offset := Vector2.ZERO, ui = null) -> void
 func _restore_subnodes(source : Node2D, destination : Node2D, owner : Node2D, offset := Vector2.ZERO, ui = null) -> void:
 	for n in source.get_children():
 		if ui:
-			var subtype = FAG_2DGrid_BaseElement.get_from_element(n).subtype
-			if subtype:
-				var button = ui._elements_dict[subtype][1]
+			if n.subtype:
+				var button = ui._elements_dict[n.subtype][1]
 				if button.visible == false or button.disabled == true:
 					# skip (on import operation) elements not currently available
 					# (not available on level or quantity limit exceeded)
@@ -256,11 +255,10 @@ func get_netlist() -> NetList:
 	
 	# add terminals and names to the previously created nets and create terminal-terminal (no lines) nets
 	for element in gElements.main_node.get_children():
-		var base_element = FAG_2DGrid_BaseElement.get_from_element(element)
-		var squared_radius = base_element.connection_radius * base_element.connection_radius
-		var netname = base_element.get_netname()
+		var squared_radius = element.connection_radius * element.connection_radius
+		var netname = element.get_netname()
 		
-		for terminal in base_element.get_node("Connections").get_children():
+		for terminal in element.get_node("Connections").get_children():
 			# find lines connected to terminal
 			# in non-orthogonal mode can connect to more that one line (and connect these lines and nets) so "find all" 
 			var conn_lines = gLines.find_all_lines_by_point(terminal.global_position, squared_radius)

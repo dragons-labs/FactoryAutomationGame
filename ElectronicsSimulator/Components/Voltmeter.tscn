@@ -17,8 +17,6 @@ func get_netlist_entry(nets_on_element, _id):
 "
 
 [node name="Voltmeter" type="Node2D"]
-
-[node name="Element" type="Node2D" parent="."]
 script = ExtResource("1_1kyli")
 connections = PackedVector2Array(-40, 0)
 image_texture = ExtResource("2_jd6qm")
@@ -29,9 +27,9 @@ type = "Meter"
 subtype = "Voltmeter"
 metadata/_edit_lock_ = true
 
-[node name="Image" type="Sprite2D" parent="Element"]
+[node name="Image" type="Sprite2D" parent="."]
 
-[node name="Value" type="LineEdit" parent="Element"]
+[node name="Value" type="LineEdit" parent="."]
 offset_left = -34.0
 offset_top = 28.0
 offset_right = 34.0
@@ -45,10 +43,10 @@ editable = false
 caret_blink = true
 script = SubResource("GDScript_04h3j")
 
-[node name="Label" type="Label" parent="Element"]
+[node name="Label" type="Label" parent="."]
 offset_left = -19.0
 offset_top = -48.0
 offset_right = 21.0
 offset_bottom = -25.0
 
-[connection signal="text_submitted" from="Element/Value" to="Element/Value" method="release_focus" unbinds=1]
+[connection signal="text_submitted" from="Value" to="Value" method="release_focus" unbinds=1]

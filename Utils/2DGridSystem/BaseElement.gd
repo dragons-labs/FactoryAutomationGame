@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 @tool
-extends Node2D
-class_name FAG_2DGrid_BaseElement
+class_name FAG_2DGrid_BaseElement extends Node2D
 
 @export_group("Grid Element Settings")
 
@@ -45,14 +44,10 @@ class_name FAG_2DGrid_BaseElement
 @export var params : Dictionary[String, Variant]
 
 
-### get from terminal / from element
+### get from terminal
 
 static func get_from_terminal(terminal : Node2D) -> FAG_2DGrid_BaseElement:
 	return terminal.get_parent().get_parent()
-
-static func get_from_element(element : Node2D) -> FAG_2DGrid_BaseElement:
-	return element.get_child(0) # child(0) should be FAG_2DGrid_BaseElement ...
-	# we do not use FAG_2DGrid_BaseElement directly as element to hide element configuration
 
 
 ### get value / get netname

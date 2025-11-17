@@ -98,7 +98,7 @@ func get_ngspice_netlist(
 	# add elements from grid editor and create models list
 	var models = {}
 	for j in range(len(all_elements)):
-		var base_element = FAG_2DGrid_BaseElement.get_from_element(all_elements[j])
+		var base_element = all_elements[j]
 		if "models" in base_element.params:
 			models.merge(base_element.params.models)
 		var entry = base_element.get_netlist_entry(netlist, j)

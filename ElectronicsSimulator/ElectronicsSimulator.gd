@@ -23,12 +23,6 @@ func serialise() -> Dictionary:
 func restore(data : Dictionary) -> void:
 	grid_editor.grid.restore(data, grid_editor.ui._elements_dict)
 
-func save_tscn(save_file : String) -> void:
-	grid_editor.grid.save_tscn(save_file)
-
-func restore_tscn(save_file : String) -> void:
-	grid_editor.grid.restore_tscn(save_file)
-
 func close() -> void:
 	if gdspice.get_simulation_state() != GdSpice.NOT_STARTED:
 		stop()
@@ -139,6 +133,5 @@ func _ready():
 	gdspice.verbose = 2
 
 func _on_element_click(element, _long):
-	var base_element = FAG_2DGrid_BaseElement.get_from_element(element)
-	if base_element.type == "Meter":
-		gdspice.on_measurer_click(base_element)
+	if element.type == "Meter":
+		gdspice.on_measurer_click(element)

@@ -447,14 +447,12 @@ func _update_block_count(block: Node3D, val: int) -> void:
 	_stats.status = "not started"
 
 func _update_circuit_element_count(element: Node2D, val: int) -> void:
-	var base_element = FAG_2DGrid_BaseElement.get_from_element(element)
-	
-	if not base_element.type in ["NET", "Meter"]:
+	if not element.type in ["NET", "Meter"]:
 		_stats.circuit_element_count += val
-	elif base_element.subtype == "NetConnector":
-		base_element.get_node("NetNames").netnames = factory_control.netnames
+	elif element.subtype == "NetConnector":
+		element.get_node("NetNames").netnames = factory_control.netnames
 	
-	var element_subtype = base_element.subtype
+	var element_subtype = element.subtype
 	_stats.circuit_element_count_per_type[element_subtype] = _stats.circuit_element_count_per_type.get(element_subtype, 0) + val
 	
 	if level_scene_node.circuit_element_count_updated(

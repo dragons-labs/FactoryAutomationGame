@@ -21,8 +21,6 @@ func get_netlist_entry(nets_on_element, id):
 "
 
 [node name="NOT" type="Node2D"]
-
-[node name="Element" type="Node2D" parent="."]
 script = ExtResource("1_u44q1")
 connections = PackedVector2Array(-40, 0, 60, 0)
 image_texture = ExtResource("2_0ucuk")
@@ -37,7 +35,7 @@ params = Dictionary[String, Variant]({
 })
 metadata/_edit_lock_ = true
 
-[node name="Value" type="LineEdit" parent="Element"]
+[node name="Value" type="LineEdit" parent="."]
 visible = false
 offset_left = -30.0
 offset_top = -64.0
@@ -50,4 +48,4 @@ max_length = 12
 caret_blink = true
 script = SubResource("GDScript_04h3j")
 
-[connection signal="text_submitted" from="Element/Value" to="Element/Value" method="release_focus" unbinds=1]
+[connection signal="text_submitted" from="Value" to="Value" method="release_focus" unbinds=1]

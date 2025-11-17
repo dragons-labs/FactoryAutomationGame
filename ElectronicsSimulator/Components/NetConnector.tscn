@@ -60,8 +60,6 @@ func _on_popup_visibility_changed() -> void:
 "
 
 [node name="NetConnector" type="Node2D"]
-
-[node name="Element" type="Node2D" parent="."]
 script = ExtResource("1_0r8lw")
 connections = PackedVector2Array(0, 0)
 image_texture = ExtResource("2_fhbit")
@@ -72,7 +70,7 @@ type = "NET"
 subtype = "NetConnector"
 metadata/_edit_lock_ = true
 
-[node name="Value" type="LineEdit" parent="Element"]
+[node name="Value" type="LineEdit" parent="."]
 auto_translate_mode = 2
 offset_left = 13.0
 offset_top = -25.0
@@ -84,7 +82,7 @@ placeholder_text = "Vcc"
 expand_to_text_length = true
 caret_blink = true
 
-[node name="NetNames" type="OptionButton" parent="Element"]
+[node name="NetNames" type="OptionButton" parent="."]
 offset_left = 13.0
 offset_top = -56.0
 offset_right = 77.0
@@ -96,6 +94,6 @@ item_count = 1
 popup/item_0/text = "ABC"
 script = SubResource("GDScript_c3jac")
 
-[connection signal="text_submitted" from="Element/Value" to="Element/Value" method="release_focus" unbinds=1]
-[connection signal="focus_entered" from="Element/NetNames" to="Element/NetNames" method="_on_focus_entered"]
-[connection signal="item_selected" from="Element/NetNames" to="Element/NetNames" method="_on_item_selected"]
+[connection signal="text_submitted" from="Value" to="Value" method="release_focus" unbinds=1]
+[connection signal="focus_entered" from="NetNames" to="NetNames" method="_on_focus_entered"]
+[connection signal="item_selected" from="NetNames" to="NetNames" method="_on_item_selected"]

@@ -20,8 +20,6 @@ func get_netlist_entry(nets_on_element, id):
 "
 
 [node name="Inductor" type="Node2D"]
-
-[node name="Element" type="Node2D" parent="."]
 script = ExtResource("1_dd0uy")
 connections = PackedVector2Array(-40, 0, 40, 0)
 image_texture = ExtResource("2_iuvpn")
@@ -32,7 +30,7 @@ subtype = "Inductor"
 type = "L"
 metadata/_edit_lock_ = true
 
-[node name="Value" type="LineEdit" parent="Element"]
+[node name="Value" type="LineEdit" parent="."]
 offset_left = -34.0
 offset_top = -40.0
 offset_right = 34.0
@@ -45,4 +43,4 @@ max_length = 12
 caret_blink = true
 script = SubResource("GDScript_04h3j")
 
-[connection signal="text_submitted" from="Element/Value" to="Element/Value" method="release_focus" unbinds=1]
+[connection signal="text_submitted" from="Value" to="Value" method="release_focus" unbinds=1]
