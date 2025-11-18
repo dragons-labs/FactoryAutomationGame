@@ -5,14 +5,14 @@ extends Node
 
 #region   input/output signals processing (get/set value)
 
-func get_signal_value(signal_name : String) -> float:
-	var info = _get_signal_value(signal_name)
+func get_signal_value(signal_name : String, default : Variant = 0) -> Variant: # return float or default (e.g. null)
+	var info = _get_signal_value(signal_name, default)
 	# print(_signal_value_with_info(signal_name, info))
 	if info[1] == CONFLICT:
 		conflict_error.emit(info)
 	return info[0]
 
-func _get_signal_value(signal_name : String) -> Array:
+func _get_signal_value(signal_name : String, default : Variant = 0) -> Array:
 	var value1 = null
 	if circuit_simulator.gdspice.get_simulation_state() & circuit_simulator.gdspice.WORKING_TYPE_STATE_MASK:
 		var electric_signal = outputs_from_circuit_to_factory[signal_name][0]
@@ -35,7 +35,8 @@ func _get_signal_value(signal_name : String) -> Array:
 					value2 = float(new_value)
 					value2_source = computer_id
 				elif not is_equal_approx(float(new_value), value2):
-					return [0, CONFLICT, value2_source, float(new_value), value2, computer_id]
+					new_value = float(new_value)
+					return [(value2+new_value)/2, CONFLICT, value2_source, new_value, value2, computer_id]
 	
 	if value2 == null:
 		value2 = internal_signals_values.get(signal_name)
@@ -43,7 +44,7 @@ func _get_signal_value(signal_name : String) -> Array:
 	
 	if value1 != null and value2 != null:
 		if not is_equal_approx(value1, value2):
-			return [0, CONFLICT, value2_source, value1, value2]
+			return [(value1+value2)/2, CONFLICT, value2_source, value1, value2]
 		else:
 			return [value2, COMPUTER, value2_source]
 	elif value1 != null:
@@ -51,7 +52,7 @@ func _get_signal_value(signal_name : String) -> Array:
 	elif value2 != null:
 		return [value2, COMPUTER, value2_source]
 	else:
-		return [0, NONE]
+		return [default, NONE]
 
 func set_signal_value(signal_name : String, value : float) -> void:
 	#print("set_signal_value ", signal_name, " → ", value)
@@ -202,7 +203,7 @@ func close() -> void:
 ##  - computer_id:
 ##     computer id to register signals
 ##     null (default) to register in all computers
-func register_factory_signals(inputs_from_factory : Dictionary, outputs_to_factory : Dictionary, circuit_entries : Array, name_prefix : String, computer_id : Variant = ""):
+func register_factory_signals(inputs_from_factory : Dictionary, outputs_to_factory : Dictionary, circuit_entries : Array, name_prefix : String, computer_id : Variant = null):
 	if name_prefix:
 		name_prefix += "_"
 	
@@ -221,7 +222,7 @@ func register_factory_signals(inputs_from_factory : Dictionary, outputs_to_facto
 		input_to_circuit_from_factory[signal_name2][1] = voltage_source_name.substr(0, split_position) + name_prefix + voltage_source_name.substr(split_position)
 		# if signal is external controlled add it to computers system configuration
 		if FAG_Utils.array_get(input_to_circuit_from_factory[signal_name2], 2) in [null, "external"]:
-			for cid in computer_systems_configuration if computer_id == "" else {computer_id: null}:
+			for cid in computer_systems_configuration if computer_id == null else {computer_id: null}:
 				computer_systems_configuration[cid].computer_input_names.append(signal_name2)
 				# if computer is running register signal in it via message bus
 				if cid in computer_control_blocks:
@@ -237,7 +238,7 @@ func register_factory_signals(inputs_from_factory : Dictionary, outputs_to_facto
 		# add netname to netnames list
 		netnames.append(outputs_from_circuit_to_factory[signal_name2][0])
 		# add signal to computers system configuration
-		for cid in computer_systems_configuration if computer_id == "" else {computer_id: null}:
+		for cid in computer_systems_configuration if computer_id == null else {computer_id: null}:
 			computer_systems_configuration[cid].computer_output_names.append(signal_name2)
 			# if computer is running register signal in it via message bus
 			if cid in computer_control_blocks:
@@ -247,7 +248,7 @@ func register_factory_signals(inputs_from_factory : Dictionary, outputs_to_facto
 	for circuit_entry in circuit_entries:
 		external_circuit_entries.append(circuit_entry.format([name_prefix]))
 
-func unregister_factory_signals(inputs_from_factory : Dictionary, outputs_to_factory : Dictionary, circuit_entries : Array, name_prefix : String, computer_id : Variant = ""):
+func unregister_factory_signals(inputs_from_factory : Dictionary, outputs_to_factory : Dictionary, circuit_entries : Array, name_prefix : String, computer_id : Variant = null):
 	if name_prefix:
 		name_prefix += "_"
 	
@@ -255,7 +256,7 @@ func unregister_factory_signals(inputs_from_factory : Dictionary, outputs_to_fac
 		var signal_name2 = name_prefix + signal_name
 		netnames.erase(input_to_circuit_from_factory[signal_name2][0])
 		if signal_name2 in input_to_circuit_from_factory and FAG_Utils.array_get(input_to_circuit_from_factory[signal_name2], 2) in [null, "external"]:
-			for cid in computer_systems_configuration if computer_id == "" else {computer_id: null}:
+			for cid in computer_systems_configuration if computer_id == null else {computer_id: null}:
 				computer_systems_configuration[cid].computer_input_names.erase(signal_name2)
 				if cid in computer_control_blocks:
 					computer_control_blocks[cid].get_child(0).remove_computer_input(signal_name2)
@@ -265,7 +266,7 @@ func unregister_factory_signals(inputs_from_factory : Dictionary, outputs_to_fac
 		var signal_name2 = name_prefix + signal_name
 		netnames.erase(outputs_from_circuit_to_factory[signal_name2][0])
 		outputs_from_circuit_to_factory.erase(signal_name2)
-		for cid in computer_systems_configuration if computer_id == "" else {computer_id: null}:
+		for cid in computer_systems_configuration if computer_id == null else {computer_id: null}:
 			computer_systems_configuration[cid].computer_output_names.erase(signal_name2)
 			if cid in computer_control_blocks:
 				computer_control_blocks[cid].get_child(0).remove_computer_output(signal_name2)

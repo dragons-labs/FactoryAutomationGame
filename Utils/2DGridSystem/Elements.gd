@@ -30,7 +30,6 @@ func _init(main_node_ : Node2D, owner_node_ : Node2D = null, undo_redo_ : UndoRe
 ### Serialise / Restore
 
 func serialise() -> Array:
-	store_infos()
 	var save_data = []
 	for element in main_node.get_children():
 		var values := {}
@@ -77,27 +76,6 @@ func restore(data : Array, elements : Dictionary, offset := Vector2.ZERO, duplic
 	
 	if duplicate_mode:
 		add_elements__init(new_elements, offset, false, false)
-
-func store_infos() -> void:
-	# for tscn save mode
-	for element in main_node.get_children():
-		var info := {}
-		for info_node in element.get_children():
-			if info_node is LineEdit and info_node.text:
-				info[info_node.name] = info_node.text
-		if info:
-			element.set_meta("grid_element_info", info)
-		elif element.has_meta("grid_element_info"):
-			element.remove_meta("grid_element_info")
-
-func restore_infos_and_emit_element_add__finish(element : Node2D) -> void:
-	# for tscn restore mode
-	if element.has_meta("grid_element_info"):
-		var info = element.get_meta("grid_element_info")
-		for info_node in element.get_children():
-			if info_node.name in info:
-				info_node.text = info[info_node.name]
-	on_element_add.emit(element)
 
 
 ### Add new element

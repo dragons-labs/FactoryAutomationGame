@@ -27,7 +27,7 @@ static func register_action(action_name : StringName, events_keys_info : Array, 
 		var event
 		if key and "key" in key:
 			event = InputEventKey.new()
-			event.keycode = key["key"]
+			event.physical_keycode = key["key"]
 		elif key and "button" in key:
 			event = InputEventMouseButton.new()
 			event.button_index = key["button"]

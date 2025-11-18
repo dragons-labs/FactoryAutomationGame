@@ -5,24 +5,16 @@ extends Node2D
 
 @export_group("Editor Cursor settings")
 
-@export var select_cursor : Texture2D = null
-@export var select_cursor_hotspot := Vector2.ZERO
-@export var duplicate_cursor : Texture2D = null
-@export var duplicate_cursor_hotspot := Vector2.ZERO
-@export var move_cursor : Texture2D = null
-@export var move_cursor_hotspot := Vector2.ZERO
-@export var rotate_cursor : Texture2D = null
-@export var rotate_cursor_hotspot := Vector2.ZERO
-@export var mirror_cursor : Texture2D = null
-@export var mirror_cursor_hotspot := Vector2.ZERO
-@export var scale_cursor : Texture2D = null
-@export var scale_cursor_hotspot := Vector2.ZERO
-@export var delete_cursor : Texture2D = null
-@export var delete_cursor_hotspot := Vector2.ZERO
-@export var draw_cursor : Texture2D = null
-@export var draw_cursor_hotspot := Vector2.ZERO
-@export var add_element_cursor : Texture2D = null
-@export var add_element_cursor_hotspot := Vector2.ZERO
+@export var select_cursor : FAG_CursorInfo
+@export var duplicate_cursor : FAG_CursorInfo
+@export var move_cursor : FAG_CursorInfo
+@export var rotate_cursor : FAG_CursorInfo
+@export var mirror_cursor : FAG_CursorInfo
+@export var scale_cursor : FAG_CursorInfo
+@export var rename_cursor : FAG_CursorInfo
+@export var delete_cursor : FAG_CursorInfo
+@export var draw_cursor : FAG_CursorInfo
+@export var add_element_cursor : FAG_CursorInfo
 
 @export_group("Selection Box Settings")
 @export var selection_box_enabled := true
@@ -40,6 +32,7 @@ extends Node2D
 @export var scale_tool_enabled := false
 @export var duplicate_tool_enabled := false
 @export var line_tool_enabled := false
+@export var rename_tool_enabled := false
 @export var elements : Array[PackedScene] = []
 
 ## function used for getting editable elements on [param _point],
@@ -50,7 +43,7 @@ extends Node2D
 ## Set to empty string to disable using settings (hide in settings menu, disallow override properties and key mapping).
 @export var settings_group_name := "WORLD_EDITOR_UI_SETTINGS_GROUP_NAME"
 
-enum {NONE, SELECT, SELECT_LONG, DUPLICATE, MOVE, SCALE, SCALE_IN_PROGRESS, ROTATE, MIRROR, DELETE, LINE, ELEMENT}
+enum {NONE, SELECT, SELECT_LONG, DUPLICATE, MOVE, SCALE, SCALE_IN_PROGRESS, ROTATE, MIRROR, RENAME, DELETE, LINE, ELEMENT}
 var _active_ui_tool := NONE
 func get_active_ui_tool_mode(): return _active_ui_tool
 
@@ -143,7 +136,8 @@ func _init() -> void:
 		"EDIT_ROTATE": [{"key": KEY_R}],
 		"EDIT_MIRROR": [{"key": KEY_M}],
 		"EDIT_DELETE": [{"key": KEY_X}],
-		"EDIT_LINE_TOOL": [{"key": KEY_L}, {"key": KEY_N}],
+		"EDIT_LINE_TOOL": [{"key": KEY_L}],
+		"EDIT_RENAME": [{"key": KEY_N}],
 	})
 	
 	if settings_group_name:
@@ -164,6 +158,8 @@ func _ready() -> void:
 		%Tools/Scale.visible = false
 	if not line_tool_enabled:
 		%AddElements/Line.visible = false
+	if not rename_tool_enabled:
+		%Tools/Rename.visible = false
 	
 	_on_keymap_update()
 	
@@ -192,6 +188,7 @@ func _on_keymap_update() -> void:
 	%Tools/Rotate.shortcut = FAG_Utils.create_shorcut("EDIT_ROTATE")
 	%Tools/Mirror.shortcut = FAG_Utils.create_shorcut("EDIT_MIRROR")
 	%Tools/Delete.shortcut = FAG_Utils.create_shorcut("EDIT_DELETE")
+	%Tools/Rename.shortcut = FAG_Utils.create_shorcut("EDIT_RENAME")
 	%Tools/Scale.shortcut = FAG_Utils.create_shorcut("EDIT_SCALE")
 	%AddElements/Line.shortcut = FAG_Utils.create_shorcut("EDIT_LINE_TOOL")
 
@@ -218,6 +215,7 @@ func add_element(element : PackedScene) -> void:
 	button.name = state.get_node_name(0)
 	button.visible = true
 	button.shortcut = null
+	print("Add element to editor UI: ", button.name)
 	# iterate over properties of first child of root node
 	# (node index == 0 => first (root) node in packed scene)
 	for i in range(state.get_node_property_count(0)):
@@ -282,28 +280,31 @@ func _on_ui_tool_selected(force := false) -> void:
 	match button_name:
 		"SelectMove":
 			_active_ui_tool = SELECT
-			_ui_set_cursor_select()
+			_ui_set_cursor(select_cursor)
 		"Duplicate":
 			_active_ui_tool = DUPLICATE
-			_ui_set_cursor_duplicate()
+			_ui_set_cursor(duplicate_cursor)
 		"Scale":
 			_active_ui_tool = SCALE
-			_ui_set_cursor_scale()
+			_ui_set_cursor(scale_cursor)
 		"Rotate":
 			_active_ui_tool = ROTATE
-			_ui_set_cursor_rotate()
+			_ui_set_cursor(rotate_cursor)
 		"Mirror":
 			_active_ui_tool = MIRROR
-			_ui_set_cursor_mirror()
+			_ui_set_cursor(mirror_cursor)
+		"Rename":
+			_active_ui_tool = RENAME
+			_ui_set_cursor(rename_cursor)
 		"Delete":
 			_active_ui_tool = DELETE
-			_ui_set_cursor_delete()
+			_ui_set_cursor(delete_cursor)
 		"Line":
 			_active_ui_tool = LINE
-			_ui_set_cursor_draw()
+			_ui_set_cursor(draw_cursor)
 		_:
 			_active_ui_tool = ELEMENT
-			_ui_set_cursor_add_element()
+			_ui_set_cursor(add_element_cursor)
 	
 	if _active_ui_tool == LINE or _active_ui_tool == ELEMENT:
 		clear_selection()
@@ -344,7 +345,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				if _selection_box.hit_in_selection_box(point):
 					if _active_ui_tool == SELECT:
 						_active_ui_tool = MOVE
-						_ui_set_cursor_move()
+						_ui_set_cursor(move_cursor)
 					do_on_selection.emit(_active_ui_tool, point, _selection_box)
 				else:
 					clear_selection()
@@ -362,7 +363,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				if _active_ui_tool == MOVE or _active_ui_tool == SELECT_LONG:
 					do_move_finish.emit()
 					_active_ui_tool = SELECT
-					_ui_set_cursor_select()
+					_ui_set_cursor(select_cursor)
 				elif _active_ui_tool == SCALE_IN_PROGRESS:
 					do_scale_finish.emit()
 					_active_ui_tool = SCALE
@@ -394,7 +395,7 @@ func _set_move_mode(immediately := false):
 	if _active_ui_tool == SELECT and _raycast_result:
 		if _editor_enabled:
 			_active_ui_tool = MOVE
-			_ui_set_cursor_move()
+			_ui_set_cursor(move_cursor)
 		else:
 			# used to possibility of emit long click action (via do_move_finish action) while editor is disabled
 			_active_ui_tool = SELECT_LONG
@@ -406,44 +407,6 @@ func clear_selection():
 
 
 ### Helper functions for UI
-
-var _ui_set_cursor = []
-
-func _ui_set_cursor_select() -> void:
-	_ui_set_cursor = [select_cursor, select_cursor_hotspot]
-	update_cursor()
-
-func _ui_set_cursor_duplicate() -> void:
-	_ui_set_cursor = [duplicate_cursor, duplicate_cursor_hotspot]
-	update_cursor()
-
-func _ui_set_cursor_move() -> void:
-	_ui_set_cursor = [move_cursor, move_cursor_hotspot]
-	update_cursor()
-
-func _ui_set_cursor_rotate() -> void:
-	_ui_set_cursor = [rotate_cursor, rotate_cursor_hotspot]
-	update_cursor()
-
-func _ui_set_cursor_mirror() -> void:
-	_ui_set_cursor = [mirror_cursor, mirror_cursor_hotspot]
-	update_cursor()
-
-func _ui_set_cursor_scale() -> void:
-	_ui_set_cursor = [scale_cursor, scale_cursor_hotspot]
-	update_cursor()
-
-func _ui_set_cursor_delete() -> void:
-	_ui_set_cursor = [delete_cursor, delete_cursor_hotspot]
-	update_cursor()
-
-func _ui_set_cursor_draw() -> void:
-	_ui_set_cursor = [draw_cursor, draw_cursor_hotspot]
-	update_cursor()
-
-func _ui_set_cursor_add_element() -> void:
-	_ui_set_cursor = [add_element_cursor, add_element_cursor_hotspot]
-	update_cursor()
 
 var _last_focus := false
 func _check_if_focus_changed() -> void:
@@ -459,11 +422,16 @@ func _check_if_focus_changed() -> void:
 			_raycast_result = null
 			focus_lost.emit()
 
+var _ui_cursor = []
+func _ui_set_cursor(cursor : FAG_CursorInfo) -> void:
+	_ui_cursor = cursor
+	update_cursor()
+
 func update_cursor(focus = true, force = false):
 	# print_verbose("update_cursor ", self, " child of ", get_parent(), " focus=", focus)
 	if focus:
 		FAG_WindowManager.cursor_owner = get_viewport()
-		Input.set_custom_mouse_cursor(_ui_set_cursor[0], Input.CURSOR_ARROW, _ui_set_cursor[1])
+		Input.set_custom_mouse_cursor(_ui_cursor.image, Input.CURSOR_ARROW, _ui_cursor.hotspot)
 	elif FAG_WindowManager.cursor_owner == get_viewport() or force:
 		Input.set_custom_mouse_cursor(null, Input.CURSOR_ARROW)
 		FAG_WindowManager.cursor_owner = null

@@ -10,53 +10,41 @@ const _block_signals_inputs := {
 	"producer_control_enabled" : ["producer_control_enabled_@out"],
 	"producer_release_object" : ["producer_release_object_@out"],
 }
-var _factory_root
-var _factory_control
-var _name_prefix
 
-func init(factory_root):
-	_factory_root = factory_root
-	_factory_control = _factory_root.factory_control
-	
-	_name_prefix = handle_name_prefix(self, $Label3D)
-	
-	_factory_root.factory_stop.connect(_on_factory_stop)
-	_factory_root.factory_start.connect(_on_factory_start)
-	
-	_factory_control.register_factory_signals(
-		_block_signals_outputs, _block_signals_inputs, [],
-		get_meta("in_game_name", ""), get_meta("using_computer_id", ""),
-	)
+@onready var _block_control = FAG_FactoryBlockControl.new(self)
 
-func deinit():
-	_factory_control.unregister_factory_signals(
-		_block_signals_outputs, _block_signals_inputs, [],
-		get_meta("in_game_name", ""), get_meta("using_computer_id", ""),
-	)
+func init(factory_root, name = null):
+	_block_control.init(factory_root, name, $Label3D, _block_signals_outputs, _block_signals_inputs, [])
+	
+	factory_root.factory_stop.connect(_on_factory_stop)
+	factory_root.factory_start.connect(_on_factory_start)
+	
+	_objects_root = factory_root.objects_root
 
 
 @export var object : RigidBody3D
 @export var timer_period := 1.0
 
+var _objects_root
 var _object_is_ready := false
 var _timer = null
 
 func _on_timer_timeout(delay : float) -> void:
-	if _factory_control.get_signal_value(_name_prefix + "producer_control_enabled") > 2:
+	if _block_control.get_signal_value("producer_control_enabled") > 2:
 		if _object_is_ready:
-			if _factory_control.get_signal_value(_name_prefix + "producer_release_object") > 2:
+			if _block_control.get_signal_value("producer_release_object") > 2:
 				_release_object()
 		else:
 			_object_is_ready = true
-			_factory_control.set_signal_value(_name_prefix + "producer_object_ready", 3.3)
+			_block_control.set_signal_value("producer_object_ready", 3.3)
 			_timer.reset(0.1)
 	else:
 		_release_object(delay)
 
 func _release_object(delay := 0.0) -> void:
-	_factory_control.set_signal_value(_name_prefix + "producer_object_ready", 0)
+	_block_control.set_signal_value("producer_object_ready", 0)
 	var element : Node3D = object.duplicate()
-	_factory_root.objects_root.add_child(element)
+	_objects_root.add_child(element)
 	element.global_position = global_position
 	element.visible = true
 	_object_is_ready = false
@@ -69,6 +57,6 @@ func _on_factory_stop() -> void:
 func _on_factory_start() -> void:
 	if not is_inside_tree():
 		return
-	_timer = _factory_control.create_timer(timer_period, false)
+	_timer = _block_control._factory_control.create_timer(timer_period, false)
 	_timer.timeout.connect(_on_timer_timeout)
 	_on_timer_timeout(0.0)

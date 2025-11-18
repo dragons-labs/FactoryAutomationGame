@@ -3,6 +3,7 @@ FACTORY_BLOCK_NAME_SimpleFactoryBlock,Simple Construction Block,Blok konstrukcyj
 FACTORY_BLOCK_NAME_ElectronicControlBlock,Electronic Control Block,Elektroniczny blok kontrolny
 FACTORY_BLOCK_NAME_ConveyorBelt,Conveyor Belt,Pas transmisyjny
 FACTORY_BLOCK_NAME_ComputerControlBlock,Computer Control Block,Komputerowy blok kontrolny
+FACTORY_BLOCK_NAME_GPIOExpander,"GPIO Expander\n(allow to make connection between Electronic and Computer Control Blocks)","Expander GPIO\n(pozwala na przekazywanie sygnałów między elektronicznymi i komputerowymi blokami kontrolnymi)"
 FACTORY_BLOCK_NAME_ProducerBlock,Component Producer,Producent
 FACTORY_BLOCK_NAME_Welder,Welder,Spawacz
 FACTORY_BLOCK_NAME_Painter,Painter,Malarz
@@ -35,3 +36,6 @@ FACTORY_PRODUCT_FAILURE_TEXT,The product did not meet specifications.,Dostarczon
 FACTORY_PRODUCT_TIMEOUT_TEXT,Products not delivered within the required time.,Nie dostarczono produktów w wymaganym czasie.
 FACTORY_PRODUCT_SUCCESS_TITLE,Mission Successful,Sukces
 FACTORY_PRODUCT_SUCCESS_TEXT_%fTIME,"Congratulation!\n\nYou delivered all required products within %f seconds.","Gratulacje!\n\nDostarczyłeś wszystkie wymagane produkty w ciągu %s sekund."
+
+FACTORY_BLOCK_UI_ACCEPT,OK,OK
+FACTORY_BLOCK_UI_NUMBER_OF_SIGNALS,Number of signals:,Ilość sygnałów:

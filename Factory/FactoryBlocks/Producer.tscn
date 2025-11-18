@@ -10,7 +10,7 @@
 script = ExtResource("1_hqsx2")
 ui_name = "FACTORY_BLOCK_NAME_ProducerBlock"
 ui_icon = ExtResource("2_5gikm")
-object_subtype = "ProducerBlock"
+object_type = "ProducerBlock"
 metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]

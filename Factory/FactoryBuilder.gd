@@ -28,11 +28,8 @@ signal on_block_remove(block: Node3D)
 @onready var camera := %Camera3D
 @onready var _viewport := camera.get_viewport()
 
-### if true allow interact with static block (like producer, consumer and world elements)
-@onready var developer_mode := false
 
-
-### Save / Restore
+### save / restore and close
 
 func serialise() -> Array:
 	var save_data = []
@@ -40,15 +37,15 @@ func serialise() -> Array:
 		if node == _new_element:
 			continue
 		var node_data = {
-			"type": node.object_subtype,
+			"type": node.object_type,
 			"position": node.position,
 			"rotation": node.rotation,
 			"scale": node.scale,
 		}
-		if node.has_meta("in_game_name"):
-			node_data["in_game_name"] = node.get_meta("in_game_name")
-		if node.has_meta("using_computer_id"):
-			node_data["using_computer_id"] = node.get_meta("using_computer_id")
+		if node.get_block_control():
+			node_data["block_name"] = node.get_block_control().get_block_name()
+		if node.has_meta("block_config"):
+			node_data["block_config"] = node.get_meta("block_config")
 		
 		save_data.append(node_data)
 	return save_data
@@ -61,62 +58,35 @@ func restore(data : Array) -> void:
 		node.position = FAG_Utils.Vector3_from_JSON(node_info.position)
 		node.rotation = FAG_Utils.Vector3_from_JSON(node_info.rotation)
 		node.scale = FAG_Utils.Vector3_from_JSON(node_info.scale)
-		if "in_game_name" in node_info:
-			node.set_meta("in_game_name", node_info.in_game_name)
-		if "using_computer_id" in node_info:
-			node.set_meta("using_computer_id", int(node_info.using_computer_id)) # TODO this causes incompatibility with non integer computer ids
+		if "block_config" in node_info:
+			node.set_meta("block_config", node_info.block_config)
 		
 		factory_blocks_main_node.add_child(node)
 		node.owner = factory_blocks_main_node
 		
-		_on_block_add(node)
-
-func save_tscn(save_file : String) -> bool:
-	var scene = PackedScene.new()
-	var result = scene.pack(factory_blocks_main_node)
-	if result == OK:
-		result = ResourceSaver.save(scene, save_file)
-		if result == OK:
-			print("Factory blocks saved successfully")
-			return true
-	return false
-
-func restore_tscn(save_file : String) -> void:
-	var saved_data = load(save_file).instantiate()
-
-	for n in saved_data.get_children():
-		var node = n.duplicate()
-		factory_blocks_main_node.add_child(node)
-		node.owner = factory_blocks_main_node
-		_on_block_add(node)
-	
-	saved_data.free() # this delete all child of saved_data also
-	# (https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html#memory-management)
+		_on_block_add(node, node_info.get("block_name", null))
 
 func close() -> void:
 	ui.reset_editor()
 	_moving_elements.clear()
 	_scaled_element = null
 	_intersection = null
-	_remove_subnodes(factory_blocks_main_node)
-
-func _remove_subnodes(destination : Node3D) -> void:
-	for n in destination.get_children():
-		destination.remove_child(n)
-		n.queue_free()
+	for child in factory_blocks_main_node.get_children():
+		factory_blocks_main_node.remove_child(child)
+		child.queue_free()
 
 
 ### Block add / remove callbacks
 
-func _on_block_add(element : Node3D) -> void:
-	if "object_subtype" in element and element.object_subtype == "ComputerControlBlock":
+func _on_block_add(element : Node3D, name = null) -> void:
+	if "object_type" in element and element.object_type == "ComputerControlBlock":
 		factory_control.setup_computer_control_blocks(element)
 	elif "init" in element:
-		element.init(factory_root)
+		element.init(factory_root, name)
 	on_block_add.emit(element)
 
 func _on_block_remove(element : Node3D) -> void:
-	if "object_subtype" in element and element.object_subtype == "ComputerControlBlock":
+	if "object_type" in element and element.object_type == "ComputerControlBlock":
 		factory_control.remove_computer_control_blocks(element)
 	elif "deinit" in element:
 		element.deinit()
@@ -145,9 +115,9 @@ func _process(_delta) -> void:
 		var ray_end = ray_start + camera.project_ray_normal(point) * ray_length
 		var exclude = []
 		if _new_element:
-			exclude.append_array(_new_element.physics_rids)
+			exclude.append_array(_new_element.get_physics_rids())
 		for element in _moving_elements:
-			exclude.append_array(element.physics_rids)
+			exclude.append_array(element.get_physics_rids())
 		var ray_query := PhysicsRayQueryParameters3D.create(ray_start, ray_end, attachable_objects_collision_mask, exclude)
 		_intersection = get_world_3d().direct_space_state.intersect_ray(ray_query)
 		
@@ -217,17 +187,24 @@ func _on_element_add__update(_point = null) -> void:
 func _on_element_add__finish(_point = null) -> void:
 	if _intersection:
 		_on_element_add__update()
-		if "factory_signals" in _new_element:
-			ui.input_allowed = false
-			camera.disable_input()
-			%GetNameInput.text = ""
-			%GetNameDialog.show()
-			%GetNameInput.grab_focus()
+		if _new_element.get_block_control():
+			_show_name_dialog(_add_element)
 		else:
 			_add_element()
 
+var _show_name_dialog_cllback = null
+
+func _show_name_dialog(callback, name := ""):
+	_show_name_dialog_cllback = callback
+	ui.input_allowed = false
+	camera.disable_input()
+	%GetNameInput.text = name
+	%GetNameDialog.show()
+	%GetNameInput.grab_focus()
+
 func _on_get_name_ok() -> void:
-	_add_element(%GetNameInput.text.to_lower())
+	_show_name_dialog_cllback.call(%GetNameInput.text.to_lower())
+	_show_name_dialog_cllback = null
 	ui.input_allowed = true
 	camera.enable_input()
 	%GetNameDialog.hide()
@@ -237,27 +214,28 @@ func _on_get_name_cancel() -> void:
 	camera.enable_input()
 	%GetNameDialog.hide()
 
-func _add_element(block_name := "") -> void:
+func _add_element(block_name = null) -> void:
 		var element = _new_element_scene.instantiate()
 		element.position = _new_element.position
 		element.rotation = _new_element.rotation
-		if block_name:
-			element.set_meta("in_game_name", block_name)
 		undo_redo.create_action("3DWorld Element: Add")
 		undo_redo.add_do_reference(element)
 		undo_redo.add_do_method(factory_blocks_main_node.add_child.bind(element))
-		undo_redo.add_do_method(_on_block_add.bind(element))
+		undo_redo.add_do_method(_on_block_add.bind(element, block_name))
 		undo_redo.add_undo_method(factory_blocks_main_node.remove_child.bind(element))
 		undo_redo.add_undo_method(_on_block_remove.bind(element))
 		undo_redo.commit_action()
 		element.owner = factory_blocks_main_node
+
+func _rename_element(block_name, element):
+	element.get_block_control().set_block_name(block_name)
 
 func _on_do_on_raycast_result(_mode: int, point: Vector2, raycast_result: Variant) -> void:
 	match ui.get_active_ui_tool_mode():
 		ui.SELECT:
 			_moving_elements[raycast_result] = raycast_result.position
 		ui.SCALE_IN_PROGRESS:
-			if "object_subtype" in raycast_result and raycast_result.object_subtype == "ConveyorBelt":
+			if "object_type" in raycast_result and raycast_result.object_type == "ConveyorBelt":
 				var rotated_normal = Quaternion.from_euler(raycast_result.global_rotation) * _intersection.normal
 				if not is_zero_approx(rotated_normal.x):
 					_scaled_element = raycast_result
@@ -297,10 +275,16 @@ func _on_do_on_raycast_result(_mode: int, point: Vector2, raycast_result: Varian
 			undo_redo.add_do_method(_on_element_transform_update.bind(raycast_result))
 			undo_redo.add_undo_method(_on_element_transform_update.bind(raycast_result))
 			undo_redo.commit_action()
+		ui.RENAME:
+			if raycast_result.get_block_control():
+				_show_name_dialog(_rename_element.bind(raycast_result), raycast_result.get_block_control().get_block_name())
 
 func _on_do_move_step(_point) -> void:
 	for element in _moving_elements:
-		element.position = _intersection_grid_position
+		var offset = _intersection_grid_position - element.position + grid_size * 0.01
+		element.position += offset.round()
+		# uses round offset is need for scaled element with scale % 2 == 0
+		# `+ grid_size * 0.01` to avoid object jumping/flickering
 
 func _on_do_move_finish() -> void:
 	if not _moving_elements:
@@ -321,10 +305,10 @@ func _on_do_move_finish() -> void:
 
 func _on_do_on_raycast_selection_finish(raycast_result: Variant) -> void:
 	if raycast_result: #  <=>  if "on_click" event:
-		if "object_subtype" in raycast_result:
-			if raycast_result.object_subtype == "ElectronicControlBlock":
+		if "object_type" in raycast_result:
+			if raycast_result.object_type == "ElectronicControlBlock":
 				FAG_WindowManager.set_windows_visibility_recursive(factory_control.circuit_simulator_window, true)
-			elif raycast_result.object_subtype == "ComputerControlBlock":
+			elif raycast_result.object_type == "ComputerControlBlock":
 				var computer_id = raycast_result.get_meta("computer_id")
 				FAG_WindowManager.set_windows_visibility_recursive(factory_control.computer_control_blocks[computer_id], true)
 	_moving_elements.clear()
@@ -389,10 +373,7 @@ func _ready() -> void:
 func _get_block_from_raycast(_point):
 	if _intersection:
 		var block := get_block_from_collider(_intersection.collider)
-		if "object_type" in block and (
-			block.object_type == "FactoryBlock" or
-			(developer_mode and block.object_type == "FactoryStaticBlock")
-		):
+		if block.get_parent() == factory_blocks_main_node:
 			return block
 	return null
 

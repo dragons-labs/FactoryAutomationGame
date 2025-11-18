@@ -1,0 +1,37 @@
+[gd_scene load_steps=9 format=3 uid="uid://byuh2wfbdy3s5"]
+
+[ext_resource type="Script" path="res://Factory/FactoryBlocks/GPIOExpander.gd" id="1_lnnks"]
+[ext_resource type="Texture2D" uid="uid://2wbw56xloujj" path="res://Factory/FactoryBlocks/images/ElectronicControlBlock.svg" id="2_2wkkg"]
+[ext_resource type="ArrayMesh" path="res://.godot/imported/ControlBlock.tres" id="3_6v8xk"]
+[ext_resource type="Texture2D" uid="uid://d0yb8tt2m4gto" path="res://Factory/FactoryBlocks/3d_models/ElectronicControlBlock.svg" id="4_lnnks"]
+[ext_resource type="PackedScene" uid="uid://cy0brqivxb2l1" path="res://Utils/Gui3DNode/Gui3DNode.tscn" id="5_6v8xk"]
+[ext_resource type="PackedScene" uid="uid://c5japjfigom8j" path="res://Factory/FactoryBlocks/ui/NumberControl.tscn" id="6_qskco"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uwn0y"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2wkkg"]
+albedo_color = Color(0.1254902, 0.29411766, 0, 1)
+albedo_texture = ExtResource("4_lnnks")
+
+[node name="GPIOExpander" type="Node3D"]
+script = ExtResource("1_lnnks")
+ui_name = "FACTORY_BLOCK_NAME_GPIOExpander"
+ui_icon = ExtResource("2_2wkkg")
+object_type = "GPIOExpander"
+
+[node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
+shape = SubResource("BoxShape3D_uwn0y")
+
+[node name="FactoryElementVisual" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = ExtResource("3_6v8xk")
+skeleton = NodePath("")
+surface_material_override/0 = SubResource("StandardMaterial3D_2wkkg")
+
+[node name="Gui3DNode" parent="." instance=ExtResource("5_6v8xk")]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 1.01, 0)
+gui_scene = ExtResource("6_qskco")
+screen_size_2d = Vector2(300, 300)

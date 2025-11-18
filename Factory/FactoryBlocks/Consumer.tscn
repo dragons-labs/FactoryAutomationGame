@@ -11,8 +11,7 @@ size = Vector3(0.79, 0.5, 0.79)
 script = ExtResource("2_hk5bj")
 ui_name = "FACTORY_BLOCK_NAME_ConsumerBlock"
 ui_icon = ExtResource("1_r6csw")
-object_type = "FactoryStaticBlock"
-object_subtype = "ConsumerBlock"
+object_type = "ConsumerBlock"
 metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]

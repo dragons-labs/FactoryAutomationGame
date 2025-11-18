@@ -11,7 +11,7 @@
 script = ExtResource("1_r7foq")
 ui_name = "FACTORY_BLOCK_NAME_ComputerControlBlock"
 ui_icon = ExtResource("1_a3dtk")
-object_subtype = "ComputerControlBlock"
+object_type = "ComputerControlBlock"
 metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]

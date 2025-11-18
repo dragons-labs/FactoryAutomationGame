@@ -28,7 +28,7 @@ func _init(base_node_, undo_redo_, grid_size_) -> void:
 	gElements = FAG_2DGrid_Elements.new(elements_node, gParent, undo_redo_, grid_size_)
 
 
-### Save / Restore system
+### save / restore and close
 
 func serialise() -> Dictionary:
 	return {
@@ -40,64 +40,12 @@ func restore(data : Dictionary, elements : Dictionary, offset := Vector2.ZERO, d
 	gLines.restore(data.Lines, offset, duplicate_mode)
 	gElements.restore(data.Elements, elements, offset, duplicate_mode)
 
-func save_tscn(save_file : String) -> bool:
-	gElements.store_infos()
-	var scene = PackedScene.new()
-	var result = scene.pack(gParent)
-	if result == OK:
-		result = ResourceSaver.save(scene, save_file)
-		if result == OK:
-			print("Grid 2D saved successfully")
-			return true
-	return false
-
-func restore_tscn(save_file : String, offset := Vector2.ZERO, ui = null) -> void:
-	var saved_data = load(save_file).instantiate()
-	
-	# restore gLines
-	_restore_subnodes(saved_data.get_node("Lines"), gLines.main_node, gParent, offset)
-	gLines.update_connections()
-	
-	# restore gElements
-	_restore_subnodes(saved_data.get_node("Elements"), gElements.main_node, gParent, offset, ui)
-	
-	saved_data.free() # this delete all child of saved_data also
-	# (https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html#memory-management)
-
-func _restore_subnodes(source : Node2D, destination : Node2D, owner : Node2D, offset := Vector2.ZERO, ui = null) -> void:
-	for n in source.get_children():
-		if ui:
-			if n.subtype:
-				var button = ui._elements_dict[n.subtype][1]
-				if button.visible == false or button.disabled == true:
-					# skip (on import operation) elements not currently available
-					# (not available on level or quantity limit exceeded)
-					continue
-		
-		var element = n.duplicate()
-		if element is Line2D:
-			var new_points = []
-			new_points.resize(len(element.points))
-			for i in range(len(element.points)):
-				new_points[i] = element.points[i] + offset
-			element.points = new_points
-		else:
-			element.position += offset
-		destination.add_child(element)
-		element.owner = owner
-		
-		if destination == gElements.main_node:
-			gElements.restore_infos_and_emit_element_add__finish(element)
-
 func close() -> void:
-	_remove_subnodes(gLines.main_node)
-	_remove_subnodes(gElements.main_node)
+	for node in [gLines.main_node, gElements.main_node]:
+		for child in node.get_children():
+			node.remove_child(child)
+			child.queue_free()
 	gLines.update_connections()
-
-func _remove_subnodes(destination : Node2D) -> void:
-	for n in destination.get_children():
-		destination.remove_child(n)
-		n.queue_free()
 
 
 ### Netlists system

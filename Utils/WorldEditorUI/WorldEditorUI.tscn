@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://ccjlqcswjr2vw"]
+[gd_scene load_steps=35 format=3 uid="uid://ccjlqcswjr2vw"]
 
 [ext_resource type="Texture2D" uid="uid://y2fcv1wbsmu3" path="res://Utils/WorldEditorUI/ui_icons/undo.svg" id="1_a4hem"]
 [ext_resource type="Script" uid="uid://b3yqm6f4ea6xl" path="res://Utils/WorldEditorUI/WorldEditorUI.gd" id="1_kdydk"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://b6vfmrhv4itfb" path="res://Utils/WorldEditorUI/ui_icons/cursor-normal.svg" id="2_g33n0"]
 [ext_resource type="Texture2D" uid="uid://brntqfj2f3r" path="res://Utils/WorldEditorUI/ui_icons/cursor-duplicate.svg" id="3_344tk"]
 [ext_resource type="Texture2D" uid="uid://decp7tuvf5ix3" path="res://Utils/WorldEditorUI/ui_icons/cursor-move.svg" id="3_evb7p"]
+[ext_resource type="Script" uid="uid://d3lefliu5dq1e" path="res://Utils/WorldEditorUI/CursorInfo.gd" id="3_vfolx"]
 [ext_resource type="Texture2D" uid="uid://cnvxo7w100sdm" path="res://Utils/WorldEditorUI/ui_icons/select-move.svg" id="3_xkg5s"]
 [ext_resource type="Texture2D" uid="uid://38rhwivrnrhu" path="res://Utils/WorldEditorUI/ui_icons/cursor-rotate.svg" id="4_lh4ej"]
 [ext_resource type="Texture2D" uid="uid://8wcb4bhwlj8e" path="res://Utils/WorldEditorUI/ui_icons/delete.svg" id="4_vljnu"]
@@ -21,21 +22,74 @@
 [ext_resource type="Texture2D" uid="uid://dnh0tpemkvavt" path="res://Utils/WorldEditorUI/ui_icons/import.svg" id="11_a2raq"]
 [ext_resource type="Texture2D" uid="uid://s58u38ioqdvk" path="res://Utils/WorldEditorUI/ui_icons/save.svg" id="12_saxks"]
 [ext_resource type="Texture2D" uid="uid://b7pbbp3dxxpdm" path="res://Utils/WorldEditorUI/ui_icons/duplicate.svg" id="14_8qkfq"]
+[ext_resource type="Texture2D" uid="uid://cwfngkg1xuec3" path="res://Utils/WorldEditorUI/ui_icons/rename.svg" id="19_r58dy"]
+
+[sub_resource type="Resource" id="Resource_juq1e"]
+script = ExtResource("3_vfolx")
+image = ExtResource("2_g33n0")
+metadata/_custom_type_script = "uid://d3lefliu5dq1e"
+
+[sub_resource type="Resource" id="Resource_baxm3"]
+script = ExtResource("3_vfolx")
+image = ExtResource("3_344tk")
+metadata/_custom_type_script = "uid://d3lefliu5dq1e"
+
+[sub_resource type="Resource" id="Resource_u4gy2"]
+script = ExtResource("3_vfolx")
+image = ExtResource("3_evb7p")
+metadata/_custom_type_script = "uid://d3lefliu5dq1e"
+
+[sub_resource type="Resource" id="Resource_b86fl"]
+script = ExtResource("3_vfolx")
+image = ExtResource("4_lh4ej")
+metadata/_custom_type_script = "uid://d3lefliu5dq1e"
+
+[sub_resource type="Resource" id="Resource_6y44k"]
+script = ExtResource("3_vfolx")
+image = ExtResource("5_x1l62")
+metadata/_custom_type_script = "uid://d3lefliu5dq1e"
+
+[sub_resource type="Resource" id="Resource_3p451"]
+script = ExtResource("3_vfolx")
+image = ExtResource("6_3a64l")
+metadata/_custom_type_script = "uid://d3lefliu5dq1e"
+
+[sub_resource type="Resource" id="Resource_362am"]
+script = ExtResource("3_vfolx")
+image = ExtResource("7_kcx5t")
+hotspot = Vector2(0, 32)
+metadata/_custom_type_script = "uid://d3lefliu5dq1e"
+
+[sub_resource type="Resource" id="Resource_2ue5e"]
+script = ExtResource("3_vfolx")
+image = ExtResource("6_h4ypi")
+metadata/_custom_type_script = "uid://d3lefliu5dq1e"
+
+[sub_resource type="Resource" id="Resource_2h6yo"]
+script = ExtResource("3_vfolx")
+image = ExtResource("7_kcx5t")
+hotspot = Vector2(0, 32)
+metadata/_custom_type_script = "uid://d3lefliu5dq1e"
+
+[sub_resource type="Resource" id="Resource_dkocy"]
+script = ExtResource("3_vfolx")
+image = ExtResource("2_g33n0")
+metadata/_custom_type_script = "uid://d3lefliu5dq1e"
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_05y61"]
 
 [node name="WorldEditorUI" type="Node2D"]
 script = ExtResource("1_kdydk")
-select_cursor = ExtResource("2_g33n0")
-duplicate_cursor = ExtResource("3_344tk")
-move_cursor = ExtResource("3_evb7p")
-rotate_cursor = ExtResource("4_lh4ej")
-mirror_cursor = ExtResource("5_x1l62")
-scale_cursor = ExtResource("6_3a64l")
-delete_cursor = ExtResource("6_h4ypi")
-draw_cursor = ExtResource("7_kcx5t")
-draw_cursor_hotspot = Vector2(0, 32)
-add_element_cursor = ExtResource("2_g33n0")
+select_cursor = SubResource("Resource_juq1e")
+duplicate_cursor = SubResource("Resource_baxm3")
+move_cursor = SubResource("Resource_u4gy2")
+rotate_cursor = SubResource("Resource_b86fl")
+mirror_cursor = SubResource("Resource_6y44k")
+scale_cursor = SubResource("Resource_3p451")
+rename_cursor = SubResource("Resource_362am")
+delete_cursor = SubResource("Resource_2ue5e")
+draw_cursor = SubResource("Resource_2h6yo")
+add_element_cursor = SubResource("Resource_dkocy")
 
 [node name="UI" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
@@ -133,6 +187,13 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_05y61")
 icon = ExtResource("6_frc30")
 
+[node name="Rename" type="Button" parent="UI/LeftPanel/FixedButtons/VBoxContainer/Tools"]
+layout_mode = 2
+tooltip_text = "EDITOR_RENAME_TOOLTIP"
+toggle_mode = true
+button_group = SubResource("ButtonGroup_05y61")
+icon = ExtResource("19_r58dy")
+
 [node name="Delete" type="Button" parent="UI/LeftPanel/FixedButtons/VBoxContainer/Tools"]
 layout_mode = 2
 tooltip_text = "EDITOR_DELETE_TOOLTIP"
@@ -192,6 +253,7 @@ script = ExtResource("8_3dr2u")
 [connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Tools/Scale" to="." method="_on_ui_tool_selected"]
 [connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Tools/Rotate" to="." method="_on_ui_tool_selected"]
 [connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Tools/Mirror" to="." method="_on_ui_tool_selected"]
+[connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Tools/Rename" to="." method="_on_ui_tool_selected"]
 [connection signal="pressed" from="UI/LeftPanel/FixedButtons/VBoxContainer/Tools/Delete" to="." method="_on_ui_tool_selected"]
 [connection signal="pressed" from="UI/LeftPanel/ScrollContainer/ScrollableButtons/AddElements/Line" to="." method="_on_ui_tool_selected"]
 [connection signal="file_selected" from="UI/FileDialog" to="." method="_on_file_dialog_file_selected"]

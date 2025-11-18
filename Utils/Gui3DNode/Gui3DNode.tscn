@@ -16,11 +16,12 @@ albedo_texture = SubResource("2")
 [sub_resource type="BoxShape3D" id="4"]
 size = Vector3(1, 1, 0.001)
 
-[node name="GUIPanel3D" type="Node3D"]
+[node name="Gui3DNode" type="Node3D"]
 process_mode = 3
 script = ExtResource("1")
 
 [node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
 canvas_item_default_texture_filter = 2
 gui_embed_subwindows = true
 render_target_update_mode = 4

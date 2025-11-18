@@ -14,7 +14,7 @@ size = Vector3(1, 0.5, 1)
 script = ExtResource("1_kb8ux")
 ui_name = "FACTORY_BLOCK_NAME_ConveyorSplitter"
 ui_icon = ExtResource("1_omw6g")
-object_subtype = "ConveyorSplitter"
+object_type = "ConveyorSplitter"
 metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]

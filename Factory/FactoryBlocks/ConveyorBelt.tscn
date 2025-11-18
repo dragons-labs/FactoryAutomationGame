@@ -16,7 +16,7 @@ _area = NodePath("Area3D")
 _root = NodePath(".")
 ui_name = "FACTORY_BLOCK_NAME_ConveyorBelt"
 ui_icon = ExtResource("1_8s4c1")
-object_subtype = "ConveyorBelt"
+object_type = "ConveyorBelt"
 metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
@@ -37,8 +37,7 @@ script = ExtResource("1_kb8ux")
 _area = NodePath(".")
 _root = NodePath("..")
 exclusive_owner = true
-object_type = "Part"
-object_subtype = "Part of ConveyorBelt"
+object_type = "Part of ConveyorBelt"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D_2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.44, 0, 0)
@@ -50,8 +49,7 @@ script = ExtResource("1_kb8ux")
 _area = NodePath(".")
 _root = NodePath("..")
 exclusive_owner = true
-object_type = "Part"
-object_subtype = "Part of ConveyorBelt"
+object_type = "Part of ConveyorBelt"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D_3"]
 transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, -0.44, 0, 0)

@@ -66,13 +66,13 @@ func load_level(level_id : String, save_dir := "") -> void:
 			
 		$FactoryControl.computer_systems_configuration = computer_config
 	
+	level_scene_node.init(self, level_id, save_dir != "")
+	add_child(level_scene_node)
+	
 	# run register_factory_signals on static blocks
 	for element in level_scene_node.get_node("FactoryBlocks").get_children():
 		if "init" in element:
 			element.init(self)
-	
-	level_scene_node.init(self, level_id, save_dir != "")
-	add_child(level_scene_node)
 	
 	# hide unsupported blocks in builder UI
 	for button in factory_builder.ui._ui_add_elements_container.get_children():
@@ -89,14 +89,6 @@ func load_level(level_id : String, save_dir := "") -> void:
 			button.disabled = false
 		else:
 			button.visible = false
-	
-	var max_blocks = level_scene_node.get_meta("max_blocks", {})
-	if max_blocks.get("ElectronicControlBlock", 0) > 0:
-		max_blocks["ElectronicControlBlock"] = 1
-	else:
-		max_blocks["ElectronicControlBlock"] = 0
-	if not "ComputerControlBlock" in max_blocks:
-		max_blocks["ComputerControlBlock"] = 0
 	
 	# update unlocked manuals ... need be done in load to to ensure correct operation of the manual for this level
 	var game_progress = FAG_Utils.load_from_json_file(GAME_PROGRESS_SAVE)
@@ -427,14 +419,14 @@ func _reset_stats() -> void:
 func _update_block_count(block: Node3D, val: int) -> void:
 	_stats.block_count += val
 	
-	if "object_subtype" in block:
-		var object_subtype = block.object_subtype
-		_stats.block_count_per_type[object_subtype] = _stats.block_count_per_type.get(object_subtype, 0) + val
+	if "object_type" in block:
+		var object_type = block.object_type
+		_stats.block_count_per_type[object_type] = _stats.block_count_per_type.get(object_type, 0) + val
 		
 		if level_scene_node.block_count_updated(
-			object_subtype, block,
-			_stats.block_count_per_type[object_subtype],
-			factory_builder.ui._elements_dict[object_subtype][1]
+			object_type, block,
+			_stats.block_count_per_type[object_type],
+			factory_builder.ui._elements_dict[object_type][1]
 		):
 			factory_builder.ui.reset_editor()
 	
@@ -498,14 +490,14 @@ func _ready() -> void:
 
 var _console_read_set # to keep console read/set variable interface
 
-func _factory_producer(operation : String, arg = null, in_game_name = null):
+func _factory_producer(operation : String, arg = null, producer_name = null):
 	if operation in ["start", "stop", "step"]:
-		in_game_name = arg
-	if in_game_name != null:
-		in_game_name = str(in_game_name)
+		producer_name = arg
+	if producer_name != null:
+		producer_name = str(producer_name)
 	
 	for node in get_tree().get_nodes_in_group("FactoryProducers"):
-		if in_game_name == null or in_game_name == node.get_meta("in_game_name", ""):
+		if producer_name == null or producer_name == node.get_block_control().get_block_name():
 			match operation:
 				"start":
 					node._timer.paused = false

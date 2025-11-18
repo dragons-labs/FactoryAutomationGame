@@ -7,13 +7,17 @@ extends Node3D
 @export var keyboard_move_step := 1.7
 ## multiplier for [member keyboard_move_step] used on _FAST variant of action
 @export var keyboard_move_step_multiplier  := 5.0
+## move step into camera direction while using keybord (CAMERA_SMOOTH_ZOOM_IN / CAMERA_SMOOTH_ZOOM_OUT)
+@export var keyboard_zoom_step := 4.0
+## move step into camera direction while using keybord (CAMERA_SMOOTH_ZOOM_IN_FAST / CAMERA_SMOOTH_ZOOM_OUT_FAST)
+@export var keyboard_zoom_step_fast := 17.0
 ## zoom (change [member Camera3D.fov]) step for keyboard actions (CAMERA_FOV_ZOOM_IN and CAMERA_FOV_ZOOM_OUT keys, use both for reset FOV to default)
-@export var keyboard_zoom_step := 60
+@export var keyboard_zoom_fov_step := 60
 ## rotation step for keyboard actions (CAMERA_ROTATE_LEFT, CAMERA_ROTATE_RIGHT, CAMERA_ROTATE_DOWN and CAMERA_ROTATE_UP keys)
 @export var keyboard_rotation_step := 1.7
 
-## move step into camera direction while using mouse scroll (or keyboard shortcut) (CAMERA_ZOOM_IN / CAMERA_ZOOM_OUT)
-@export var button_move_step_z  := 0.1
+## move step into camera direction while using mouse scroll (or keyboard shortcut) (CAMERA_STEP_ZOOM_IN / CAMERA_STEP_ZOOM_OUT)
+@export var button_move_step_z  := 0.4
 ## multiplier for [member button_move_step_z] used on _FAST variant of action
 @export var button_move_step_z_multiplier  := 5.0
 
@@ -63,7 +67,7 @@ func _init() -> void:
 	var default_settings = FAG_Settings.set_default_setting_from_object(self, "CAMERA3D_SETTINGS_", [
 		"keyboard_move_step",
 		"keyboard_move_step_multiplier",
-		"keyboard_zoom_step",
+		"keyboard_zoom_fov_step",
 		"keyboard_rotation_step",
 		
 		"button_move_step_z",
@@ -92,13 +96,17 @@ func _init() -> void:
 		"CAMERA_ROTATE_RIGHT": [{"key": KEY_KP_PERIOD}],
 		"CAMERA_ROTATE_DOWN": [{"key": KEY_KP_7}],
 		"CAMERA_ROTATE_UP": [{"key": KEY_KP_1}],
-		"CAMERA_FOV_ZOOM_IN": [{"key": KEY_KP_ADD}],
-		"CAMERA_FOV_ZOOM_OUT": [{"key": KEY_KP_SUBTRACT}],
+		"CAMERA_FOV_ZOOM_IN": [{"key": KEY_KP_MULTIPLY}],
+		"CAMERA_FOV_ZOOM_OUT": [{"key": KEY_KP_DIVIDE}],
+		"CAMERA_SMOOTH_ZOOM_IN": [{"key": KEY_KP_ADD}],
+		"CAMERA_SMOOTH_ZOOM_IN_FAST": [{"key": KEY_KP_ADD, "shift": true}],
+		"CAMERA_SMOOTH_ZOOM_OUT": [{"key": KEY_KP_SUBTRACT}],
+		"CAMERA_SMOOTH_ZOOM_OUT_FAST": [{"key": KEY_KP_SUBTRACT, "shift": true}],
 		
-		"CAMERA_ZOOM_IN": [{"button": MOUSE_BUTTON_WHEEL_UP}],
-		"CAMERA_ZOOM_IN_FAST": [{"button": MOUSE_BUTTON_WHEEL_UP, "shift": true}],
-		"CAMERA_ZOOM_OUT": [{"button": MOUSE_BUTTON_WHEEL_DOWN}],
-		"CAMERA_ZOOM_OUT_FAST": [{"button": MOUSE_BUTTON_WHEEL_DOWN, "shift": true}],
+		"CAMERA_STEP_ZOOM_IN": [{"button": MOUSE_BUTTON_WHEEL_UP}],
+		"CAMERA_STEP_ZOOM_IN_FAST": [{"button": MOUSE_BUTTON_WHEEL_UP, "shift": true}],
+		"CAMERA_STEP_ZOOM_OUT": [{"button": MOUSE_BUTTON_WHEEL_DOWN}],
+		"CAMERA_STEP_ZOOM_OUT_FAST": [{"button": MOUSE_BUTTON_WHEEL_DOWN, "shift": true}],
 		
 		"CAMERA_MOUSE_ROTATE": [{"button": MOUSE_BUTTON_MIDDLE}],
 		"CAMERA_MOUSE_MOVE": [{"button": MOUSE_BUTTON_MIDDLE, "shift": true}],
@@ -128,6 +136,7 @@ func _ready() -> void:
 var _move := Vector3.ZERO
 var _move_valid := false
 var _rotation := Vector2.ZERO
+var _zoom_z := 0.0
 var _fov := 0.0
 
 func _camera_keyboard_input(event: InputEvent) -> void:
@@ -136,7 +145,8 @@ func _camera_keyboard_input(event: InputEvent) -> void:
 		"CAMERA_MOVE_FRONT", "CAMERA_MOVE_FRONT_FAST", "CAMERA_MOVE_BACK", "CAMERA_MOVE_BACK_FAST",
 		"CAMERA_MOVE_LEFT", "CAMERA_MOVE_LEFT_FAST", "CAMERA_MOVE_RIGHT", "CAMERA_MOVE_RIGHT_FAST",
 		"CAMERA_MOVE_UP", "CAMERA_MOVE_UP_FAST", "CAMERA_MOVE_DOWN", "CAMERA_MOVE_DOWN_FAST",
-		"CAMERA_FOV_ZOOM_IN", "CAMERA_FOV_ZOOM_OUT",
+		"CAMERA_SMOOTH_ZOOM_IN", "CAMERA_SMOOTH_ZOOM_OUT",
+		"CAMERA_FOV_ZOOM_IN", "CAMERA_SMOOTH_ZOOM_IN_FAST", "CAMERA_FOV_ZOOM_OUT", "CAMERA_SMOOTH_ZOOM_OUT_FAST",
 		"CAMERA_ROTATE_LEFT", "CAMERA_ROTATE_RIGHT", "CAMERA_ROTATE_DOWN", "CAMERA_ROTATE_UP"
 	]:
 		if FAG_Utils.action_exact_match(action, event):
@@ -219,13 +229,24 @@ func _camera_keyboard_input(event: InputEvent) -> void:
 	else:
 		_rotation.x = 0
 	
+	if FAG_Utils.action_exact_match_pressed("CAMERA_SMOOTH_ZOOM_IN"):
+		_zoom_z = -keyboard_zoom_step
+	elif FAG_Utils.action_exact_match_pressed("CAMERA_SMOOTH_ZOOM_OUT"):
+		_zoom_z = keyboard_zoom_step
+	elif FAG_Utils.action_exact_match_pressed("CAMERA_SMOOTH_ZOOM_IN_FAST"):
+		_zoom_z = -keyboard_zoom_step_fast
+	elif FAG_Utils.action_exact_match_pressed("CAMERA_SMOOTH_ZOOM_OUT_FAST"):
+		_zoom_z = keyboard_zoom_step_fast
+	else:
+		_zoom_z = 0
+	
 	if FAG_Utils.action_exact_match_pressed("CAMERA_FOV_ZOOM_IN") and FAG_Utils.action_exact_match_pressed("CAMERA_FOV_ZOOM_OUT"):
 		_fov = 0
 		_camera.fov = _default_fov
 	elif FAG_Utils.action_exact_match_pressed("CAMERA_FOV_ZOOM_IN"):
-		_fov = -keyboard_zoom_step
+		_fov = -keyboard_zoom_fov_step
 	elif FAG_Utils.action_exact_match_pressed("CAMERA_FOV_ZOOM_OUT"):
-		_fov = keyboard_zoom_step
+		_fov = keyboard_zoom_fov_step
 	else:
 		_fov = 0
 
@@ -248,6 +269,9 @@ func _process(_delta: float) -> void:
 	if _rotation.x:
 		_update_pitch(_rotation.x * delta)
 	
+	if _zoom_z:
+		_translate(Vector3(0, 0, _zoom_z * delta))
+	
 	if _fov:
 		_update_zoom(_fov * delta)
 
@@ -258,13 +282,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_camera_keyboard_input(event)
 	if event is InputEventWithModifiers:
 		# using event with echo for support mouse scroll and keyboard shortcuts here
-		if FAG_Utils.action_exact_match_pressed("CAMERA_ZOOM_IN", event, true):
+		if FAG_Utils.action_exact_match_pressed("CAMERA_STEP_ZOOM_IN", event, true):
 			_translate(Vector3(0, 0, -button_move_step_z))
-		elif FAG_Utils.action_exact_match_pressed("CAMERA_ZOOM_IN_FAST", event, true):
+		elif FAG_Utils.action_exact_match_pressed("CAMERA_STEP_ZOOM_IN_FAST", event, true):
 			_translate(Vector3(0, 0, -button_move_step_z * button_move_step_z_multiplier))
-		elif FAG_Utils.action_exact_match_pressed("CAMERA_ZOOM_OUT", event, true):
+		elif FAG_Utils.action_exact_match_pressed("CAMERA_STEP_ZOOM_OUT", event, true):
 			_translate(Vector3(0, 0, button_move_step_z))
-		elif FAG_Utils.action_exact_match_pressed("CAMERA_ZOOM_OUT_FAST", event, true):
+		elif FAG_Utils.action_exact_match_pressed("CAMERA_STEP_ZOOM_OUT_FAST", event, true):
 			_translate(Vector3(0, 0, button_move_step_z * button_move_step_z_multiplier))
 	if event is InputEventMouseMotion:
 		if FAG_Utils.action_exact_match_pressed("CAMERA_MOUSE_ROTATE"):

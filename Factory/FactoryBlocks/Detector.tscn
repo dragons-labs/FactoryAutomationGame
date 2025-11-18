@@ -13,7 +13,7 @@ size = Vector3(1, 0.5, 1)
 script = ExtResource("2_enkqh")
 ui_name = "FACTORY_BLOCK_NAME_Detector"
 ui_icon = ExtResource("1_ne86n")
-object_subtype = "Detector"
+object_type = "Detector"
 metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]

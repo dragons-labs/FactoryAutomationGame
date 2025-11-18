@@ -56,7 +56,6 @@ func transfer_object_to_factory_block(node : RigidBody3D):
 	node.custom_integrator = true
 	FAG_FactoryBlockConveyor.set_object_speed(node, Vector3.ZERO)
 	_new_accepted_object = true
-	#_factory_root.factory_control.set_signal_value(get_meta("in_game_name", "") + "object_inside", 3.3)
 
 func _on_factory_process(_time : float, _delta_time : float):
 	if _new_accepted_object and _object[0] and _object[1]:

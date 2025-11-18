@@ -15,7 +15,7 @@ material = SubResource("StandardMaterial3D_ts5lk")
 script = ExtResource("1_4n0at")
 ui_name = "FACTORY_BLOCK_NAME_SimpleFactoryBlock"
 ui_icon = ExtResource("1_ukid1")
-object_subtype = "SimpleBlock"
+object_type = "SimpleBlock"
 metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]

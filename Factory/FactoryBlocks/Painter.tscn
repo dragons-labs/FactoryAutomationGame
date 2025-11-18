@@ -19,7 +19,7 @@ exclusive_owner = true
 speed = 0.6
 ui_name = "FACTORY_BLOCK_NAME_Painter"
 ui_icon = ExtResource("1_cmfor")
-object_subtype = "Painter"
+object_type = "Painter"
 metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]

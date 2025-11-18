@@ -56,7 +56,7 @@ var supported_blocks := [
 	"SimpleFactoryBlock",
 	"ConveyorBelt",
 	"ComputerControlBlock",
-	"ElectronicControlBlock",
+	"ElectronicControlBlock", "GPIOExpander",
 	"Painter",
 	"ConveyorSplitter", "ConveyorFastSplitter", "Welder", "Detector"
 ]

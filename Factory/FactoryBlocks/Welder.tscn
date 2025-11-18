@@ -17,7 +17,7 @@ size = Vector3(1, 0.5, 0.89)
 script = ExtResource("1_kb8ux")
 ui_name = "FACTORY_BLOCK_NAME_Welder"
 ui_icon = ExtResource("1_43dem")
-object_subtype = "Welder"
+object_type = "Welder"
 metadata/_custom_type_script = "uid://bxicm2k6m7lkg"
 
 [node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
