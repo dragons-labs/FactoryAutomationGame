@@ -65,18 +65,11 @@ func load_level(level_id : String, save_dir := "") -> void:
 				computer_config[id]["computer_output_names"] = []
 			
 		$FactoryControl.computer_systems_configuration = computer_config
-	factory_builder.defualt_computer_system_id = level_scene_node.defualt_computer_system_id
 	
 	# run register_factory_signals on static blocks
 	for element in level_scene_node.get_node("FactoryBlocks").get_children():
-		if "factory_signals" in element:
-			factory_control.register_factory_signals(
-				element.factory_signals[0],
-				element.factory_signals[1],
-				element.factory_signals[2],
-				element.get_meta("in_game_name", ""),
-				element.get_meta("using_computer_id", factory_builder.defualt_computer_system_id),
-			)
+		if "init" in element:
+			element.init(self)
 	
 	level_scene_node.init(self, level_id, save_dir != "")
 	add_child(level_scene_node)
@@ -353,7 +346,10 @@ func _on_simulation_error() -> void:
 	)
 
 func _on_conflict_error(info : Array) -> void:
-	printerr("electronic circuit / computer system #" + str(info[2]) + " conflict: "  + str(info[3]) + " vs " + str(info[4]) + " in get_signal_value")
+	if len(info) == 6:
+		printerr("computer system #" + str(info[5]) + " / computer system #" + str(info[2]) + " conflict: "  + str(info[3]) + " vs " + str(info[4]) + " in get_signal_value")
+	else:
+		printerr("electronic circuit / computer system #" + str(info[2]) + " conflict: "  + str(info[3]) + " vs " + str(info[4]) + " in get_signal_value")
 	emergency_stop(
 		"FACTORY_CIRCUT_COMPUTER_CONFLICT_ERROR_TITLE",
 		"FACTORY_CIRCUT_COMPUTER_CONFLICT_ERROR_TEXT"

@@ -3,41 +3,53 @@
 
 extends FAG_FactoryBlockConveyor
 
-const factory_signals = [
-	# block outputs (to control system)
-	{
-		"splitter_object_inside"   : ["splitter_object_inside_@in", "v_splitter_object_inside"],
-	},
-	# block inputs (from control system)
-	{
-		"splitter_redirect_forward" : ["splitter_redirect_forward_@out"],
-		"splitter_redirect_to_left" : ["splitter_redirect_to_left_@out"],
-		"splitter_redirect_to_right" : ["splitter_redirect_to_right_@out"],
-	},
-	# extra circuit elements for this block
-	[]
-]
+const _block_signals_outputs := {
+	"splitter_object_inside"   : ["splitter_object_inside_@in", "v_splitter_object_inside"],
+}
+const _block_signals_inputs := {
+	"splitter_redirect_forward" : ["splitter_redirect_forward_@out"],
+	"splitter_redirect_to_left" : ["splitter_redirect_to_left_@out"],
+	"splitter_redirect_to_right" : ["splitter_redirect_to_right_@out"],
+}
+var _factory_root
+var _factory_control
+var _name_prefix
+
+func init(factory_root):
+	_factory_root = factory_root
+	_factory_control = _factory_root.factory_control
+	
+	_name_prefix = handle_name_prefix(self, $Label3D)
+	
+	_factory_root.factory_stop.connect(_on_factory_start_stop)
+	_factory_root.factory_start.connect(_on_factory_start_stop)
+	
+	_factory_control.factory_tick.connect(_on_factory_process)
+	_factory_control.register_factory_signals(
+		_block_signals_outputs, _block_signals_inputs, [],
+		get_meta("in_game_name", ""), get_meta("using_computer_id", ""),
+	)
+	
+	_area.body_entered.connect(_on_object_enter_block)
+	_area.body_exited.connect(_on_object_exit_block)
+	
+	on_transform_update()
+
+func deinit():
+	_factory_control.unregister_factory_signals(
+		_block_signals_outputs, _block_signals_inputs, [],
+		get_meta("in_game_name", ""), get_meta("using_computer_id", ""),
+	)
+
+func on_transform_update():
+	on_block_transform_updated(_area)
+
 
 @onready var _area := $Area3D
-@onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
-@onready var _name_prefix := FAG_FactoryBlock.handle_name_prefix(self, $Label3D)
 
 var _object = null
 var _waiting_object = null
 var _new_accepted_object := false
-var _factory_control = null
-
-func _ready():
-	_area.body_entered.connect(_on_object_enter_block)
-	_area.body_exited.connect(_on_object_exit_block)
-	_factory_root.factory_start.connect(_on_factory_start_stop)
-	_factory_root.factory_stop.connect(_on_factory_start_stop)
-	_factory_control = _factory_root.factory_control
-	_factory_control.factory_tick.connect(_on_factory_process)
-	on_transform_update()
-
-func on_transform_update():
-	on_block_transform_updated(_area)
 
 func _on_factory_start_stop() -> void:
 	if not is_inside_tree():

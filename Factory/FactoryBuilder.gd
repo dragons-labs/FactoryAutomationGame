@@ -10,9 +10,8 @@ extends Node3D
 @export_group("Factory Basic Settings")
 
 @export var factory_control : Node
+@export var factory_root : Node
 @export var factory_blocks_main_node : Node3D
-@export var defualt_computer_system_id = 0
-
 @export_group("Factory World Size Settings")
 
 @export var grid_size := Vector3(1, 1, 1)
@@ -112,27 +111,15 @@ func _remove_subnodes(destination : Node3D) -> void:
 func _on_block_add(element : Node3D) -> void:
 	if "object_subtype" in element and element.object_subtype == "ComputerControlBlock":
 		factory_control.setup_computer_control_blocks(element)
-	elif "factory_signals" in element:
-		factory_control.register_factory_signals(
-			element.factory_signals[0],
-			element.factory_signals[1],
-			element.factory_signals[2],
-			element.get_meta("in_game_name", ""),
-			element.get_meta("using_computer_id", defualt_computer_system_id),
-		)
+	elif "init" in element:
+		element.init(factory_root)
 	on_block_add.emit(element)
 
 func _on_block_remove(element : Node3D) -> void:
 	if "object_subtype" in element and element.object_subtype == "ComputerControlBlock":
 		factory_control.remove_computer_control_blocks(element)
-	elif "factory_signals" in element:
-		factory_control.unregister_factory_signals(
-			element.factory_signals[0],
-			element.factory_signals[1],
-			element.factory_signals[2],
-			element.get_meta("in_game_name", ""),
-			element.get_meta("using_computer_id", defualt_computer_system_id),
-		)
+	elif "deinit" in element:
+		element.deinit()
 	on_block_remove.emit(element)
 
 
@@ -262,8 +249,6 @@ func _add_element(block_name := "") -> void:
 		undo_redo.add_do_method(_on_block_add.bind(element))
 		undo_redo.add_undo_method(factory_blocks_main_node.remove_child.bind(element))
 		undo_redo.add_undo_method(_on_block_remove.bind(element))
-		undo_redo.add_do_method(_on_element_transform_update.bind(element))
-		undo_redo.add_undo_method(_on_element_transform_update.bind(element))
 		undo_redo.commit_action()
 		element.owner = factory_blocks_main_node
 

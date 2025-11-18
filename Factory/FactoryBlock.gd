@@ -22,30 +22,22 @@ func get_rids() -> Array:
 		return [get_node("FactoryElementPhysics").get_rid()]
 	return []
 
-# definition of input / output signal for this block
+# optional function called by FactoryBuilder:
+# 
+# func init(factory_root):
+#   # called after placing the block in the factory
+#   #  after `_read()`, but (unlike `_read()`) only when it has been placed
+#   # used to init internal state and register signals
 #
-# this variable is optional, it can be defined in derivered class or script
-# (it is used only for for player addable blocks with input/output signal)
-#
-# value of `in_game_name` meta (if set and not empty) with `_`
-# will be used as prefix for signals names
-#
-# see FactoryControl.register_factory_signals for details
-#
-# const factory_signals = [
-# 	# block outputs (to control system)
-# 	{},
-# 	# block inputs (from control system)
-# 	{},
-# 	# extra circuit elements for this block
-# 	[]
-# ]
-
-# optional callback from FactoryBuilder to block
-# used by block which requires updating their internal state
-# after performing 3D transformations (rotation, mirror) on block
+# func deinit():
+#   # called when block is removing from factory
+#   #  after removed from scene tree
+#   # used to unregister signals
 #
 # func on_transform_update():
+#   # called when 3D transform was updated (after rotate and mirror)
+#   # used by block which requires updating their internal state in this situation
+#   # not called placement (so should be called via `_read()` or `init()` also)
 
 
 static func handle_name_prefix(object : Object, label: Label3D = null) -> String:

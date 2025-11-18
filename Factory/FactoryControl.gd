@@ -29,24 +29,27 @@ func _get_signal_value(signal_name : String) -> Array:
 		var computer_system = computer_control_blocks[computer_id].get_child(0)
 		if computer_system.is_running_and_ready() and signal_name in computer_system.computer_output_names:
 			# NOTE controlling this same signal by multiple computer system is not supported here
-			value2 = computer_system.get_signal_value(signal_name, null)
-			value2_source = computer_id
-			break
+			var new_value = computer_system.get_signal_value(signal_name, null)
+			if new_value != null:
+				if value2 == null:
+					value2 = float(new_value)
+					value2_source = computer_id
+				elif not is_equal_approx(float(new_value), value2):
+					return [0, CONFLICT, value2_source, float(new_value), value2, computer_id]
 	
 	if value2 == null:
 		value2 = internal_signals_values.get(signal_name)
 		value2_source = "internal"
 	
-	if value1 != null and value2 != null and value2 != "":
-		value2 = float(value2)
+	if value1 != null and value2 != null:
 		if not is_equal_approx(value1, value2):
 			return [0, CONFLICT, value2_source, value1, value2]
 		else:
 			return [value2, COMPUTER, value2_source]
 	elif value1 != null:
 		return [value1, ELECTRONICS]
-	elif value2 != null and value2 != "":
-		return [float(value2), COMPUTER, value2_source]
+	elif value2 != null:
+		return [value2, COMPUTER, value2_source]
 	else:
 		return [0, NONE]
 
@@ -198,12 +201,8 @@ func close() -> void:
 ##     non-empty for per-block signals, empty for level-scope signals to avoid add it for nets like `Vcc`
 ##  - computer_id:
 ##     computer id to register signals
-func register_factory_signals(inputs_from_factory : Dictionary, outputs_to_factory : Dictionary, circuit_entries : Array, name_prefix : String, computer_id : Variant):
-	# get computer system to set input / outputs
-	var computer_system_simulator = null
-	if computer_id in computer_control_blocks:
-		computer_system_simulator = computer_control_blocks[computer_id].get_child(0)
-	
+##     null (default) to register in all computers
+func register_factory_signals(inputs_from_factory : Dictionary, outputs_to_factory : Dictionary, circuit_entries : Array, name_prefix : String, computer_id : Variant = ""):
 	if name_prefix:
 		name_prefix += "_"
 	
@@ -222,10 +221,11 @@ func register_factory_signals(inputs_from_factory : Dictionary, outputs_to_facto
 		input_to_circuit_from_factory[signal_name2][1] = voltage_source_name.substr(0, split_position) + name_prefix + voltage_source_name.substr(split_position)
 		# if signal is external controlled add it to computers system configuration
 		if FAG_Utils.array_get(input_to_circuit_from_factory[signal_name2], 2) in [null, "external"]:
-			computer_systems_configuration[computer_id].computer_input_names.append(signal_name2)
-			# if computer is running register signal in it via message bus
-			if computer_system_simulator:
-				computer_system_simulator.set_signal_value(signal_name2, 0)
+			for cid in computer_systems_configuration if computer_id == "" else {computer_id: null}:
+				computer_systems_configuration[cid].computer_input_names.append(signal_name2)
+				# if computer is running register signal in it via message bus
+				if cid in computer_control_blocks:
+					computer_control_blocks[cid].get_child(0).set_signal_value(signal_name2, 0)
 	
 	# control blocks outputs (to factory)
 	for signal_name in outputs_to_factory:
@@ -237,20 +237,17 @@ func register_factory_signals(inputs_from_factory : Dictionary, outputs_to_facto
 		# add netname to netnames list
 		netnames.append(outputs_from_circuit_to_factory[signal_name2][0])
 		# add signal to computers system configuration
-		computer_systems_configuration[computer_id].computer_output_names.append(signal_name2)
-		# if computer is running register signal in it via message bus
-		if computer_system_simulator:
-			computer_system_simulator.add_computer_output(signal_name2)
+		for cid in computer_systems_configuration if computer_id == "" else {computer_id: null}:
+			computer_systems_configuration[cid].computer_output_names.append(signal_name2)
+			# if computer is running register signal in it via message bus
+			if cid in computer_control_blocks:
+				computer_control_blocks[cid].get_child(0).add_computer_output(signal_name2)
 	
 	# extra circuit entries
 	for circuit_entry in circuit_entries:
 		external_circuit_entries.append(circuit_entry.format([name_prefix]))
 
-func unregister_factory_signals(inputs_from_factory : Dictionary, outputs_to_factory : Dictionary, circuit_entries : Array, name_prefix : String, computer_id : Variant):
-	var computer_system_simulator = null
-	if computer_id in computer_control_blocks:
-		computer_system_simulator = computer_control_blocks[computer_id].get_child(0)
-	
+func unregister_factory_signals(inputs_from_factory : Dictionary, outputs_to_factory : Dictionary, circuit_entries : Array, name_prefix : String, computer_id : Variant = ""):
 	if name_prefix:
 		name_prefix += "_"
 	
@@ -258,18 +255,20 @@ func unregister_factory_signals(inputs_from_factory : Dictionary, outputs_to_fac
 		var signal_name2 = name_prefix + signal_name
 		netnames.erase(input_to_circuit_from_factory[signal_name2][0])
 		if signal_name2 in input_to_circuit_from_factory and FAG_Utils.array_get(input_to_circuit_from_factory[signal_name2], 2) in [null, "external"]:
-			computer_systems_configuration[computer_id].computer_input_names.erase(signal_name2)
-			if computer_system_simulator:
-				computer_system_simulator.remove_computer_input(signal_name2)
+			for cid in computer_systems_configuration if computer_id == "" else {computer_id: null}:
+				computer_systems_configuration[cid].computer_input_names.erase(signal_name2)
+				if cid in computer_control_blocks:
+					computer_control_blocks[cid].get_child(0).remove_computer_input(signal_name2)
 		input_to_circuit_from_factory.erase(signal_name2)
 	
 	for signal_name in outputs_to_factory:
 		var signal_name2 = name_prefix + signal_name
 		netnames.erase(outputs_from_circuit_to_factory[signal_name2][0])
 		outputs_from_circuit_to_factory.erase(signal_name2)
-		computer_systems_configuration[computer_id].computer_output_names.erase(signal_name2)
-		if computer_system_simulator:
-			computer_system_simulator.remove_computer_output(signal_name2)
+		for cid in computer_systems_configuration if computer_id == "" else {computer_id: null}:
+			computer_systems_configuration[cid].computer_output_names.erase(signal_name2)
+			if cid in computer_control_blocks:
+				computer_control_blocks[cid].get_child(0).remove_computer_output(signal_name2)
 	
 	for circuit_entry in circuit_entries:
 		external_circuit_entries.erase(circuit_entry.format([name_prefix]))

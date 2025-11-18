@@ -39,7 +39,6 @@ var computer_systems_configuration := {
 		# "memory_size" : "192M"
 	}
 }
-var defualt_computer_system_id = 0
 
 ## factory block settings
 var supported_blocks := [
@@ -101,8 +100,7 @@ func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 		{},
 		# (global level) extra circuit elements
 		[],
-		"",
-		defualt_computer_system_id
+		""
 	)
 	# NOTE register_factory_signals will be also (automatically) called on
 	#      all children (having `factory_signals`) of `FactoryBlocks` child of main root of level scene

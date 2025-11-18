@@ -8,8 +8,8 @@
 [ext_resource type="PackedScene" uid="uid://nw7mcpisrwv6" path="res://Factory/FactoryBlocks/SimpleBlock.tscn" id="4_wpvne"]
 [ext_resource type="PackedScene" uid="uid://b5boyct3stll1" path="res://Factory/FactoryBlocks/Producer.tscn" id="5_u6lyq"]
 [ext_resource type="PackedScene" uid="uid://ilbgjjdg2jch" path="res://Factory/FactoryBlocks/Consumer.tscn" id="6_a113l"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ElectronicControlBlock.tscn" id="7_q855b"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/ComputerControlBlock.tscn" id="8_flw0k"]
+[ext_resource type="PackedScene" uid="uid://blbqlpktptnhn" path="res://Factory/FactoryBlocks/ElectronicControlBlock.tscn" id="7_q855b"]
+[ext_resource type="PackedScene" uid="uid://3opcwol2ss6p" path="res://Factory/FactoryBlocks/ComputerControlBlock.tscn" id="8_flw0k"]
 [ext_resource type="PackedScene" uid="uid://djw56v5wqttyd" path="res://Factory/FactoryBlocks/Painter.tscn" id="9_xypg3"]
 [ext_resource type="PackedScene" uid="uid://cskpx42qtrwba" path="res://Factory/FactoryBlocks/ConveyorSplitter.tscn" id="10_gofsm"]
 [ext_resource type="PackedScene" uid="uid://bjsmgjs7sq5q4" path="res://Factory/FactoryBlocks/Welder.tscn" id="11_aa"]
@@ -19,9 +19,15 @@
 [node name="FactoryRoot" type="Node3D"]
 script = ExtResource("1_88vxl")
 
-[node name="FactoryBuilder" parent="." node_paths=PackedStringArray("factory_control") instance=ExtResource("2_ncfa0")]
+[node name="FactoryBuilder" parent="." node_paths=PackedStringArray("factory_control", "factory_root") instance=ExtResource("2_ncfa0")]
 elements = Array[PackedScene]([ExtResource("4_wpvne"), ExtResource("5_u6lyq"), ExtResource("6_a113l"), ExtResource("7_q855b"), ExtResource("8_flw0k"), ExtResource("4_ipc57"), ExtResource("12_oom2c"), ExtResource("10_gofsm"), ExtResource("11_f8ngn"), ExtResource("9_xypg3"), ExtResource("11_aa")])
 factory_control = NodePath("../FactoryControl")
+factory_root = NodePath("..")
+grid_size = Vector3(1, 1, 1)
+ray_length = 300
+attachable_objects_collision_mask = 4294967295
+blocking_space_objects_collision_mask = 4294967295
+mouse_y_distance_per_scale_step = 30
 
 [node name="FactoryControl" parent="." instance=ExtResource("2_cmtbq")]
 

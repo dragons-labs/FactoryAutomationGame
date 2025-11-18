@@ -3,34 +3,43 @@
 
 extends FAG_FactoryBlock
 
-const factory_signals = [
-	# block outputs (to control system)
-	{
-		"producer_object_ready"   : ["producer_object_ready_@in", "v_producer_object_ready"],
-	},
-	# block inputs (from control system)
-	{
-		"producer_control_enabled" : ["producer_control_enabled_@out"],
-		"producer_release_object" : ["producer_release_object_@out"],
-	},
-	# extra circuit elements for this block
-	[]
-]
+const _block_signals_outputs := {
+	"producer_object_ready"   : ["producer_object_ready_@in", "v_producer_object_ready"],
+}
+const _block_signals_inputs := {
+	"producer_control_enabled" : ["producer_control_enabled_@out"],
+	"producer_release_object" : ["producer_release_object_@out"],
+}
+var _factory_root
+var _factory_control
+var _name_prefix
+
+func init(factory_root):
+	_factory_root = factory_root
+	_factory_control = _factory_root.factory_control
+	
+	_name_prefix = handle_name_prefix(self, $Label3D)
+	
+	_factory_root.factory_stop.connect(_on_factory_stop)
+	_factory_root.factory_start.connect(_on_factory_start)
+	
+	_factory_control.register_factory_signals(
+		_block_signals_outputs, _block_signals_inputs, [],
+		get_meta("in_game_name", ""), get_meta("using_computer_id", ""),
+	)
+
+func deinit():
+	_factory_control.unregister_factory_signals(
+		_block_signals_outputs, _block_signals_inputs, [],
+		get_meta("in_game_name", ""), get_meta("using_computer_id", ""),
+	)
+
 
 @export var object : RigidBody3D
 @export var timer_period := 1.0
 
-@onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
-@onready var _name_prefix := FAG_FactoryBlock.handle_name_prefix(self, $Label3D)
-
 var _object_is_ready := false
 var _timer = null
-var _factory_control = null
-
-func _ready() -> void:
-	_factory_root.factory_stop.connect(_on_factory_stop)
-	_factory_root.factory_start.connect(_on_factory_start)
-	_factory_control = _factory_root.factory_control
 
 func _on_timer_timeout(delay : float) -> void:
 	if _factory_control.get_signal_value(_name_prefix + "producer_control_enabled") > 2:
@@ -62,4 +71,4 @@ func _on_factory_start() -> void:
 		return
 	_timer = _factory_control.create_timer(timer_period, false)
 	_timer.timeout.connect(_on_timer_timeout)
-	_release_object()
+	_on_timer_timeout(0.0)

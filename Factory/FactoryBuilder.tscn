@@ -7,8 +7,6 @@
 [node name="FactoryBuilder" type="Node3D"]
 script = ExtResource("1_51ivo")
 elements = null
-computer_systems_configuration = null
-defualt_computer_system_id = null
 grid_size = null
 ray_length = null
 attachable_objects_collision_mask = null
