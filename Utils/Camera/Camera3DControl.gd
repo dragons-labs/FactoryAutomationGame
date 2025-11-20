@@ -9,8 +9,8 @@ extends Node3D
 @export var keyboard_move_step_multiplier  := 5.0
 ## move step into camera direction while using keybord (CAMERA_SMOOTH_ZOOM_IN / CAMERA_SMOOTH_ZOOM_OUT)
 @export var keyboard_zoom_step := 4.0
-## move step into camera direction while using keybord (CAMERA_SMOOTH_ZOOM_IN_FAST / CAMERA_SMOOTH_ZOOM_OUT_FAST)
-@export var keyboard_zoom_step_fast := 17.0
+## multiplier for [member keyboard_zoom_step] used on _FAST variant of action
+@export var keyboard_zoom_step_multiplier := 4.0
 ## zoom (change [member Camera3D.fov]) step for keyboard actions (CAMERA_FOV_ZOOM_IN and CAMERA_FOV_ZOOM_OUT keys, use both for reset FOV to default)
 @export var keyboard_zoom_fov_step := 60
 ## rotation step for keyboard actions (CAMERA_ROTATE_LEFT, CAMERA_ROTATE_RIGHT, CAMERA_ROTATE_DOWN and CAMERA_ROTATE_UP keys)
@@ -67,6 +67,8 @@ func _init() -> void:
 	var default_settings = FAG_Settings.set_default_setting_from_object(self, "CAMERA3D_SETTINGS_", [
 		"keyboard_move_step",
 		"keyboard_move_step_multiplier",
+		"keyboard_zoom_step",
+		"keyboard_zoom_step_multiplier",
 		"keyboard_zoom_fov_step",
 		"keyboard_rotation_step",
 		
@@ -230,13 +232,13 @@ func _camera_keyboard_input(event: InputEvent) -> void:
 		_rotation.x = 0
 	
 	if FAG_Utils.action_exact_match_pressed("CAMERA_SMOOTH_ZOOM_IN"):
-		_zoom_z = -keyboard_zoom_step
+		_zoom_z = -1
 	elif FAG_Utils.action_exact_match_pressed("CAMERA_SMOOTH_ZOOM_OUT"):
-		_zoom_z = keyboard_zoom_step
+		_zoom_z = 1
 	elif FAG_Utils.action_exact_match_pressed("CAMERA_SMOOTH_ZOOM_IN_FAST"):
-		_zoom_z = -keyboard_zoom_step_fast
+		_zoom_z = -keyboard_zoom_step_multiplier
 	elif FAG_Utils.action_exact_match_pressed("CAMERA_SMOOTH_ZOOM_OUT_FAST"):
-		_zoom_z = keyboard_zoom_step_fast
+		_zoom_z = keyboard_zoom_step_multiplier
 	else:
 		_zoom_z = 0
 	
@@ -270,7 +272,7 @@ func _process(_delta: float) -> void:
 		_update_pitch(_rotation.x * delta)
 	
 	if _zoom_z:
-		_translate(Vector3(0, 0, _zoom_z * delta))
+		_translate(Vector3(0, 0, _zoom_z * keyboard_zoom_step * delta))
 	
 	if _fov:
 		_update_zoom(_fov * delta)

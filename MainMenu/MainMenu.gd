@@ -89,33 +89,8 @@ func _on_settings_pressed() -> void:
 	var relative_size := Vector2(0.55, 0.55)
 	%SettingsDialog.custom_minimum_size = screen_size * relative_size
 	#%SettingsDialog.position = screen_size * (Vector2(1, 1)-relative_size) * 0.5
-	FAG_Settings.reinit_settings_ui(%SettingsList, %KeyReampInfo, _settings_order)
+	FAG_Settings.reinit_settings_ui(%SettingsDialog, %SettingsKeyReampDialog, _settings_order)
 	_set_mode(Mode.SETTINGS)
-
-
-### "Settings" submenu support (also in `_input` and `_unhandled_input`)
-
-func _on_settings_cancel_pressed() -> void:
-	FAG_Settings.cancel_settings_changes()
-	_set_mode(Mode.NORMAL)
-
-func _on_settings_reset_pressed() -> void:
-	FAG_Settings.reset_to_default_all()
-	_on_settings_pressed()
-
-func _on_settings_ok_pressed() -> void:
-	FAG_Settings.accept_settings_changes()
-	_set_mode(Mode.NORMAL)
-
-var _last_event_to_remap
-func _on_action_remap_ok_pressed() -> void:
-	FAG_Settings._on_action_remap_finish(_last_event_to_remap)
-
-func _on_action_remap_remove_pressed() -> void:
-	FAG_Settings._on_action_remap_finish(null)
-
-func _on_action_remap_cancel_pressed() -> void:
-	%KeyReampInfo.hide()
 
 
 ### "Load" submenu support
@@ -246,13 +221,13 @@ func _ready():
 			"finished_levels": {},
 			"unlocked_manuals": ["game", "game/credits"]
 		})
+	%SettingsDialog.visible = false
 	call_deferred("_show")
 
 func _input(event: InputEvent):
-	if FAG_Settings.action_rempaing and event is InputEventKey and event.pressed:
-		_last_event_to_remap = event
-		%KeyReampInfo_Key.text = event.as_text()
-	elif event.is_action_pressed("GLOBAL_BREAK", false, true):
+	if %SettingsKeyReampDialog.on_input(event):
+		return
+	if event.is_action_pressed("GLOBAL_BREAK", false, true):
 		_show()
 	elif event.is_action_pressed("GLOBAL_ESCAPE"):
 		if LimboConsole.is_open() and event is InputEventKey and event.physical_keycode == KEY_ESCAPE:
@@ -265,9 +240,7 @@ func _input(event: InputEvent):
 			_show()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if FAG_Settings.action_rempaing and event is InputEventMouseButton and event.pressed:
-		_last_event_to_remap = event
-		%KeyReampInfo_Key.text = event.as_text()
+	%SettingsKeyReampDialog.on_unhandled_input(event)
 
-func _on_subdialog_cancel_pressed() -> void:
+func _switch_to_normal() -> void:
 	_set_mode(Mode.NORMAL)

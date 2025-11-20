@@ -1,0 +1,19 @@
+keys,en,pl
+MAIN_MENU_SETTINGS_PRIMARY_KEY_TOOLTIP,Primary action shortcut. Click to change.,Podstawowy skrót klawiszowy dla akcji. Kliknij aby zmienić.
+MAIN_MENU_SETTINGS_SECONDARY_KEY_TOOLTIP,Secondary action shortcut. Click to change.,Dodatkowy skrót klawiszowy dla akcji. Kliknij aby zmienić.
+MAIN_MENU_SETTINGS_KEY_REMAP_TITLE,Changing key/button mapping,Zmiana mapowania klawiszy i przycisków
+MAIN_MENU_SETTINGS_UPDATE_KEY_MAPPING_FOR_%s,"Updating key/button mapping for:\n\n    %s\n\nPlease press key/button or keys/buttons combination and press OK or press 'Remove' to remove current mapping.","Aktualizacja klawisza dla:\n\n    %s\n\nProszę nacisnąć klawisz lub przycisk lub kombinację i nacisnąć OK lub nacisnąć 'Usuń' aby usunąć aktualne przypisanie."
+MAIN_MENU_SETTINGS_REMOVE_MAPPING,Remove,Usuń
+
+LOCALE_SETTINGS_GROUP_NAME,Locale settings,Ustawienia językowe
+LOCALE_SETTINGS_locale,Language,Język
+
+GRAPHICS_SETTINGS_GROUP_NAME,Graphics settings,Ustawienia graficzne
+ACTION_GRAPHICS_FULL_SCREEN,Switch fullscreen hot key,Przełącz pełny ekran
+GRAPHICS_SETTINGS_full_screen,Use fullscreen as default,Używaj trybu pełnoekranowego
+GRAPHICS_SETTINGS_antialiasing,Antialiasing,Antialiasing
+GRAPHICS_SETTINGS_antialiasing_TOOLTIP,"SSRL: Screen Space Roughness Limiter\nFXAA: Fast Approximate Anti-Aliasing (fast but will make the image look blurry)\nSMAA: Subpixel Morphological Antyaliasing (may produce clearer results than FXAA)\nTAA: Temporal Anti-Aliasing (jittering the camera and accumulating the images of the last rendered frames)\nFSR2: FidelityFX Super Resolution 2 (use upscaling for antialiasing)\nMSAA: MultiSample Anti-Aliasing (render in higher resolution and sampling pixels on edge)\nSSAA: SuperSampling Anti-Aliasing (render in higher resolution and downscale)","SSRL: Screen Space Roughness Limiter\nFXAA: Fast Approximate Anti-Aliasing (szybki ale powoduje rozmycie obrazu)\nSMAA: Subpixel Morphological Antyaliasing (może dawać lepsze efekty niż FXAA)\nTAA: Temporal Anti-Aliasing (porusza kamerą i akumuluje klatki w czasie)\nFSR2: FidelityFX Super Resolution 2 (używa upscalingu dla uzyskania obrazu w wyższej rozdzielczości na potrzeby antyaliasingu)\nMSAA: MultiSample Anti-Aliasing (renderuje obraz w wyższej rozdzielczości i próbkuje jedynie na krawędziach)\nSSAA: SuperSampling Anti-Aliasing (renderuje obraz w wyższej rozdzielczości i skaluje w dół)"
+GRAPHICS_SETTINGS_vsync,Vsync,Vsync
+GRAPHICS_SETTINGS_ui_scale,UI scale,Skalowanie interfejsu użytkownika
+GRAPHICS_SETTINGS_limit_fps,Limit FPS,Limituj ilość klatek
+GRAPHICS_SETTINGS_limit_fps_value,FPS limit value,Warość limitu klatek

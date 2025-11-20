@@ -15,7 +15,7 @@ extends Node
 				get_tree().root.set_mode(Window.MODE_EXCLUSIVE_FULLSCREEN)
 		full_screen = value
 
-@export_enum("Disabled", "SSRL", "FXAA", "TAA", "FSR2", "MSAA 2x", "MSAA 4x", "MSAA 8x", "SSAA 2.25x", "SSAA 4x") var antialiasing := "FSR2" :
+@export_enum("Disabled", "SSRL", "FXAA", "TAA", "FSR2", "MSAA 2x", "MSAA 4x", "MSAA 8x", "SSAA 2.25x", "SSAA 4x") var antialiasing := "Disabled" :
 	set(value):
 		print("Set antialiasing to: ", value)
 		RenderingServer.screen_space_roughness_limiter_set_active(false, 0.25, 0.18)
@@ -29,6 +29,8 @@ extends Node
 				RenderingServer.screen_space_roughness_limiter_set_active(true, 0.25, 0.18)
 			"FXAA":
 				get_viewport().screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA
+			"SMAA":
+				get_viewport().screen_space_aa = Viewport.SCREEN_SPACE_AA_SMAA
 			"TAA":
 				get_viewport().use_taa = true
 			"FSR2":
@@ -62,6 +64,22 @@ extends Node
 		get_tree().root.content_scale_factor = value
 		ui_scale = value
 
+@export var limit_fps := true:
+	set(value):
+		limit_fps = value
+		if limit_fps:
+			Engine.max_fps = limit_fps_value
+		else:
+			Engine.max_fps = 0
+
+@export var limit_fps_value := 60:
+	set(value):
+		limit_fps_value = value
+		if limit_fps:
+			Engine.max_fps = limit_fps_value
+		else:
+			Engine.max_fps = 0
+
 ## Name of settings group for this object. This allowing override some properties and input maps.
 ## Set to empty string to disable using settings (hide in settings menu, disallow override properties and key mapping).
 @export var settings_group_name := "GRAPHICS_SETTINGS_GROUP_NAME"
@@ -72,7 +90,9 @@ func _init() -> void:
 		"antialiasing",
 		"vsync",
 		"ui_scale",
-	])
+		"limit_fps",
+		["limit_fps_value", {"numeric_range": [30, 240, 30]}],
+	], true)
 	
 	var default_controls = FAG_Settings.set_default_controls_and_create_actions("ACTION_", {
 		"GRAPHICS_FULL_SCREEN": [{"key": KEY_ENTER, "alt": true}, {"key": KEY_F11}],

@@ -81,7 +81,7 @@ limbo_auto_complete_with_list={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://Utils/Camera/translate/Camera.en.translation", "res://Utils/WorldEditorUI/translate/WorldEditorUI.en.translation", "res://Utils/WebBrowser/translate/WebBrowser.en.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.en.translation", "res://ComputerSimulator/translate/ComputerSystemSimulator.en.translation", "res://MainMenu/translate/MainMenu.en.translation", "res://Manual/translate/Manual.en.translation", "res://Factory/translate/Factory.en.translation", "res://Factory/translate/Factory.pl.translation", "res://MainMenu/translate/MainMenu.pl.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.pl.translation")
+locale/translations=PackedStringArray("res://Utils/Camera/translate/Camera.en.translation", "res://Utils/WorldEditorUI/translate/WorldEditorUI.en.translation", "res://Utils/WebBrowser/translate/WebBrowser.en.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.en.translation", "res://ComputerSimulator/translate/ComputerSystemSimulator.en.translation", "res://MainMenu/translate/MainMenu.en.translation", "res://Manual/translate/Manual.en.translation", "res://Factory/translate/Factory.en.translation", "res://Factory/translate/Factory.pl.translation", "res://MainMenu/translate/MainMenu.pl.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.pl.translation", "res://Utils/Settings/translate/Settings.en.translation", "res://Utils/Settings/translate/Settings.pl.translation")
 
 [physics]
 

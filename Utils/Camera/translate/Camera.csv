@@ -23,11 +23,13 @@ CAMERA3D_SETTINGS_GROUP_NAME,Camera (3D)
 
 CAMERA3D_SETTINGS_keyboard_move_step,"Moving speed factor"
 CAMERA3D_SETTINGS_keyboard_move_step_multiplier,"Moving speed factor multiplier (on 'fast' action)"
-CAMERA3D_SETTINGS_keyboard_zoom_step,"FOV zoom speed factor"
+CAMERA3D_SETTINGS_keyboard_zoom_step,"Zoom speed factor"
+CAMERA3D_SETTINGS_keyboard_zoom_step_multiplier,"Zoom speed factor multiplier (on 'fast' action)"
+CAMERA3D_SETTINGS_keyboard_zoom_fov_step,"FOV zoom speed factor"
 CAMERA3D_SETTINGS_keyboard_rotation_step,"Rotating speed factor"
 
-CAMERA3D_SETTINGS_button_move_step_z,"Zoom speed factor (for zooming via moving 'into / out of screen' with button)"
-CAMERA3D_SETTINGS_button_move_step_z_multiplier,"Zoom speed factor multiplier (on 'fast' action)"
+CAMERA3D_SETTINGS_button_move_step_z,"Zoom speed factor (for zooming via moving 'into / out of screen' with scroll)"
+CAMERA3D_SETTINGS_button_move_step_z_multiplier,"Zoom speed factor multiplier (on 'fast' action with scroll)"
 
 CAMERA3D_SETTINGS_mouse_move_step,"Moving speed factor (when moving with the mouse)"
 CAMERA3D_SETTINGS_mouse_rotation_step,"Rotating speed factor (when rotating with the mouse)"

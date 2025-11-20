@@ -48,7 +48,7 @@ static func _get_prop_info(property_list : Array, prop_name : String) -> Diction
 			return prop_info
 	return {}
 
-static func set_default_setting_from_object(object : Object, tr_prefix : String, setting_list : Array) -> Dictionary:
+static func set_default_setting_from_object(object : Object, tr_prefix : String, setting_list : Array, call_setters := false) -> Dictionary:
 	var settings = {}
 	var props_info = object.get_property_list()
 	for setting_name in setting_list:
@@ -57,6 +57,8 @@ static func set_default_setting_from_object(object : Object, tr_prefix : String,
 			setting_info = setting_name[1]
 			setting_name = setting_name[0]
 		setting_info["default_value"] = object.get(setting_name)
+		if call_setters:
+			setting_info["call_setters"] = true
 		setting_info["ui_name"] = tr_prefix + setting_name
 		if not "possible_values" in setting_info:
 			var prop_info = _get_prop_info(props_info, setting_name)
@@ -81,6 +83,7 @@ func get_root_subnode(node : String) -> Node:
 var _all_settings := {}
 var _custom_values := {}
 var _custom_actions := {}
+var _setters_to_call := {}
 
 func register_settings(object : Object, group_name : String, settings : Dictionary, actions : Dictionary) -> void:
 	if group_name in _all_settings:
@@ -97,12 +100,17 @@ func register_settings(object : Object, group_name : String, settings : Dictiona
 				#     default_value → default value
 				#     ui_name → UI name (for translate)
 				#     possible_values → (optional) list of possible values for this setting
+				#     call_setters → (optional) if true call setters in `_ready()` of settings
+				#     numeric_range → (optional) array of [min, max, step], if set use numeric input instead of slider
 			"actions": actions,
 				# Dictionary:
 				#   key → action name (used in InputMap)
 				#   value[0] → default action events info – events_keys_info (Array of Dictionaries, argument of `register_action`)
 				#   value[1] → UI name
 		}
+	for setting_name in settings:
+		if settings[setting_name].get("call_setters", false):
+			_setters_to_call[[object, setting_name]] = settings[setting_name].default_value
 
 func reset_to_default(group_name : String) -> void:
 	_custom_values.clear()
@@ -126,13 +134,14 @@ func apply_custom(group_name : String) -> void:
 			for obj in _all_settings[group_name].objects:
 				if setting_name in obj:
 					obj.set(setting_name, value)
+					# cancel call default setter
+					_setters_to_call.erase([obj, setting_name])
 	if group_name in _custom_actions:
 		for action_name in _custom_actions[group_name]:
 			register_action(action_name, _custom_actions[group_name][action_name], true)
 
 func apply_custom_all() -> void:
 	for group_name in _all_settings:
-		
 		apply_custom(group_name)
 
 
@@ -175,6 +184,7 @@ func reset_settings_ui(ui_parent : Control) -> void:
 			c.queue_free()
 
 func reinit_settings_ui(ui_parent : Control, ui_remap_info : Control, ordered := []) -> void:
+	ui_parent = ui_parent.get_node("%SettingsList")
 	reset_settings_ui(ui_parent)
 	for group_name in ordered:
 		FAG_Settings.generate_settings_ui(group_name, ui_parent, ui_remap_info)
@@ -252,6 +262,9 @@ func _on_setting_value_changed(value : Variant, group_name : String, setting_nam
 
 func _ready() -> void:
 	load_from_file_and_apply()
+	# call setters for settings that require it not had custom value
+	for s in _setters_to_call:
+		s[0].set(s[1], _setters_to_call[s])
 
 func cancel_settings_changes() -> void:
 	reset_to_default_all()

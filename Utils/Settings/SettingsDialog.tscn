@@ -1,0 +1,338 @@
+[gd_scene load_steps=6 format=3 uid="uid://bntranin4w8tt"]
+
+[ext_resource type="Script" uid="uid://sip6m3sdhfpc" path="res://Utils/SliderWithValue.gd" id="1_0t2g5"]
+
+[sub_resource type="GDScript" id="GDScript_0t2g5"]
+resource_name = "SettingsDialog"
+script/source = "extends VBoxContainer
+
+signal on_setting_close()
+signal on_setting_reset()
+
+func _on_settings_cancel_pressed() -> void:
+	FAG_Settings.cancel_settings_changes()
+	on_setting_close.emit()
+	#
+
+func _on_settings_reset_pressed() -> void:
+	FAG_Settings.reset_to_default_all()
+	on_setting_reset.emit()
+
+func _on_settings_ok_pressed() -> void:
+	FAG_Settings.accept_settings_changes()
+	on_setting_close.emit()
+	#_set_mode(Mode.NORMAL)
+"
+
+[sub_resource type="GDScript" id="GDScript_2ji10"]
+resource_name = "SettingsGroup"
+script/source = "extends PanelContainer
+
+func setup_and_show(label_text : String, ui_parent : Control) -> void:
+	ui_parent.add_child(self)
+	visible = true
+	$MarginContainer/Group.text = label_text
+"
+
+[sub_resource type="GDScript" id="GDScript_rdwsm"]
+resource_name = "ValueSettings"
+script/source = "extends PanelContainer
+
+@export var default_setting_value_mapped_to := 1.0
+
+func setup_and_show(
+		group_name : String, setting_name : String,
+		setting_info : Variant, current_value : Variant, button_callback : Callable,
+		ui_parent : Control
+	) -> void:
+		ui_parent.add_child(self)
+		visible = true
+		var setting_ui = get_node(\"MarginContainer/Setting\")
+		setting_ui.get_node(\"Label\").text = setting_info.ui_name
+		var ui_tooltip_text = setting_info.ui_name + \"_TOOLTIP\"
+		if tr(ui_tooltip_text) == ui_tooltip_text:
+			ui_tooltip_text = \"\"
+		if current_value is bool:
+			setting_ui.get_node(\"BoolValue\").show()
+			setting_ui.get_node(\"BoolValue/HBoxContainer/CheckBox\").button_pressed = current_value
+			setting_ui.get_node(\"BoolValue/HBoxContainer/CheckBox\").tooltip_text = ui_tooltip_text
+			setting_ui.get_node(\"BoolValue/HBoxContainer/CheckBox\").toggled.connect(button_callback.bind(group_name, setting_name))
+		elif current_value is String and setting_info.possible_values:
+			setting_ui.get_node(\"StringEnumValue\").show()
+			var button := setting_ui.get_node(\"StringEnumValue/HBoxContainer/OptionButton\")
+			button.tooltip_text = ui_tooltip_text
+			button.clear()
+			var idx := 0
+			for val in setting_info.possible_values:
+				button.add_item(val)
+				if val == current_value:
+					button.select(idx)
+				idx += 1
+			button.item_selected.connect(_on_setting_value_changed_option.bind(button, group_name, setting_name, button_callback))
+		elif setting_info.get(\"numeric_range\", false):
+			var spinbox = setting_ui.get_node(\"NumericValueRange/HBoxContainer/Value\")
+			setting_ui.get_node(\"NumericValueRange/HBoxContainer/Value\").tooltip_text = ui_tooltip_text
+			spinbox.min_value = setting_info.numeric_range[0]
+			spinbox.max_value = setting_info.numeric_range[1]
+			spinbox.custom_arrow_step = setting_info.numeric_range[2]
+			spinbox.value = current_value
+			spinbox.value_changed.connect(button_callback.bind(group_name, setting_name))
+			setting_ui.get_node(\"NumericValueRange\").show()
+		else:
+			setting_ui.get_node(\"FloatValueSlider\").show()
+			setting_ui.get_node(\"FloatValueSlider/HBoxContainer/Slider\").tooltip_text = ui_tooltip_text
+			setting_ui.get_node(\"FloatValueSlider/HBoxContainer/Value\").tooltip_text = ui_tooltip_text
+			setting_ui.set_value( current_value  * default_setting_value_mapped_to / setting_info.default_value )
+			setting_ui.value_changed.connect(_on_setting_value_changed_float.bind(group_name, setting_name, setting_info.default_value, button_callback))
+
+func _ready() ->void:
+	$MarginContainer/Setting/FloatValueSlider.hide()
+	$MarginContainer/Setting/NumericValueRange.hide()
+	$MarginContainer/Setting/BoolValue.hide()
+	$MarginContainer/Setting/StringEnumValue.hide()
+
+func _on_setting_value_changed_float(value : float, group_name : String, setting_name : String, default_value : float, button_callback : Callable) -> void:
+	value = value * default_value / default_setting_value_mapped_to
+	button_callback.call(value, group_name, setting_name)
+
+func _on_setting_value_changed_option(idx : int, button : OptionButton, group_name : String, setting_name : String, button_callback : Callable) -> void:
+	button_callback.call(button.get_item_text(idx), group_name, setting_name)
+"
+
+[sub_resource type="GDScript" id="GDScript_ddmgb"]
+resource_name = "ActionSettings"
+script/source = "extends PanelContainer
+
+func setup_and_show(
+		label_text : String, group_name : String, action_name : String,
+		events : Array, button_callback : Callable,
+		ui_parent : Control, ui_remap_info : Control
+	) -> void:
+		ui_parent.add_child(self)
+		visible = true
+		$MarginContainer/Action/Label.text = label_text
+		
+		var button = $MarginContainer/Action/VBoxContainer/HBoxContainer/PrimaryKey
+		if len(events) > 0:
+			button.text = events[0].as_text()
+			button.pressed.connect(button_callback.bind([group_name, action_name, 0, button, ui_remap_info, events[0]]))
+		else:
+			button.pressed.connect(button_callback.bind([group_name, action_name, 0, button, ui_remap_info, null]))
+		
+		button = $MarginContainer/Action/VBoxContainer/HBoxContainer/SecondaryKey
+		if len(events) > 1:
+			button.text = events[1].as_text()
+			button.pressed.connect(button_callback.bind([group_name, action_name, 1, button, ui_remap_info, events[1]]))
+		else:
+			button.pressed.connect(button_callback.bind([group_name, action_name, 1, button, ui_remap_info, null]))
+"
+
+[node name="SettingsDialog" type="VBoxContainer"]
+custom_minimum_size = Vector2(650, 350)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+script = SubResource("GDScript_0t2g5")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="SettingsList" type="VBoxContainer" parent="ScrollContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 5
+
+[node name="Group" type="PanelContainer" parent="ScrollContainer/MarginContainer/SettingsList"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_2ji10")
+
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer/MarginContainer/SettingsList/Group"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="Group" type="Label" parent="ScrollContainer/MarginContainer/SettingsList/Group/MarginContainer"]
+layout_mode = 2
+theme_type_variation = &"HeaderMedium"
+horizontal_alignment = 1
+
+[node name="Setting" type="PanelContainer" parent="ScrollContainer/MarginContainer/SettingsList"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_rdwsm")
+
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer/MarginContainer/SettingsList/Setting"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="Setting" type="HBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer"]
+layout_mode = 2
+script = ExtResource("1_0t2g5")
+slider_path = NodePath("FloatValueSlider/HBoxContainer/Slider")
+value_editbox_path = NodePath("FloatValueSlider/HBoxContainer/Value")
+
+[node name="Label" type="Label" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting"]
+custom_minimum_size = Vector2(360, 10)
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="Space" type="Control" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="FloatValueSlider" type="VBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/FloatValueSlider"]
+layout_mode = 2
+
+[node name="Slider" type="HSlider" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/FloatValueSlider/HBoxContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 5.0
+step = 0.05
+allow_greater = true
+allow_lesser = true
+
+[node name="Value" type="LineEdit" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/FloatValueSlider/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "1.0"
+alignment = 1
+virtual_keyboard_type = 3
+
+[node name="NumericValueRange" type="VBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/NumericValueRange"]
+layout_mode = 2
+
+[node name="Value" type="SpinBox" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/NumericValueRange/HBoxContainer"]
+layout_mode = 2
+step = 0.0
+allow_greater = true
+allow_lesser = true
+alignment = 1
+
+[node name="BoolValue" type="VBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/BoolValue"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/BoolValue/HBoxContainer"]
+layout_mode = 2
+
+[node name="StringEnumValue" type="VBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/StringEnumValue"]
+layout_mode = 2
+
+[node name="OptionButton" type="OptionButton" parent="ScrollContainer/MarginContainer/SettingsList/Setting/MarginContainer/Setting/StringEnumValue/HBoxContainer"]
+layout_mode = 2
+
+[node name="Action" type="PanelContainer" parent="ScrollContainer/MarginContainer/SettingsList"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_ddmgb")
+
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer/MarginContainer/SettingsList/Action"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="Action" type="HBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action"]
+custom_minimum_size = Vector2(440, 10)
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="Space" type="Control" parent="ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action/VBoxContainer"]
+layout_mode = 2
+
+[node name="PrimaryKey" type="Button" parent="ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "MAIN_MENU_SETTINGS_PRIMARY_KEY_TOOLTIP"
+text = "..."
+
+[node name="SecondaryKey" type="Button" parent="ScrollContainer/MarginContainer/SettingsList/Action/MarginContainer/Action/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "MAIN_MENU_SETTINGS_SECONDARY_KEY_TOOLTIP"
+text = "..."
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="Margin1" type="Control" parent="Buttons"]
+layout_mode = 2
+
+[node name="Cancel" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "MAIN_MENU_CANCEL"
+
+[node name="Fill1" type="Control" parent="Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="Reset" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "MAIN_MENU_RESET_TO_DEFAULT"
+
+[node name="Fill2" type="Control" parent="Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Ok" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "MAIN_MENU_OK"
+
+[node name="Margin2" type="Control" parent="Buttons"]
+layout_mode = 2
+
+[connection signal="pressed" from="Buttons/Cancel" to="." method="_on_settings_cancel_pressed"]
+[connection signal="pressed" from="Buttons/Reset" to="." method="_on_settings_reset_pressed"]
+[connection signal="pressed" from="Buttons/Ok" to="." method="_on_settings_ok_pressed"]
