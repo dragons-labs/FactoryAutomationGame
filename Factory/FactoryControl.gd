@@ -56,7 +56,8 @@ func _get_signal_value(signal_name : String, default : Variant = 0) -> Array:
 
 func set_signal_value(signal_name : String, value : float) -> void:
 	#print("set_signal_value ", signal_name, " → ", value)
-	circuit_simulator.gdspice.set_voltages_currents(input_to_circuit_from_factory[signal_name][1], value)
+	if signal_name in input_to_circuit_from_factory:
+		circuit_simulator.gdspice.set_voltages_currents(input_to_circuit_from_factory[signal_name][1], value)
 	for element in computer_control_blocks.values():
 		var computer_system = element.get_child(0)
 		if computer_system.is_running_and_ready() and signal_name in computer_system.computer_input_names:

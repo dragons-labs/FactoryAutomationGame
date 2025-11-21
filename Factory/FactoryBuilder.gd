@@ -16,8 +16,8 @@ extends Node3D
 
 @export var grid_size := Vector3(1, 1, 1)
 @export var ray_length := 300
-@export var attachable_objects_collision_mask := 0xffffffff
-@export var blocking_space_objects_collision_mask := 0xffffffff
+@export var attachable_objects_collision_mask := 0xfffffff0
+@export var blocking_space_objects_collision_mask := 0xfffffff0
 @export var mouse_y_distance_per_scale_step := 30
 
 signal on_block_add(block: Node3D)
@@ -151,9 +151,30 @@ func _process(_delta) -> void:
 		_intersection_need_update = false
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouse:
+	if event is InputEventMouse and not _block_3d_operation:
 		_intersection_need_update = true
 
+# while true temporary block 3d world raycasting
+var _block_3d_operation := false
+
+var _previous_ui_input_state
+
+func disable_input() -> void:
+	if _block_3d_operation:
+		return
+	_block_3d_operation = true
+	_previous_ui_input_state = ui.input_allowed
+	ui.input_allowed = false
+	ui.process_mode = PROCESS_MODE_DISABLED
+	ui.update_cursor(false, true)
+	camera.disable_input()
+
+func enable_input(force := false) -> void:
+	camera.enable_input()
+	ui.update_cursor(true, true)
+	ui.process_mode = PROCESS_MODE_INHERIT
+	ui.input_allowed = _previous_ui_input_state or force
+	_block_3d_operation = false
 
 ### UI callbacks
 

@@ -226,24 +226,16 @@ func unpause_factory():
 	if factory_control.simulation_on_time:
 		get_tree().call_deferred("set_pause", _factory_paused)
 
-var _pre_input_off_ui_input_allowed := true
 var _input_is_off := false
 
 func input_off():
-	prints("input_on", _pre_input_off_ui_input_allowed, _input_is_off)
 	if _input_is_off:
 		return
 	_input_is_off = true
-	_pre_input_off_ui_input_allowed = factory_builder.ui.input_allowed
-	factory_builder.ui.input_allowed = false
-	factory_builder.camera.disable_input()
-	factory_builder.ui.update_cursor(false, true)
+	factory_builder.disable_input()
 
 func input_on(force := false):
-	prints("input_on", _pre_input_off_ui_input_allowed, _input_is_off, force)
-	factory_builder.ui.input_allowed = force or _pre_input_off_ui_input_allowed
-	factory_builder.ui.update_cursor(true, true)
-	factory_builder.camera.enable_input()
+	factory_builder.enable_input(force)
 	_input_is_off = false
 
 func set_visibility(value : bool) -> void:

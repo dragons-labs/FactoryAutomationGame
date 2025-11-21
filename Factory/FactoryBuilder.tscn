@@ -6,12 +6,6 @@
 
 [node name="FactoryBuilder" type="Node3D"]
 script = ExtResource("1_51ivo")
-elements = null
-grid_size = null
-ray_length = null
-attachable_objects_collision_mask = null
-blocking_space_objects_collision_mask = null
-mouse_y_distance_per_scale_step = null
 
 [node name="WorldEditorUI" parent="." instance=ExtResource("3_iwf3v")]
 unique_name_in_owner = true

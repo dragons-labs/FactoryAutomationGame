@@ -1,9 +1,9 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=12 format=3 uid="uid://dpc7cthy26gi"]
 
-[ext_resource type="Script" path="res://Levels/painter/painter_slow.gd" id="1_7y1sa"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Consumer.tscn" id="2_gbgwv"]
-[ext_resource type="PackedScene" path="res://Factory/FactoryBlocks/Producer.tscn" id="3_3l6sj"]
-[ext_resource type="Script" path="res://Levels/painter/painter_object.gd" id="4_b36je"]
+[ext_resource type="Script" uid="uid://buiat74x4ue4n" path="res://Levels/painter/painter_slow.gd" id="1_7y1sa"]
+[ext_resource type="PackedScene" uid="uid://ilbgjjdg2jch" path="res://Factory/FactoryBlocks/Consumer.tscn" id="2_gbgwv"]
+[ext_resource type="PackedScene" uid="uid://b5boyct3stll1" path="res://Factory/FactoryBlocks/Producer.tscn" id="3_3l6sj"]
+[ext_resource type="Script" uid="uid://rqmbyau7n5xe" path="res://Levels/painter/painter_object.gd" id="4_b36je"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kkeuu"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -77,7 +77,6 @@ visible = false
 
 [node name="Object_Demo1" type="RigidBody3D" parent="ComponentsTemplates"]
 collision_layer = 3
-collision_mask = 3
 script = ExtResource("4_b36je")
 
 [node name="FactoryElementVisual" type="MeshInstance3D" parent="ComponentsTemplates/Object_Demo1"]

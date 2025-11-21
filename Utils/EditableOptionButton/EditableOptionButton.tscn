@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://dn7h1nmjb6eqs"]
+
+[ext_resource type="Script" uid="uid://bjsked3twdgxt" path="res://Utils/EditableOptionButton/EditableOptionButton.gd" id="1_nw85s"]
+
+[node name="EditableOptionButton" type="HBoxContainer"]
+offset_right = 253.0
+offset_bottom = 31.0
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+script = ExtResource("1_nw85s")
+
+[node name="LineEdit" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(235, 0)
+layout_mode = 2
+
+[node name="MenuButton" type="MenuButton" parent="."]
+clip_contents = true
+layout_mode = 2
+text = "⌵"
+flat = false
+
+[connection signal="text_changed" from="LineEdit" to="." method="_on_line_edit_text_changed"]

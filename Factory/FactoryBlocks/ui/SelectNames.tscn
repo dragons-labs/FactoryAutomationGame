@@ -1,0 +1,89 @@
+[gd_scene load_steps=4 format=3 uid="uid://bkvq73e4cq523"]
+
+[ext_resource type="PackedScene" uid="uid://dn7h1nmjb6eqs" path="res://Utils/EditableOptionButton/EditableOptionButton.tscn" id="1_00efg"]
+[ext_resource type="Script" uid="uid://blk6u3q75xni2" path="res://Factory/FactoryBlocks/ui/SelectNames.gd" id="1_7c84k"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7c84k"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="MarginContainer" type="MarginContainer"]
+offset_right = 508.0
+offset_bottom = 221.0
+theme_override_constants/margin_left = 13
+theme_override_constants/margin_top = 13
+theme_override_constants/margin_right = 13
+theme_override_constants/margin_bottom = 13
+script = ExtResource("1_7c84k")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Output" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Output"]
+layout_mode = 2
+text = "FACTORY_BLOCK_UI_OUTPUT"
+
+[node name="EditableOptionButton" parent="VBoxContainer/Output" instance=ExtResource("1_00efg")]
+layout_mode = 2
+
+[node name="NumberOfInputs" type="HBoxContainer" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/NumberOfInputs"]
+layout_mode = 2
+text = "FACTORY_BLOCK_UI_INPUTS"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/NumberOfInputs"]
+layout_mode = 2
+min_value = 1.0
+max_value = 64.0
+value = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Input" parent="VBoxContainer/VBoxContainer" instance=ExtResource("1_00efg")]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "  → "
+
+[node name="Output" parent="VBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("1_00efg")]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NotAppliedWarning" type="Label" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85490197, 1, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_7c84k")
+text = "FACTORY_BLOCK_UI_NOT_APPLIED"
+
+[node name="Control2" type="Control" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.9
+
+[node name="OK" type="Button" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "FACTORY_BLOCK_UI_ACCEPT"
+
+[connection signal="value_changed" from="VBoxContainer/NumberOfInputs/SpinBox" to="." method="_update_inputs_number"]

@@ -83,6 +83,12 @@ limbo_auto_complete_with_list={
 
 locale/translations=PackedStringArray("res://Utils/Camera/translate/Camera.en.translation", "res://Utils/WorldEditorUI/translate/WorldEditorUI.en.translation", "res://Utils/WebBrowser/translate/WebBrowser.en.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.en.translation", "res://ComputerSimulator/translate/ComputerSystemSimulator.en.translation", "res://MainMenu/translate/MainMenu.en.translation", "res://Manual/translate/Manual.en.translation", "res://Factory/translate/Factory.en.translation", "res://Factory/translate/Factory.pl.translation", "res://MainMenu/translate/MainMenu.pl.translation", "res://ElectronicsSimulator/translate/ElectronicsSimulator.pl.translation", "res://Utils/Settings/translate/Settings.en.translation", "res://Utils/Settings/translate/Settings.pl.translation")
 
+[layer_names]
+
+3d_physics/layer_1="Physics world (collisions)"
+3d_physics/layer_2="Factory product detection"
+3d_physics/layer_32="GUI 3D"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

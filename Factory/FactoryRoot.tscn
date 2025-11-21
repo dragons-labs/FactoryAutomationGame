@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://cr1jneq81cpn2"]
+[gd_scene load_steps=20 format=3 uid="uid://cr1jneq81cpn2"]
 
 [ext_resource type="Script" uid="uid://cy3s4cxl70a76" path="res://Factory/FactoryRoot.gd" id="1_88vxl"]
 [ext_resource type="PackedScene" uid="uid://bs8dvw28ifomo" path="res://Factory/FactoryControl.tscn" id="2_cmtbq"]
@@ -16,19 +16,19 @@
 [ext_resource type="PackedScene" uid="uid://by2y4eoj5dd6" path="res://Factory/FactoryBlocks/ConveyorFastSplitter.tscn" id="11_f8ngn"]
 [ext_resource type="PackedScene" uid="uid://bwxt451nu1i3s" path="res://Factory/FactoryBlocks/Detector.tscn" id="12_oom2c"]
 [ext_resource type="PackedScene" uid="uid://byuh2wfbdy3s5" path="res://Factory/FactoryBlocks/GPIOExpander.tscn" id="14_3m60o"]
+[ext_resource type="PackedScene" uid="uid://dt7r7r4jewuyr" path="res://Factory/FactoryBlocks/SimpleLogicAND.tscn" id="15_ixy5m"]
+[ext_resource type="PackedScene" uid="uid://khgv770bgcv8" path="res://Factory/FactoryBlocks/SimpleLogicOR.tscn" id="16_mvkar"]
+[ext_resource type="PackedScene" uid="uid://blpck3uwql0tf" path="res://Factory/FactoryBlocks/SimpleLogicNOT.tscn" id="17_m6io6"]
 
 [node name="FactoryRoot" type="Node3D"]
 script = ExtResource("1_88vxl")
 
 [node name="FactoryBuilder" parent="." node_paths=PackedStringArray("factory_control", "factory_root") instance=ExtResource("2_ncfa0")]
-elements = Array[PackedScene]([ExtResource("4_wpvne"), ExtResource("5_u6lyq"), ExtResource("6_a113l"), ExtResource("7_q855b"), ExtResource("8_flw0k"), ExtResource("4_ipc57"), ExtResource("12_oom2c"), ExtResource("10_gofsm"), ExtResource("11_f8ngn"), ExtResource("9_xypg3"), ExtResource("11_aa"), ExtResource("14_3m60o")])
+elements = Array[PackedScene]([ExtResource("4_wpvne"), ExtResource("5_u6lyq"), ExtResource("6_a113l"), ExtResource("7_q855b"), ExtResource("8_flw0k"), ExtResource("4_ipc57"), ExtResource("12_oom2c"), ExtResource("10_gofsm"), ExtResource("11_f8ngn"), ExtResource("9_xypg3"), ExtResource("11_aa"), ExtResource("14_3m60o"), ExtResource("15_ixy5m"), ExtResource("16_mvkar"), ExtResource("17_m6io6")])
 factory_control = NodePath("../FactoryControl")
 factory_root = NodePath("..")
-grid_size = Vector3(1, 1, 1)
-ray_length = 300
 attachable_objects_collision_mask = 4294967295
 blocking_space_objects_collision_mask = 4294967295
-mouse_y_distance_per_scale_step = 30
 
 [node name="FactoryControl" parent="." instance=ExtResource("2_cmtbq")]
 

@@ -1,0 +1,38 @@
+[gd_scene load_steps=9 format=3 uid="uid://blpck3uwql0tf"]
+
+[ext_resource type="Script" uid="uid://bad7gc8yj1tsv" path="res://Factory/FactoryBlocks/SimpleLogic.gd" id="1_qgehy"]
+[ext_resource type="Texture2D" uid="uid://lsmd1b0xo3nh" path="res://ElectronicsSimulator/Components/images/not-icon.svg" id="2_qgehy"]
+[ext_resource type="ArrayMesh" path="res://.godot/imported/ControlBlock.tres" id="3_ftmdi"]
+[ext_resource type="Texture2D" uid="uid://c0cpipgxbqhxs" path="res://Factory/FactoryBlocks/3d_models/SimpleLogicNOT.svg" id="4_qgehy"]
+[ext_resource type="PackedScene" uid="uid://cy0brqivxb2l1" path="res://Utils/Gui3DNode/Gui3DNode.tscn" id="5_6r4mu"]
+[ext_resource type="PackedScene" uid="uid://bkvq73e4cq523" path="res://Factory/FactoryBlocks/ui/SelectNames.tscn" id="6_a5gko"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uwn0y"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2wkkg"]
+albedo_color = Color(0.4191122, 0.0024260306, 0.40102366, 1)
+albedo_texture = ExtResource("4_qgehy")
+
+[node name="SimpleLogicNOT" type="Node3D"]
+script = ExtResource("1_qgehy")
+gate_type = 2
+ui_name = "FACTORY_BLOCK_NAME_SimpleLogicNOT"
+ui_icon = ExtResource("2_qgehy")
+object_type = "SimpleLogicNOT"
+
+[node name="FactoryElementPhysics" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="FactoryElementCollision" type="CollisionShape3D" parent="FactoryElementPhysics"]
+shape = SubResource("BoxShape3D_uwn0y")
+
+[node name="FactoryElementVisual" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = ExtResource("3_ftmdi")
+skeleton = NodePath("")
+surface_material_override/0 = SubResource("StandardMaterial3D_2wkkg")
+
+[node name="Gui3DNode" parent="." instance=ExtResource("5_6r4mu")]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 1.01, 0)
+gui_scene = ExtResource("6_a5gko")
+screen_size_2d = Vector2(400, 400)

@@ -55,8 +55,8 @@ var computer_systems_configuration := {
 var supported_blocks := [
 	"SimpleFactoryBlock",
 	"ConveyorBelt",
-	"ComputerControlBlock",
-	"ElectronicControlBlock", "GPIOExpander",
+	"ComputerControlBlock", "ElectronicControlBlock", "GPIOExpander",
+	"SimpleLogicAND", "SimpleLogicOR", "SimpleLogicNOT",
 	"Painter",
 	"ConveyorSplitter", "ConveyorFastSplitter", "Welder", "Detector"
 ]

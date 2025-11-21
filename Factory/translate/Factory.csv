@@ -10,6 +10,9 @@ FACTORY_BLOCK_NAME_Painter,Painter,Malarz
 FACTORY_BLOCK_NAME_Detector,Detector,Detektor
 FACTORY_BLOCK_NAME_ConveyorSplitter,Conveyor Splitter,Podział pasa transmisyjnego
 FACTORY_BLOCK_NAME_ConveyorFastSplitter,Fast Conveyor Splitter,Szybki podział pasa transmisyjnego
+FACTORY_BLOCK_NAME_SimpleLogicAND,"Auxiliary AND gate (slow, synchronous, sequential)","Pomocnicza bramka AND (wolna, synchroniczna, sekwencyjna)"
+FACTORY_BLOCK_NAME_SimpleLogicNOT,"Auxiliary NOT gate (slow, synchronous, sequential)","Pomocnicza bramka NOT (wolna, synchroniczna, sekwencyjna)"
+FACTORY_BLOCK_NAME_SimpleLogicOR,"Auxiliary OR gate (slow, synchronous, sequential)","Pomocnicza bramka OR (wolna, synchroniczna, sekwencyjna)"
 FACTORY_START,Run,Start
 FACTORY_STOP,Stop,Stop
 FACTORY_PAUSE,Pause,Pause
@@ -38,4 +41,7 @@ FACTORY_PRODUCT_SUCCESS_TITLE,Mission Successful,Sukces
 FACTORY_PRODUCT_SUCCESS_TEXT_%fTIME,"Congratulation!\n\nYou delivered all required products within %f seconds.","Gratulacje!\n\nDostarczyłeś wszystkie wymagane produkty w ciągu %s sekund."
 
 FACTORY_BLOCK_UI_ACCEPT,OK,OK
+FACTORY_BLOCK_UI_NOT_APPLIED,WARNING: Changes not applied!,UWAGA: Zmiany nie zatwierdzone!
 FACTORY_BLOCK_UI_NUMBER_OF_SIGNALS,Number of signals:,Ilość sygnałów:
+FACTORY_BLOCK_UI_OUTPUT,Output:,Wyjście:
+FACTORY_BLOCK_UI_INPUTS,Inputs:,Wejścia:

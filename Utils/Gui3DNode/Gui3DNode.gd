@@ -54,9 +54,17 @@ extends Node3D
 	get():
 		return billboard_mode
 
+## Auto realase focus while mouse exited area
+@export var release_focus := true
+
 ## shortcut to GUI root node
 var gui : Node = null
 
+# emited when mouse enter/exit area
+signal mouse_inside(mouse_inside: bool)
+
+# emited on focus changes (when release_focus == false also on mouse enter/exit area)
+signal focus_inside(focus: bool, mouse_inside: bool, from_mouse: bool)
 
 @onready var _node_viewport: SubViewport = $SubViewport
 @onready var _node_quad: MeshInstance3D = $Quad
@@ -65,10 +73,11 @@ var gui : Node = null
 
 func _ready() -> void:
 	# call setters
-	gui_scene = gui_scene
 	screen_size_3d = screen_size_3d
 	screen_size_2d = screen_size_2d
 	billboard_mode = billboard_mode
+	# create gui scene after set view port size (screen_size_2d)
+	gui_scene = gui_scene
 	
 	# update viewport_path in viewport material (needed if Gui3DNode is used with "Editable Children" option)
 	_node_quad.get_surface_override_material(0).albedo_texture.viewport_path = _node_viewport.get_path()
@@ -77,6 +86,8 @@ func _ready() -> void:
 	_node_area.mouse_entered.connect(_mouse_entered_area)
 	_node_area.mouse_exited.connect(_mouse_exited_area)
 	_node_area.input_event.connect(_mouse_input_event)
+	
+	_node_viewport.gui_focus_changed.connect(_on_gui_focus_changed)
 
 func _process(_delta: float) -> void:
 	_rotate_as_billboard()
@@ -95,11 +106,20 @@ func _mouse_entered_area() -> void:
 	_is_mouse_inside = true
 	# Notify the viewport that the mouse is now hovering it.
 	_node_viewport.notification(NOTIFICATION_VP_MOUSE_ENTER)
+	mouse_inside.emit(true)
+	if not release_focus:
+		focus_inside.emit(len(_focus_owners) != 0, _is_mouse_inside, true)
 
 func _mouse_exited_area() -> void:
 	# Notify the viewport that the mouse is no longer hovering it.
 	_node_viewport.notification(NOTIFICATION_VP_MOUSE_EXIT)
 	_is_mouse_inside = false
+	mouse_inside.emit(false)
+	if release_focus:
+		for n in _focus_owners:
+			n.release_focus()
+	else:
+		focus_inside.emit(len(_focus_owners) != 0, _is_mouse_inside, true)
 
 func _unhandled_input(input_event: InputEvent) -> void:
 	# Check if the event is a non-mouse/non-touch event
@@ -190,3 +210,15 @@ func _rotate_as_billboard() -> void:
 
 	# Rotate in the Z axis to compensate camera tilt.
 	_node_quad.rotate_object_local(Vector3.BACK, camera.rotation.z)
+
+var _focus_owners = []
+
+func _on_gui_focus_exited(node: Control) -> void:
+	_focus_owners.erase(node)
+	if len(_focus_owners) == 0:
+		focus_inside.emit(false, _is_mouse_inside, false)
+	
+func _on_gui_focus_changed(node: Control) -> void:
+	_focus_owners.append(node)
+	node.focus_exited.connect(_on_gui_focus_exited.bind(node), CONNECT_ONE_SHOT)
+	focus_inside.emit(true, _is_mouse_inside, false)
