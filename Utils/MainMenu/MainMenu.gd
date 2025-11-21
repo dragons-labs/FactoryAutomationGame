@@ -8,7 +8,7 @@ const SAVE_DIR := "user://saves/"
 enum Mode {NORMAL, LOAD, LOAD_SAVE, WRITE_SAVE, SETTINGS, LOADING}
 var _current_mode : Mode
 
-@export var _factory_root : Node3D
+@export var _game_root : Node3D
 @export var _settings_order : Array[String]
 
 func _set_mode(mode : Mode) -> void:
@@ -19,10 +19,10 @@ func _set_mode(mode : Mode) -> void:
 	%Loading.hide()
 	match _current_mode:
 		Mode.NORMAL:
-			var factory_is_loaded = _factory_root.is_loaded()
-			%Buttons/Resume.disabled = not factory_is_loaded
-			%Buttons/SaveGame.disabled = not factory_is_loaded
-			%Buttons/ShowInfo.text = "MAIN_MENU_TASK_INFO" if factory_is_loaded else "MAIN_MENU_MANUAL"
+			var game_is_loaded = _game_root.is_loaded()
+			%Buttons/Resume.disabled = not game_is_loaded
+			%Buttons/SaveGame.disabled = not game_is_loaded
+			%Buttons/ShowInfo.text = "MAIN_MENU_TASK_INFO" if game_is_loaded else "MAIN_MENU_MANUAL"
 			%Buttons.show()
 		Mode.LOAD:
 			%NewSaveSlot.hide()
@@ -51,11 +51,11 @@ func _on_load_level_pressed() -> void:
 	
 	var lang = TranslationServer.get_locale()
 	var fallback_lang = ProjectSettings.get("internationalization/locale/fallback")
-	var game_progress = FAG_Utils.load_from_json_file(_factory_root.GAME_PROGRESS_SAVE)
+	var game_progress = FAG_Utils.load_from_json_file(_game_root.GAME_PROGRESS_SAVE)
 	
-	for file_name in DirAccess.get_files_at(_factory_root.LEVELS_DIR):
+	for file_name in DirAccess.get_files_at(_game_root.LEVELS_DIR):
 		if file_name.ends_with(".json"):
-			var levels = FAG_Utils.load_from_json_file(_factory_root.LEVELS_DIR + file_name)
+			var levels = FAG_Utils.load_from_json_file(_game_root.LEVELS_DIR + file_name)
 			for level_id in levels:
 				if unlocked_all_levels or not levels[level_id].unlocked_by or levels[level_id].unlocked_by.any(
 					func(levels_set): return levels_set.all(
@@ -67,6 +67,7 @@ func _on_load_level_pressed() -> void:
 					)
 					item_list.set_item_metadata(index, {
 						"id": level_id,
+						"is_saved_data": levels[level_id].get("is_saved_data", false),
 						"description": FAG_Utils.get_with_fallback(levels[level_id].description, lang, fallback_lang),
 						"stats": game_progress.finished_levels.get(level_id, {})
 					})
@@ -82,7 +83,7 @@ func _on_load_save_pressed() -> void:
 	_set_mode(Mode.LOAD_SAVE)
 
 func _on_show_task_info() -> void:
-	FAG_Settings.get_root_subnode("%Manual").show_info(_factory_root.level_scene_node, _factory_root.GAME_PROGRESS_SAVE)
+	FAG_Settings.get_root_subnode("%ManualBrowser").show_info(_game_root.level_scene_node, _game_root.GAME_PROGRESS_SAVE)
 
 func _on_settings_pressed() -> void:
 	var screen_size := Vector2(get_tree().root.size)
@@ -98,27 +99,39 @@ func _on_settings_pressed() -> void:
 func _on_item_list_item_selected(index: int) -> void:
 	if _current_mode == Mode.LOAD:
 		var level_info = item_list.get_item_metadata(index)
-		%LoadDialog_ItemInfo.text = level_info.description + "\n\n" + _factory_root.stats2string(level_info.stats)
+		%LoadDialog_ItemInfo.text = level_info.description + "\n\n" + _game_root.stats2string(level_info.stats)
 	elif _current_mode == Mode.LOAD_SAVE:
 		var metadata = item_list.get_item_metadata(index)
-		var save_info = FAG_Utils.load_from_json_file(metadata.path + _factory_root.SAVE_INFO_FILE)
+		var save_info = FAG_Utils.load_from_json_file(metadata.path + _game_root.SAVE_INFO_FILE)
 		metadata["level"] = save_info.level
-		%LoadDialog_ItemInfo.text = _factory_root.stats2string(save_info.stats)
+		%LoadDialog_ItemInfo.text = _game_root.stats2string(save_info.stats)
 
 func _on_load_pressed() -> void:
 	var selected = item_list.get_selected_items()
 	if len(selected) > 0:
-		%Loading.show()
-		FAG_WindowManager.cancel_hideen_by_escape()
-		await _factory_root.close()
 		if _current_mode == Mode.LOAD:
 			var level_info = item_list.get_item_metadata(selected[0])
-			_factory_root.load_level(level_info.id)
+			if level_info["is_saved_data"]:
+				_load_level_or_save("", _game_root.LEVELS_DIR + level_info.id)
+			else:
+				_load_level_or_save(level_info.id, "")
 		elif _current_mode == Mode.LOAD_SAVE:
 			var metadata = item_list.get_item_metadata(selected[0])
-			_factory_root.restore(metadata.path)
-		_factory_root.set_visibility(true)
-		_hide()
+			_load_level_or_save("", metadata.path)
+
+func _load_level_or_save(level_id := "", save_path := ""):
+	_show(Mode.LOADING)
+	FAG_WindowManager.cancel_hideen_by_escape()
+	await _game_root.close()
+	
+	if level_id:
+		_game_root.load_level(level_id)
+	elif save_path:
+		_game_root.restore(save_path)
+	
+	_game_root.set_visibility(true)
+	_hide()
+
 
 var _save_path_to_confirm : String
 func _on_save_pressed() -> void:
@@ -126,16 +139,16 @@ func _on_save_pressed() -> void:
 	if len(selected) > 0:
 		var save_name = item_list.get_item_text(selected[0])
 		var save_dir = item_list.get_item_metadata(selected[0]).path
-		if FileAccess.file_exists(save_dir + _factory_root.SAVE_INFO_FILE):
+		if FileAccess.file_exists(save_dir + _game_root.SAVE_INFO_FILE):
 			_save_path_to_confirm = save_dir
 			%OverwriteConfirmationDialog.dialog_text = tr("MAIN_MENU_SAVE_%s_OVERWRITE_CONFIRM_TEXT") % save_name
 			%OverwriteConfirmationDialog.show()
 		else:
-			_factory_root.save(save_dir)
+			_game_root.save(save_dir)
 			_set_mode(Mode.NORMAL)
 
 func _on_overwrite_confirmation_dialog_confirmed() -> void:
-	_factory_root.save(_save_path_to_confirm)
+	_game_root.save(_save_path_to_confirm)
 	_set_mode(Mode.NORMAL)
 
 func _list_saves() -> void:
@@ -163,19 +176,19 @@ func _on_add_save_slot_pressed(text := "") -> void:
 
 ### Show / Hide main menu
 
-func _show():
+func _show(mode := Mode.NORMAL):
 	if %SettingsDialog.visible:
 		FAG_Settings.cancel_settings_changes()
 	FAG_WindowManager.hide_by_escape_all_windows()
-	_factory_root.pause_factory()
-	_factory_root.input_off()
-	_set_mode(Mode.NORMAL)
+	_game_root.pause_factory()
+	_game_root.input_off()
+	_set_mode(mode)
 	show()
 
 func _hide():
 	hide()
-	_factory_root.input_on()
-	_factory_root.unpause_factory()
+	_game_root.input_on()
+	_game_root.unpause_factory()
 	FAG_WindowManager.restore_hideen_by_escape()
 
 
@@ -184,7 +197,7 @@ func _hide():
 func _on_quit_pressed() -> void:
 	print("Quit request")
 	get_tree().paused = true
-	await _factory_root.factory_control.close()
+	await _game_root.factory_control.close()
 	get_tree().quit()
 
 func _notification(what):
@@ -212,16 +225,29 @@ func _init():
 	
 	LimboConsole.register_command(_unlocked_all_levels, "unlock_all_levels", "Unlock all levels")
 
+
 @onready var item_list := %LoadDialog_ItemList
 
 func _ready():
 	get_tree().set_auto_accept_quit(false)
-	if not FileAccess.file_exists(_factory_root.GAME_PROGRESS_SAVE):
-		FAG_Utils.write_to_json_file(_factory_root.GAME_PROGRESS_SAVE, {
+	if not FileAccess.file_exists(_game_root.GAME_PROGRESS_SAVE):
+		FAG_Utils.write_to_json_file(_game_root.GAME_PROGRESS_SAVE, {
 			"finished_levels": {},
 			"unlocked_manuals": ["game", "game/credits"]
 		})
 	%SettingsDialog.visible = false
+
+	for args in [OS.get_cmdline_user_args(), OS.get_cmdline_args()]:
+		var idx = args.find("--load-save")
+		if idx >= 0 and len(args) > idx+1:
+			print("[cmdline] load save: ", args[idx+1])
+			call_deferred("_load_level_or_save", "", args[idx+1])
+			return
+		idx = args.find("--load-level")
+		if idx >= 0 and len(args) > idx+1:
+			print("[cmdline] load level: ", args[idx+1])
+			call_deferred("_load_level_or_save", args[idx+1], "")
+			return
 	call_deferred("_show")
 
 func _input(event: InputEvent):
@@ -234,7 +260,7 @@ func _input(event: InputEvent):
 			LimboConsole.close_console()
 			get_viewport().set_input_as_handled()
 			return
-		if visible and _current_mode == Mode.NORMAL and _factory_root.is_loaded():
+		if visible and _current_mode == Mode.NORMAL and _game_root.is_loaded():
 			_hide()
 		else:
 			_show()

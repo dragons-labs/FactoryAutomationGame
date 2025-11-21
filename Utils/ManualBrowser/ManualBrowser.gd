@@ -3,8 +3,16 @@
 
 extends Window
 
-const MANUALS_BBCODE_DIR := "res://Manual/generated-bbcode/"
-const MANUALS_CONTENTS_FILE := "res://Manual/Pages/contents.json"
+## Page path tamplate
+## [code]{file}[/code] will be replaced by file path from `MANUALS_CONTENTS_FILE`
+## [code]{lang}[/code] will be replaced by lang id
+@export var MANUAL_PAGE_PATH_TEMPLATE = "res://Manual/generated-bbcode/{file}_{lang}.not_edit"
+
+## Manual contents file path
+@export var MANUALS_CONTENTS_FILE := "res://Manual/Pages/contents.json"
+
+## Manual tabs (per topic sections)
+@export var MANUAL_TABS = ["guide", "trivia"]
 
 func show_info(object : Object, progress_save_path : String) -> void:
 	var text_area = _tab_container.get_current_tab_control().get_node("RichTextLabel")
@@ -27,12 +35,11 @@ func show_info(object : Object, progress_save_path : String) -> void:
 	show()
 	grab_focus()
 
-func switch_topic(topic_path : String, trivia : bool):
+func switch_topic(topic_path : String, tab : String):
 	var item = _get_by_path(topic_path)
-	var node = _trivia_info_node if trivia else _guide_info_node
-	_add_to_history(item, node)
+	_add_to_history(item, _guide_info_nodes[tab])
 	_tree.set_selected(item, 0)
-	node.show()
+	_guide_info_nodes[tab].show()
 	_on_tab_changed() # call this even if we don't change tab
 
 
@@ -80,14 +87,20 @@ func _recusrise_build_tree(parent : TreeItem, contents : Dictionary, unlocked_ma
 		if topic_path in unlocked_manuals:
 			var child = _tree.create_item(parent)
 			child.set_text(0, FAG_Utils.get_with_fallback(contents[topic_name]["title"], lang, fallback_lang))
-			child.set_meta("guide", contents[topic_name].get("guide", ""))
-			child.set_meta("trivia", contents[topic_name].get("trivia", ""))
+			for tab in MANUAL_TABS:
+				child.set_meta(tab, contents[topic_name].get(tab, ""))
 			if topic_path == selected_path:
-				_add_to_history(child, _guide_info_node)
+				_add_to_history(child, _guide_info_nodes[MANUAL_TABS[0]])
 				_tree.set_selected(child, 0)
 			contents[topic_name]["_item"] = child
 			if "subtopics" in contents[topic_name]:
 				_recusrise_build_tree(child, contents[topic_name]["subtopics"], unlocked_manuals, topic_path + "/", selected_path, lang, fallback_lang)
+
+func _get_manual_page_path(file: String, lang: String):
+	return MANUAL_PAGE_PATH_TEMPLATE.format({
+		"file": file,
+		"lang": lang
+	})
 
 func _on_tree_item_selected() -> void:
 	var tab = _tab_container.get_current_tab_control()
@@ -97,20 +110,18 @@ func _on_tree_item_selected() -> void:
 	if not item:
 		return
 		
-	if tab == _guide_info_node:
-		file = item.get_meta("guide")
-	elif tab == _trivia_info_node :
-		file = item.get_meta("trivia")
-	else:
+	var tab_id = tab.get_meta("tab_id")
+	if not tab_id in _guide_info_nodes:
 		return
+	file = item.get_meta(tab_id)
 	
 	var text = ""
 	if file:
 		var lang = TranslationServer.get_locale()
-		var file2 = MANUALS_BBCODE_DIR + file + "_" + lang + ".not_edit"
+		var file2 = _get_manual_page_path(file, lang)
 		if not FileAccess.file_exists(file2):
 			lang = ProjectSettings.get("internationalization/locale/fallback")
-			file2 = MANUALS_BBCODE_DIR + file + "_" + lang + ".not_edit"
+			file2 = _get_manual_page_path(file, lang)
 		file = FileAccess.open(file2, FileAccess.READ)
 		if file: 
 			text = file.get_as_text()
@@ -140,13 +151,12 @@ func _on_tab_changed(_tab := 0) -> void:
 # url opening and history support
 
 func _on_rich_text_label_meta_clicked(meta: Variant) -> void:
-	if meta.begins_with("guide://"):
-		switch_topic(meta.substr(8), false)
-	elif meta.begins_with("trivia://"):
-		switch_topic(meta.substr(9), true)
-	else:
-		%MANUAL_EXTERNAL_TITLE/GDCef.open_url(meta)
-		%MANUAL_EXTERNAL_TITLE.show()
+	for prefix in MANUAL_TABS:
+		if meta.begins_with(prefix + "://"):
+			switch_topic(meta.substr(len(prefix)+3), prefix)
+			return
+	%MANUAL_EXTERNAL_TITLE.open_url(meta)
+	%MANUAL_EXTERNAL_TITLE.show()
 
 var _history = []
 var _history_current = -1
@@ -192,15 +202,38 @@ func _on_go_next_pressed() -> void:
 @onready var _tree := %Tree
 @onready var _tab_container := $TabContainer
 @onready var _task_info_node := %MANUAL_TASK_INFO_TITLE
-@onready var _guide_info_node := %MANUAL_TASK_GUIDE_TITLE
-@onready var _trivia_info_node := %MANUAL_TASK_TRIVIA_TITLE
+@onready var _guide_info_nodes := {}
 
 func _ready() -> void:
 	FAG_WindowManager.init_window(self)
 	close_requested.connect(_on_close_requested)
 	_tab_container.tab_changed.connect(_on_tab_changed)
-	_guide_info_node.get_node("RichTextLabel").text = tr("MANUAL_SELECT_TOPIC")
-	_trivia_info_node.get_node("RichTextLabel").text = tr("MANUAL_SELECT_TOPIC")
+	var tab_template = %MANUAL_TASK_GUIDE_TEMPLATE
+	
+	for i in range(0, len(MANUAL_TABS)):
+		var tab
+		var tab_id = MANUAL_TABS[i]
+		
+		if i > 0:
+			tab = tab_template.duplicate()
+			
+			# remove tree from other tabs, we keep single tree
+			var treeparent = tab.get_node("TreeParent")
+			var tree = treeparent.get_node("Tree")
+			treeparent.remove_child(tree)
+			tree.queue_free()
+			
+			_tab_container.add_child(tab)
+		else:
+			tab = tab_template
+		
+		tab.name = "MANUAL_TASK_GUIDE_TITLE_" + tab_id
+		tab.get_node("RichTextLabel").text = tr("MANUAL_SELECT_TOPIC")
+		tab.set_meta("tab_id", tab_id)
+		
+		_guide_info_nodes[tab_id] = tab
+	
+	_tab_container.move_child(%MANUAL_EXTERNAL_TITLE, -1)
 	_on_tab_changed()
 
 func _on_close_requested() -> void:

@@ -508,4 +508,4 @@ func _factory_clear():
 ### misc / utils
 
 func _on_show_task_info() -> void:
-	FAG_Settings.get_root_subnode("%Manual").show_info(level_scene_node, GAME_PROGRESS_SAVE)
+	FAG_Settings.get_root_subnode("%ManualBrowser").show_info(level_scene_node, GAME_PROGRESS_SAVE)

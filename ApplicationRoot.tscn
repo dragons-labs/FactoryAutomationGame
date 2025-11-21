@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://ceu2sr0pyo22c"]
+[gd_scene load_steps=7 format=3 uid="uid://ceu2sr0pyo22c"]
 
 [ext_resource type="PackedScene" uid="uid://cr1jneq81cpn2" path="res://Factory/FactoryRoot.tscn" id="1_lan0v"]
-[ext_resource type="PackedScene" uid="uid://54n2ntuoy5i0" path="res://Manual/Manual.tscn" id="3_7xrpt"]
+[ext_resource type="PackedScene" uid="uid://54n2ntuoy5i0" path="res://Utils/ManualBrowser/ManualBrowser.tscn" id="3_7xrpt"]
 [ext_resource type="Script" uid="uid://dsrfa28ppyaye" path="res://Utils/Settings/LocaleSettings.gd" id="3_vwh6e"]
-[ext_resource type="PackedScene" uid="uid://d4j3lg6cly74v" path="res://MainMenu/MainMenu.tscn" id="4_bwojk"]
+[ext_resource type="PackedScene" uid="uid://d4j3lg6cly74v" path="res://Utils/MainMenu/MainMenu.tscn" id="4_bwojk"]
 [ext_resource type="Script" uid="uid://dnnc1hwxuteuw" path="res://Utils/Settings/GraphicsSettings.gd" id="4_f2ney"]
+[ext_resource type="Script" uid="uid://derty6c6a4vsi" path="res://addons/limbo_console_config.gd" id="6_f2ney"]
 
 [node name="ApplicationRoot" type="Node"]
 process_mode = 3
@@ -12,8 +13,8 @@ process_mode = 3
 [node name="FactoryRoot" parent="." instance=ExtResource("1_lan0v")]
 unique_name_in_owner = true
 
-[node name="MainMenu" parent="." node_paths=PackedStringArray("_factory_root") instance=ExtResource("4_bwojk")]
-_factory_root = NodePath("../FactoryRoot")
+[node name="MainMenu" parent="." node_paths=PackedStringArray("_game_root") instance=ExtResource("4_bwojk")]
+_game_root = NodePath("../FactoryRoot")
 _settings_order = Array[String](["LOCALE_SETTINGS_GROUP_NAME", "GRAPHICS_SETTINGS_GROUP_NAME", "MAIN_MENU_UI_SETTINGS_GROUP_NAME", "CAMERA3D_SETTINGS_GROUP_NAME", "CAMERA2D_SETTINGS_GROUP_NAME"])
 
 [node name="LocaleSettings" type="Node" parent="MainMenu"]
@@ -22,6 +23,9 @@ script = ExtResource("3_vwh6e")
 [node name="GraphicsSettings" type="Node" parent="MainMenu"]
 script = ExtResource("4_f2ney")
 
-[node name="Manual" parent="." instance=ExtResource("3_7xrpt")]
+[node name="ManualBrowser" parent="." instance=ExtResource("3_7xrpt")]
 unique_name_in_owner = true
 scaling_3d_scale = 2.0
+
+[node name="ConsoleReconfig" type="Node" parent="."]
+script = ExtResource("6_f2ney")

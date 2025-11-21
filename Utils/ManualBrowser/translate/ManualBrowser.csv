@@ -1,7 +1,7 @@
 keys,en
 MANUAL_TASK_INFO_TITLE,Task Info
-MANUAL_TASK_GUIDE_TITLE,Guide
-MANUAL_TASK_TRIVIA_TITLE,Triva
+MANUAL_TASK_GUIDE_TITLE_guide,Guide
+MANUAL_TASK_GUIDE_TITLE_trivia,Trivia
 MANUAL_EXTERNAL_TITLE,External
 MANUAL_NOTHING_TO_SHOW,"Nothing to show here. Try switch guide↔trivia or select another topic"
 MANUAL_SELECT_TOPIC,"Use menu on left to select topic"
