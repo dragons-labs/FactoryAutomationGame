@@ -106,7 +106,7 @@ func _on_popup_active(gui_active: bool, is_input := true) -> void:
 		focus_on_popup.emit(false)
 
 func _update_inputs_number(new_number_of_inputs: float) -> void:
-	number_of_inputs = new_number_of_inputs
+	number_of_inputs = int(new_number_of_inputs)
 	for i in range(0, max_number_of_inputs):
 		_set_visible(i, i < number_of_inputs)
 

@@ -29,7 +29,7 @@ ui_icon = ExtResource("3_a0umb")
 type = "NPN"
 params = Dictionary[String, Variant]({
 "models": {
-"NPN": ".model NPN npn"
+"NPN": ".model NPN npn(bf=250)"
 }
 })
 metadata/_edit_lock_ = true

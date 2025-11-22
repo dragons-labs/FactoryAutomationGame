@@ -137,7 +137,8 @@ func stop():
 			terminal.size_changed.disconnect(_on_size_changed)
 			terminal.gui_input.disconnect(_on_gui_mouse_input)
 			terminal.visibility_changed.disconnect(_on_visibility_changed)
-		
+		if mode & Mode.GRAPHICAL_VNC:
+			vnc_client.stop()
 		send_message_via_msg_bus("request_poweroff")
 		
 		for x in range(on_close_timeout * 10):

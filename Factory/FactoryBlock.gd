@@ -43,9 +43,9 @@ func get_block_control():
 ## Called after placing the block in the factory, after [code]_ready()[/code],
 ## but (unlike [code]_ready()[/code]) only when it has been placed (added to factory).
 ##
-## NOTE: Called with [code]name == null[/code] when name is not changed or not set.
+## NOTE: Called with [code]block_name == null[/code] when name is not changed or not set.
 ##       In this case an object that has a name should NOT change it.
-func init(factory_root, name = null):
+func init(_factory_root, _block_name = null):
 	pass
 
 ## Called when block is removing from factory, after removed from scene tree.

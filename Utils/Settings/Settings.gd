@@ -74,11 +74,6 @@ static func set_default_controls_and_create_actions(tr_prefix : String, actions_
 		actions[action_name] = [actions_list[action_name], tr_prefix + action_name]
 	return actions
 
-# return selected child of game root node
-# (placed in Settings not utils because get_tree need be called on node in scene)
-func get_root_subnode(node : String) -> Node:
-	return get_tree().current_scene.get_node(node)
-
 
 var _all_settings := {}
 var _custom_values := {}

@@ -237,7 +237,6 @@ unique_name_in_owner = true
 initial_position = 3
 size = Vector2i(600, 350)
 current_screen = 0
-ok_button_text = "Save"
 access = 2
 
 [node name="SelectionBox" type="Node2D" parent="."]

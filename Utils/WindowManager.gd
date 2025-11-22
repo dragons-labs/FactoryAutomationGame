@@ -23,7 +23,7 @@ func focus_is_on_embeded_window() -> bool:
 		# we can't update _focus_on_embeded_window in _on_focus_exited/_on_focus_entered
 		# due to order of call those signals/functions
 		_focus_on_embeded_window = false
-		for win in get_tree().current_scene.find_children("*", "Window", true, false):
+		for win in get_tree().root.find_children("*", "Window", true, false):
 			if win.has_focus():
 				_focus_on_embeded_window = true
 				break
@@ -35,7 +35,7 @@ var cursor_owner = null
 var _focus_on_embeded_window_valid := false
 var _focus_on_embeded_window := false
 var _border_unfocused
-var _hideen_by_escape = []
+var _hideen_by_escape = [[]]
 
 func _on_focus_exited(win : Window) -> void:
 	# print_verbose("_on_focus_exited ", win)
@@ -52,9 +52,12 @@ func _on_focus_entered(win : Window) -> void:
 func _on_window_input(event: InputEvent, win : Window, catch_global_escape : bool, catch_global_break : bool) -> void:
 	if (not catch_global_escape and event.is_action_pressed("GLOBAL_ESCAPE", false, true)) or \
 	   (not catch_global_break and event.is_action_pressed("GLOBAL_BREAK", false, true)):
-		_hideen_by_escape.append(win)
 		set_windows_visibility_recursive(win, false)
-		Input.parse_input_event(event.duplicate())
+		if not win.get_meta('grab_escape', false):
+			_hideen_by_escape[-1].append(win)
+			Input.parse_input_event(event.duplicate())
+		else:
+			win.set_meta('grab_escape', false)
 	if event is InputEventMouseButton:
 		if event.button_index != MOUSE_BUTTON_LEFT and event.pressed:
 			if event.position.x < 0 or event.position.y < 0 or event.position.x > win.size.x or event.position.y > win.size.y:
@@ -89,19 +92,26 @@ func set_windows_visibility_recursive(win : Window, value : bool) -> void:
 	if win.visible:
 		win.grab_focus()
 
-func hide_by_escape_all_windows(node : Node = null):
+func hide_all_windows(node : Node = null):
 	if not node:
-		node = get_tree().current_scene
+		node = get_tree().root
 	for win in node.find_children("*", "Window", true, false):
 		if win.visible:
-			_hideen_by_escape.append(win)
+			_hideen_by_escape[-1].append(win)
 			set_windows_visibility_recursive(win, false)
+	_hideen_by_escape.append([])
 
-func restore_hideen_by_escape():
-	for i in range(len(_hideen_by_escape)-1, -1, -1):
-		if _hideen_by_escape[i]: # in case of freed object after called hide_by_escape_all_windows()
-			set_windows_visibility_recursive(_hideen_by_escape[i], true)
-	_hideen_by_escape.clear()
+func restore_hidden_windows():
+	if len(_hideen_by_escape) > 1 and len(_hideen_by_escape[-1]) == 0:
+		_hideen_by_escape.pop_back()
+	elif len(_hideen_by_escape) == 1 and len(_hideen_by_escape[-1]) == 0:
+		pass # this is normal when called just after cancel_hideen_windows_list()
+	else:
+		printerr("unexpected content of hidden windows list (it should contain two elements and last element should be empty): ", _hideen_by_escape)
+	for i in range(len(_hideen_by_escape[-1])-1, -1, -1):
+		if _hideen_by_escape[-1][i]: # in case of freed object after called hide_all_windows()
+			set_windows_visibility_recursive(_hideen_by_escape[-1][i], true)
+	_hideen_by_escape[-1].clear()
 
-func cancel_hideen_by_escape():
-	_hideen_by_escape.clear()
+func cancel_hideen_windows_list():
+	_hideen_by_escape = [[]]

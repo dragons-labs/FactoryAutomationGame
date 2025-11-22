@@ -16,7 +16,7 @@ enum ModeEnum {Default, GDCEF, GodotWRY}
 				if "create_browser" in _gdcef:
 					backend = ModeEnum.GDCEF
 				elif "visible" in _webview:
-					backend == ModeEnum.GodotWRY
+					backend = ModeEnum.GodotWRY
 				else:
 					printerr("WARNING: Can't find web browser backend")
 			if backend == ModeEnum.GodotWRY:

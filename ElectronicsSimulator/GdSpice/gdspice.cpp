@@ -277,6 +277,7 @@ void GdSpice::_bind_methods() {
 	BIND_CONSTANT(WORKING_TYPE_STATE_MASK);
 	
 	ADD_SIGNAL(godot::MethodInfo("simulation_is_ready_to_run"));
+	ADD_SIGNAL(godot::MethodInfo("simulation_error"));
 }
 
 int GdSpice::on_thread_runs(bool not_running, int /*ident*/, void* userdata) {
@@ -310,7 +311,9 @@ int GdSpice::on_exit(int retcode, bool unloaded, bool onerror, int ident, void* 
 
 int GdSpice::on_getchar(char* text, int ident, void* userdata) {
 	auto gd_spice = static_cast<GdSpice*>(userdata);
-	if (!strncmp(text, "stderr Fatal error", 18) || !strncmp(text, "stderr Error", 12) || !strncmp(text, "stderr Warning: singular matrix", 31)) {
+	if (!strncmp(text, "stderr Fatal error", 18) || !strncmp(text, "stderr Error", 12) || !strncmp(text, "stderr Warning: singular matrix", 31) || !strncmp(text, "stderr tran simulation(s) aborted", 33)) {
+		if (gd_spice->simulation_state >= STARTING && gd_spice->simulation_state < ERROR)
+			gd_spice->call_deferred("emit_signal", "simulation_error");
 		gd_spice->simulation_state = ERROR;
 		godot::UtilityFunctions::printerr("[GdSpice] ERROR: detected issue in circuit or simulation. Simulation will be stopped!");
 	}

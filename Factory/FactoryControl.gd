@@ -14,7 +14,7 @@ func get_signal_value(signal_name : String, default : Variant = 0) -> Variant: #
 
 func _get_signal_value(signal_name : String, default : Variant = 0) -> Array:
 	var value1 = null
-	if circuit_simulator.gdspice.get_simulation_state() & circuit_simulator.gdspice.WORKING_TYPE_STATE_MASK:
+	if signal_name in outputs_from_circuit_to_factory and circuit_simulator.gdspice.get_simulation_state() & circuit_simulator.gdspice.WORKING_TYPE_STATE_MASK:
 		var electric_signal = outputs_from_circuit_to_factory[signal_name][0]
 		if electric_signal in circuit_simulator.gdspice.used_nets:
 			# NOTE: due to method of construction `used_nets` and `floating_nets` this causes the inability
@@ -99,13 +99,14 @@ func start(use_circuit_simulation, circuit_simulation_time_step, circuit_simulat
 func tick(delta: float, paused : bool) -> void:
 	# if electronic circuit simulation is used then check if it's "on time" ... if it's delayed then pause 3d factory processing
 	if _circuit_simulation_ready_state == READY:
-		if circuit_simulator.try_step(simulation_time):
+		var status = circuit_simulator.try_step(simulation_time)
+		if status[0]: # running and "on time"
 			if not simulation_on_time:
 				simulation_on_time = true
 				get_tree().paused = paused
 				prints("unpause after emergency pause", _pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), circuit_simulator.gdspice.get_time_simulation())
 			_pause_count = 0
-		else:
+		elif status[1] == GdSpice.RUNNING: # running and "not time"
 			if simulation_on_time:
 				simulation_on_time = false
 				get_tree().paused = true
@@ -115,6 +116,7 @@ func tick(delta: float, paused : bool) -> void:
 			if _pause_count % 60 == 0:
 				prints(_pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), circuit_simulator.gdspice.get_time_simulation())
 			return
+		# else: not running (waiting for start / stopped / error / ...) -> do nothing here
 	
 	# do not update time while game is pause
 	# (the previous code must be processed also during pause - for unpausing)
@@ -142,8 +144,7 @@ func stop() -> void:
 		element.get_child(0).time_step(-1)
 
 func close() -> void:
-	if _circuit_simulation_ready_state != UNUSED:
-		circuit_simulator.stop()
+	circuit_simulator.stop()
 	for element in computer_control_blocks.values():
 		element.get_child(0).stop()
 	for element in computer_control_blocks.values():

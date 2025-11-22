@@ -71,6 +71,7 @@ static func on_object_leave_block(node : Node3D, factory_block_belt : FAG_Factor
 		elif node.has_meta("next_belt") and node.get_meta("next_belt") == factory_block_belt:
 			node.remove_meta("next_belt")
 
+@warning_ignore("shadowed_variable")
 static func accept_object_on_block(node : Node3D, factory_block_belt : FAG_FactoryBlockConveyor, exclusive_owner : bool, speed_vector : Variant = null) -> void:
 	# print_verbose("adding [", self, "] ", node)
 	
@@ -121,5 +122,5 @@ static func set_object_speed(node : Node3D, speed_vector : Vector3):
 
 static func translate_object(node : Node3D, translate_vector : Vector3):
 	var rid = node.get_rid()
-	var transform = PhysicsServer3D.body_get_state( rid, PhysicsServer3D.BODY_STATE_TRANSFORM )
-	PhysicsServer3D.body_set_state( rid, PhysicsServer3D.BODY_STATE_TRANSFORM, transform.translated(translate_vector) )
+	var rid_transform = PhysicsServer3D.body_get_state( rid, PhysicsServer3D.BODY_STATE_TRANSFORM )
+	PhysicsServer3D.body_set_state( rid, PhysicsServer3D.BODY_STATE_TRANSFORM, rid_transform.translated(translate_vector) )

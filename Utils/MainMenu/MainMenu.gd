@@ -83,7 +83,7 @@ func _on_load_save_pressed() -> void:
 	_set_mode(Mode.LOAD_SAVE)
 
 func _on_show_task_info() -> void:
-	FAG_Settings.get_root_subnode("%ManualBrowser").show_info(_game_root.level_scene_node, _game_root.GAME_PROGRESS_SAVE)
+	_game_root.show_task_info(true)
 
 func _on_settings_pressed() -> void:
 	var screen_size := Vector2(get_tree().root.size)
@@ -121,7 +121,7 @@ func _on_load_pressed() -> void:
 
 func _load_level_or_save(level_id := "", save_path := ""):
 	_show(Mode.LOADING)
-	FAG_WindowManager.cancel_hideen_by_escape()
+	FAG_WindowManager.cancel_hideen_windows_list()
 	await _game_root.close()
 	
 	if level_id:
@@ -179,7 +179,8 @@ func _on_add_save_slot_pressed(text := "") -> void:
 func _show(mode := Mode.NORMAL):
 	if %SettingsDialog.visible:
 		FAG_Settings.cancel_settings_changes()
-	FAG_WindowManager.hide_by_escape_all_windows()
+	FAG_WindowManager.hide_all_windows()
+	_was_paused = _game_root.is_factory_paused()
 	_game_root.pause_factory()
 	_game_root.input_off()
 	_set_mode(mode)
@@ -188,9 +189,11 @@ func _show(mode := Mode.NORMAL):
 func _hide():
 	hide()
 	_game_root.input_on()
-	_game_root.unpause_factory()
-	FAG_WindowManager.restore_hideen_by_escape()
+	if not _was_paused:
+		_game_root.unpause_factory()
+	FAG_WindowManager.restore_hidden_windows()
 
+var _was_paused := false
 
 ### Application close
 

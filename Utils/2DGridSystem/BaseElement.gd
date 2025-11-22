@@ -163,6 +163,12 @@ func set_active(val : bool):
 var _was_mirrored := false
 var _was_180_deg_rotated := false
 
+func duplicate_element() -> Node:
+	var node = duplicate()
+	node._was_mirrored = _was_mirrored
+	node._was_180_deg_rotated = _was_180_deg_rotated
+	return node
+
 func on_transform_updated() -> void:
 	var element_is_mirrored := (global_scale.y == -1)
 	var element_is_180_deg_rorared := (global_rotation > 3 or global_rotation < -3)

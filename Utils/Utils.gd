@@ -65,6 +65,27 @@ static func write_to_json_file(path : String, data : Variant) -> void:
 	var save_info_file = FileAccess.open(path, FileAccess.WRITE)
 	save_info_file.store_string(JSON.stringify(data, "  "))
 
+static func serialise_Transform3D(data: Transform3D) -> Dictionary:
+	return {'x': data.basis.x, 'y': data.basis.y, 'z': data.basis.z, 'o': data.origin}
+
+static func Transform3D_from_JSON(data : Variant) -> Transform3D:
+	if data is Transform3D:
+		return data
+	if data is not Dictionary:
+		printerr("Invalid data ", data, " passed to Vector3_from_JSON")
+		return Transform3D.IDENTITY
+	for e in ['x', 'y', 'z', 'o']:
+		if not e in data:
+			printerr("Invalid data ", data, " passed to Vector3_from_JSON")
+			return Transform3D.IDENTITY
+	
+	return Transform3D(
+		Vector3_from_JSON(data['x']),
+		Vector3_from_JSON(data['y']),
+		Vector3_from_JSON(data['z']),
+		Vector3_from_JSON(data['o']),
+	)
+
 static func Vector3_from_JSON(data : Variant) -> Vector3:
 	if data is Vector3:
 		return data

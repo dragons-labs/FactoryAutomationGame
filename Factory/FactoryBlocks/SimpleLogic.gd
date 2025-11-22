@@ -8,7 +8,7 @@ enum GateType {AND, OR, NOT}
 @export var gate_type : GateType
 @onready var _gui = $Gui3DNode.gui
 
-func init(factory_root, name = null) -> void:
+func init(factory_root, _block_name = null) -> void:
 	_factory_control = factory_root.factory_control
 	_factory_builder = factory_root.factory_builder
 	if gate_type == GateType.AND:
@@ -99,7 +99,7 @@ func _on_factory_process_not(_time : float, _delta_time : float) -> void:
 		if not _inputs[i] or not _outputs[i]:
 			continue
 		var input = _factory_control.get_signal_value(_inputs[i])
-		_factory_control.set_signal_value(_outputs[i], 0 if input > 2.5 else 3.3)
+		_factory_control.set_signal_value(_outputs[i], 0.0 if input > 2.5 else 3.3)
 
 
 var _factory_builder

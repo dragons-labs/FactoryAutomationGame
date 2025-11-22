@@ -5,18 +5,25 @@ extends FAG_FactoryBlock
 
 @onready var _block_control = FAG_FactoryBlockControl.new(self)
 
-func init(factory_root, name = null):
-	_block_control.init(factory_root, name, _gui.name_label)
+func init(factory_root, block_name = null):
+	_block_control.init(factory_root, block_name, _gui.name_label)
 	_block_control._factory_control.factory_tick.connect(_on_factory_process)
 	_gui.ok_button.pressed.connect(_on_ui_accepted)
+	_gui.spin_box.value_changed.connect(_on_spin_box_value_accepted)
 	
 	_block_config = get_block_config()
 	_change_signal_number(_block_config.get("signal_number", 1))
+	
+	_gui.not_applied_warning.visible = false
 	
 @onready var _gui = $Gui3DNode.gui
 
 func _on_ui_accepted():
 	_change_signal_number(_gui.spin_box.value)
+	_gui.not_applied_warning.visible = false
+
+func _on_spin_box_value_accepted(_value):
+	_gui.not_applied_warning.visible = true
 
 var _signals = []
 var _block_config

@@ -12,8 +12,8 @@ const _block_signals_inputs := {
 
 @onready var _block_control = FAG_FactoryBlockControl.new(self)
 
-func init(factory_root, name = null):
-	_block_control.init(factory_root, name, $Label3D, _block_signals_outputs, _block_signals_inputs, [])
+func init(factory_root, block_name = null):
+	_block_control.init(factory_root, block_name, $Label3D, _block_signals_outputs, _block_signals_inputs, [])
 	
 	_block_control._factory_control.factory_tick.connect(_on_factory_process)
 	
@@ -78,7 +78,7 @@ func _on_factory_process(_time : float, _delta_time : float):
 			for obj in _pusher_area_objects:
 				FAG_FactoryBlockConveyor.set_object_free(obj)
 				FAG_FactoryBlockConveyor.set_object_speed(obj, Vector3.ZERO)
-				FAG_FactoryBlockConveyor.translate_object(obj, get_parent().quaternion * Vector3(0, 0, -1))
+				FAG_FactoryBlockConveyor.translate_object(obj, quaternion * Vector3(0, 0, -scale.z))
 			_pusher_area_objects.clear()
 			_block_control.set_signal_value("splitter_object_inside", 0)
 	else:

@@ -61,6 +61,7 @@ func enable_input() -> void:
 var _camera : Node3D
 var _target : Node3D
 var _default_fov : float
+var _default_target_transform : Transform3D
 var _input_disabled := false
 
 func _init() -> void:
@@ -128,11 +129,30 @@ func _ready() -> void:
 	else:
 		_target = self
 		
+	_default_fov = _camera.fov
+	_default_target_transform = _target.transform
+	
+	restore_defaults()
+
+func restore_defaults():
+	_target.transform =  _default_target_transform
+	_camera.fov = _default_fov
+	
 	if _camera != _target:
 		_camera.position = Vector3(0, 0, target_camera_initial_distance)
 		_camera.look_at(_target.position)
-	
-	_default_fov = _camera.fov
+
+func serialise() -> Dictionary:
+	return {
+		"target_transform": FAG_Utils.serialise_Transform3D(_target.transform),
+		"camera_position": _camera.position,
+		"camera_fov": _camera.fov,
+	}
+
+func restore(data : Dictionary) -> void:
+	_target.transform = FAG_Utils.Transform3D_from_JSON(data["target_transform"])
+	_camera.position = FAG_Utils.Vector3_from_JSON(data["camera_position"])
+	_camera.fov = data["camera_fov"]
 
 
 var _move := Vector3.ZERO
@@ -313,9 +333,9 @@ func _translate(value : Vector3):
 			if _camera.position.z < 0:
 				_camera.position.z = 0
 		else:
-			_target.translate(Vector3(-value.x, 0, value.y))
+			_target.translate_object_local(Vector3(-value.x, 0, value.y))
 	else:
-		_camera.translate(value)
+		_camera.translate_object_local(value)
 
 func _update_zoom(value : float):
 	_camera.fov = clamp(_camera.fov + value, 1, 179) # preventing errors in Godot code 

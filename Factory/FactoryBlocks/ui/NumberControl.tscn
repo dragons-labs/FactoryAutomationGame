@@ -1,12 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://c5japjfigom8j"]
+[gd_scene load_steps=3 format=3 uid="uid://c5japjfigom8j"]
 
 [sub_resource type="GDScript" id="GDScript_rqw2r"]
 script/source = "extends Control
 
+@onready var name_label := %Name
 @onready var spin_box := %SpinBox
 @onready var ok_button := %OK
-@onready var name_label := %Name
+@onready var not_applied_warning := %NotAppliedWarning
 "
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rqw2r"]
+bg_color = Color(0, 0, 0, 1)
 
 [node name="MarginContainer" type="MarginContainer"]
 offset_right = 300.0
@@ -53,12 +57,28 @@ value = 1.0
 [node name="Control" type="Control" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="NotAppliedWarning" type="Label" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85490197, 1, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_rqw2r")
+text = "FACTORY_BLOCK_UI_NOT_APPLIED"
+
+[node name="Control2" type="Control" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
 size_flags_horizontal = 8
 
-[node name="OK" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="OK" type="Button" parent="VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "FACTORY_BLOCK_UI_ACCEPT"

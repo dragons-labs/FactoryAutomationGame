@@ -115,6 +115,7 @@ func save(save_dir : String) -> void:
 		save_dir + SAVE_INFO_FILE,
 		{
 			"level" : level_scene_node.level_id,
+			"camera": factory_builder.camera.serialise(),
 			"stats" : _stats,
 		}
 	)
@@ -136,6 +137,8 @@ func restore(save_dir : String) -> void:
 	
 	factory_builder.restore(FAG_Utils.load_from_json_file(save_dir + "/Factory.json"))
 	factory_control.circuit_simulator.restore(FAG_Utils.load_from_json_file(save_dir + "/Circuit.json"))
+	if 'camera' in save_info:
+		factory_builder.camera.restore(save_info['camera'])
 
 func close() -> void:
 	get_tree().paused = true
@@ -161,8 +164,9 @@ func run_factory() -> void:
 		printerr("Factory already started")
 		return
 	
-	_factory_state = FACTORY_RUNNING | ON_CHANGE
+	_factory_state = FACTORY_RUNNING | ON_CHANGE | FACTORY_STARTING
 	_factory_paused = false
+	_factory_start_allowed = get_tree().paused
 	_factory_speed = game_speed.get_value()
 	Engine.call_deferred("set_time_scale", _factory_speed)
 	factory_builder.ui.set_editor_enabled(false)
@@ -173,14 +177,18 @@ func run_factory() -> void:
 		level_scene_node.circuit_simulation_time_step,
 		level_scene_node.circuit_simulation_max_time
 	)
-	
 	# continue (after control is started) in _on_control_running()
 
 func _on_control_running() -> void:
 	print(" starting")
-	unpause_factory()
+	while not _factory_start_allowed:
+		await FAG_Utils.real_time_wait(0.1)
+		# wait for _factory_start_allowed
+	get_tree().paused = false
+	await FAG_Utils.real_time_wait(0.1) # some time to process control circuit signals before emit start ... important for control enabled signals
 	factory_start.emit()
 	await FAG_Utils.real_time_wait(0.2)
+	_factory_state &= ~FACTORY_STARTING
 	_factory_state &= ~ON_CHANGE
 	_start_stop_hud_ui()
 
@@ -211,7 +219,9 @@ func stop_factory() -> void:
 	_start_stop_hud_ui()
 
 func pause_factory():
-	if not _factory_state & FACTORY_RUNNING:
+	_factory_start_allowed = false
+	
+	if not _factory_state & FACTORY_RUNNING or _factory_state & EMERGENCY_STOP or _factory_state & FACTORY_STARTING:
 		return
 	
 	_factory_paused = true
@@ -219,12 +229,17 @@ func pause_factory():
 	# NOTE: we do not pause circuit simulation here ... it will be "paused" in sync function (via sleep)
 
 func unpause_factory():
-	if not _factory_state & FACTORY_RUNNING or _factory_state & EMERGENCY_STOP:
+	_factory_start_allowed = true
+	
+	if not _factory_state & FACTORY_RUNNING or _factory_state & EMERGENCY_STOP or _factory_state & FACTORY_STARTING:
 		return
 	
 	_factory_paused = false
 	if factory_control.simulation_on_time:
 		get_tree().call_deferred("set_pause", _factory_paused)
+
+func is_factory_paused():
+	return _factory_paused
 
 var _input_is_off := false
 
@@ -275,7 +290,7 @@ func _on_pause_pressed() -> void:
 		pause_factory()
 	_start_stop_hud_ui()
 
-enum { FACTORY_RUNNING = 0b00001 , FACTORY_STOP = 0b00010, ON_CHANGE = 0b00100, EMERGENCY_STOP = 0b01000}
+enum { FACTORY_RUNNING = 0b00001 , FACTORY_STOP = 0b00010, ON_CHANGE = 0b00100, EMERGENCY_STOP = 0b01000, FACTORY_STARTING = 0b10000}
 
 func _start_stop_hud_ui():
 	print("_start_stop_hud_ui _factory_state=%x" % _factory_state)
@@ -304,6 +319,7 @@ func _start_stop_hud_ui():
 var _factory_state
 var _factory_paused
 var _factory_speed
+var _factory_start_allowed
 
 
 ### factory errors handling
@@ -347,14 +363,14 @@ func emergency_stop(title : String, message : String):
 	get_tree().paused = true
 	factory_control.circuit_simulator.gdspice.emergency_stop()
 	_start_stop_hud_ui()
-	FAG_WindowManager.hide_by_escape_all_windows(self)
+	FAG_WindowManager.hide_all_windows(self)
 	%Message_Title.text = tr(title)
 	%Message_Text.text = tr(message)
 	%Message.show()
 
 func _on_errormsg_ok_pressed() -> void:
 	%Message.hide()
-	FAG_WindowManager.restore_hideen_by_escape()
+	FAG_WindowManager.restore_hidden_windows()
 
 
 ### win / loss conditions
@@ -448,6 +464,7 @@ func _update_circuit_element_count(element: Node2D, val: int) -> void:
 func _ready() -> void:
 	set_visibility(false)
 	_factory_state = FACTORY_STOP
+	_factory_paused = true
 	_start_stop_hud_ui()
 	factory_builder.on_block_add.connect(_update_block_count.bind(1))
 	factory_builder.on_block_remove.connect(_update_block_count.bind(-1))
@@ -507,5 +524,7 @@ func _factory_clear():
 
 ### misc / utils
 
-func _on_show_task_info() -> void:
-	FAG_Settings.get_root_subnode("%ManualBrowser").show_info(level_scene_node, GAME_PROGRESS_SAVE)
+func show_task_info(grab_escape := false) -> void:
+	show_manual.emit(level_scene_node, GAME_PROGRESS_SAVE, grab_escape)
+
+signal show_manual(object : Object, progress_save_path : String, grab_escape : bool)

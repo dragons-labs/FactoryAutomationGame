@@ -391,3 +391,7 @@ func _error(message : String) -> void:
 	_state = NONE
 	if (not reverse and reconnect_on_error):
 		_do_connect()
+
+func stop():
+	_state = NONE
+	_connection = null

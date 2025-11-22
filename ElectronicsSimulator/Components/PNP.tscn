@@ -29,7 +29,7 @@ ui_icon = ExtResource("3_4lpep")
 type = "PNP"
 params = Dictionary[String, Variant]({
 "models": {
-"PNP": ".model PNP pnp"
+"PNP": ".model PNP pnp(bf=250)"
 }
 })
 metadata/_edit_lock_ = true

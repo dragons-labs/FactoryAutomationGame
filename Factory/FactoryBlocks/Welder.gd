@@ -4,7 +4,6 @@
 extends FAG_FactoryBlockConveyor
 
 @onready var _area := $Area3D
-@onready var _factory_root := FAG_Settings.get_root_subnode("%FactoryRoot")
 @onready var _second_input := $Area3DIn2
 
 var _object = [null, null]
@@ -12,12 +11,12 @@ var _object_to_get = [null, null]
 var _waiting_object = [null, null]
 var _new_accepted_object := false
 
-func _ready():
+func init(factory_root, _block_name = null):
 	_area.body_entered.connect(_on_object_enter_block.bind(0))
 	_second_input.body_entered.connect(_on_object_enter_block.bind(1))
 	_area.body_exited.connect(_on_object_exit_block)
-	_factory_root.factory_start.connect(_on_factory_start)
-	_factory_root.factory_control.factory_tick.connect(_on_factory_process)
+	factory_root.factory_start.connect(_on_factory_start)
+	factory_root.factory_control.factory_tick.connect(_on_factory_process)
 	on_transform_update()
 
 func on_transform_update():

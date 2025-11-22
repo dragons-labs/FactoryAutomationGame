@@ -84,7 +84,7 @@ func init_circuit(
 func start(simulation_time_step := "10us", simulation_max_time := "600s") -> void:
 	gdspice.start(simulation_time_step, simulation_max_time)
 
-func try_step(time : float) -> bool:
+func try_step(time : float) -> Array:
 	if gdspice.try_step(time):
 		gdspice.update_measurements()
 		if current_limit:
@@ -97,11 +97,12 @@ func try_step(time : float) -> bool:
 				var value = gdspice.get_last_value(net)
 				if value > voltage_limit or value < -voltage_limit:
 					overvoltage_protection.emit(net, value)
-		return true
+		return [true, GdSpice.RUNNING]
 	else:
-		if gdspice.get_simulation_state() == GdSpice.ERROR:
-			simulation_error.emit()
-		return false
+		var simulation_state = gdspice.get_simulation_state()
+		if simulation_state == GdSpice.ERROR:
+			_on_simulation_error()
+		return [false, simulation_state]
 
 func stop() -> void:
 	print("Stop circuit simulation")
@@ -123,12 +124,15 @@ func set_visibility(value : bool) -> void:
 	visible = value
 	grid_editor.call_deferred("set_visibility", value)
 
+func _on_simulation_error():
+	simulation_error.emit()
 
 func _ready():
 	grid_editor.on_element_click.connect(_on_element_click)
 	grid_editor.ui.get_node("%Actions/Import").tooltip_text = "ELECTRONIC_EDITOR_IMPORT_TOOLTIP"
 	grid_editor.ui.get_node("%Actions/Save").tooltip_text = "ELECTRONIC_EDITOR_SAVE_TOOLTIP"
 	
+	gdspice.simulation_error.connect(_on_simulation_error)
 	gdspice.init()
 	gdspice.verbose = 2
 

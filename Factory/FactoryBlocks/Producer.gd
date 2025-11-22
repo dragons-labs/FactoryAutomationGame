@@ -13,8 +13,8 @@ const _block_signals_inputs := {
 
 @onready var _block_control = FAG_FactoryBlockControl.new(self)
 
-func init(factory_root, name = null):
-	_block_control.init(factory_root, name, $Label3D, _block_signals_outputs, _block_signals_inputs, [])
+func init(factory_root, block_name = null):
+	_block_control.init(factory_root, block_name, $Label3D, _block_signals_outputs, _block_signals_inputs, [])
 	
 	factory_root.factory_stop.connect(_on_factory_stop)
 	factory_root.factory_start.connect(_on_factory_start)
@@ -48,7 +48,7 @@ func _release_object(delay := 0.0) -> void:
 	element.global_position = global_position
 	element.visible = true
 	_object_is_ready = false
-	_timer.reset(timer_period + delay)
+	_timer.reset(timer_period - delay)
 
 func _on_factory_stop() -> void:
 	if not is_inside_tree():
@@ -57,6 +57,7 @@ func _on_factory_stop() -> void:
 func _on_factory_start() -> void:
 	if not is_inside_tree():
 		return
+	_object_is_ready = false
 	_timer = _block_control._factory_control.create_timer(timer_period, false)
 	_timer.timeout.connect(_on_timer_timeout)
 	_on_timer_timeout(0.0)

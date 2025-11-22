@@ -12,9 +12,9 @@ script/source = "extends LineEdit
 
 func get_netlist_entry(nets_on_element, id):
 	return {
-		\"circuit\" : [\"%s%d \" % [get_parent().type, id] + \\
+		\"circuit\" : [\"D%d \" % id + \\
 			\" \".join(nets_on_element) + \" \" + \\
-			get_parent().get_value()
+			\"Diode\"
 		]
 	}
 "
@@ -25,8 +25,12 @@ connections = PackedVector2Array(-40, 0, 40, 0)
 image_texture = ExtResource("2_kecim")
 ui_name = "ELECTRONIC_COMPONENT_NAME_DIODE"
 ui_icon = ExtResource("3_r031r")
-type = "D"
-subtype = "Diode"
+type = "Diode"
+params = Dictionary[String, Variant]({
+"models": {
+"Diode": ".model Diode D"
+}
+})
 metadata/_edit_lock_ = true
 
 [node name="Value" type="LineEdit" parent="."]

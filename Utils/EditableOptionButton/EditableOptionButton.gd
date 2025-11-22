@@ -49,6 +49,7 @@ func _update_popupmenu_position() -> void:
 	popupmenu.max_size.x = max_size.x
 	
 	var new_pos_y := int(menubutton.global_position.y + menubutton.size.y)
+	@warning_ignore("integer_division") 
 	if new_pos_y < max_size.y/2:
 		popupmenu.position.y = new_pos_y
 		popupmenu.max_size.y = max_size.y - new_pos_y

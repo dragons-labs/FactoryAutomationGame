@@ -68,6 +68,7 @@ func restore(data : Array) -> void:
 
 func close() -> void:
 	ui.reset_editor()
+	camera.restore_defaults()
 	_moving_elements.clear()
 	_scaled_element = null
 	_intersection = null
@@ -78,11 +79,11 @@ func close() -> void:
 
 ### Block add / remove callbacks
 
-func _on_block_add(element : Node3D, name = null) -> void:
+func _on_block_add(element : Node3D, block_name = null) -> void:
 	if "object_type" in element and element.object_type == "ComputerControlBlock":
 		factory_control.setup_computer_control_blocks(element)
 	elif "init" in element:
-		element.init(factory_root, name)
+		element.init(factory_root, block_name)
 	on_block_add.emit(element)
 
 func _on_block_remove(element : Node3D) -> void:
@@ -141,6 +142,8 @@ func _process(_delta) -> void:
 			
 			var it_is_free_grid_position = true
 			for neighbor in neighbors:
+				if neighbor is not FAG_FactoryBlock:
+					continue
 				if new__intersection_grid_position.is_equal_approx( get_block_from_collider(neighbor.collider).global_position ):
 					it_is_free_grid_position = false
 					break
@@ -215,11 +218,11 @@ func _on_element_add__finish(_point = null) -> void:
 
 var _show_name_dialog_cllback = null
 
-func _show_name_dialog(callback, name := ""):
+func _show_name_dialog(callback, block_name := ""):
 	_show_name_dialog_cllback = callback
 	ui.input_allowed = false
 	camera.disable_input()
-	%GetNameInput.text = name
+	%GetNameInput.text = block_name
 	%GetNameDialog.show()
 	%GetNameInput.grab_focus()
 

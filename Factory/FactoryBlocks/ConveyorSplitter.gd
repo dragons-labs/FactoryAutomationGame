@@ -14,8 +14,8 @@ const _block_signals_inputs := {
 
 @onready var _block_control = FAG_FactoryBlockControl.new(self)
 
-func init(factory_root, name = null):
-	_block_control.init(factory_root, name, $Label3D, _block_signals_outputs, _block_signals_inputs, [])
+func init(factory_root, block_name = null):
+	_block_control.init(factory_root, block_name, $Label3D, _block_signals_outputs, _block_signals_inputs, [])
 	
 	_block_control._factory_control.factory_tick.connect(_on_factory_process)
 	

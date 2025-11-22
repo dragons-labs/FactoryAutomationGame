@@ -14,7 +14,7 @@ extends Window
 ## Manual tabs (per topic sections)
 @export var MANUAL_TABS = ["guide", "trivia"]
 
-func show_info(object : Object, progress_save_path : String) -> void:
+func show_info(object : Object, progress_save_path : String, grab_escape := false) -> void:
 	var text_area = _tab_container.get_current_tab_control().get_node("RichTextLabel")
 	if text_area:
 		text_area.text = tr("MANUAL_SELECT_TOPIC")
@@ -32,6 +32,7 @@ func show_info(object : Object, progress_save_path : String) -> void:
 			_tab_container.get_parent().add_child(_task_info_node)
 			_task_info_node.hide()
 		_update_tree("", progress_save_path)
+	set_meta('grab_escape', grab_escape)
 	show()
 	grab_focus()
 
