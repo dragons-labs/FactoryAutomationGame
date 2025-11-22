@@ -1,0 +1,74 @@
+[
+  {
+    "block_config": {
+      "inputs": [
+        "io_expander_1_signal_03_out",
+        "io_expander_1_signal_04_out"
+      ],
+      "outputs": [
+        "io_expander_1_signal_05_in"
+      ]
+    },
+    "position": "Vector3(-1.0, 0.0, 0.0)",
+    "rotation": "Vector3(0.0, 0.0, 0.0)",
+    "scale": "Vector3(1.0, 1.0, 1.0)",
+    "type": "SimpleLogicOR"
+  },
+  {
+    "block_config": {
+      "signal_number": 6.0
+    },
+    "block_name": "io_expander_1",
+    "position": "Vector3(-3.0, 0.0, 0.0)",
+    "rotation": "Vector3(0.0, 0.0, 0.0)",
+    "scale": "Vector3(1.0, 1.0, 1.0)",
+    "type": "GPIOExpander"
+  },
+  {
+    "block_config": {
+      "inputs": [
+        "custom_signal_1"
+      ],
+      "outputs": [
+        "io_expander_1_signal_03_in"
+      ]
+    },
+    "position": "Vector3(0.0, 0.0, 0.0)",
+    "rotation": "Vector3(0.0, 0.0, 0.0)",
+    "scale": "Vector3(1.0, 1.0, 1.0)",
+    "type": "SimpleLogicNOT"
+  },
+  {
+    "block_config": {
+      "inputs": [
+        "io_expander_1_signal_00_out",
+        "io_expander_1_signal_01_out"
+      ],
+      "outputs": [
+        "custom_signal_1"
+      ]
+    },
+    "position": "Vector3(-2.0, 0.0, 0.0)",
+    "rotation": "Vector3(0.0, 0.0, 0.0)",
+    "scale": "Vector3(1.0, 1.0, 1.0)",
+    "type": "SimpleLogicAND"
+  },
+  {
+    "position": "Vector3(-4.0, 0.0, 0.0)",
+    "rotation": "Vector3(0.0, 0.0, 0.0)",
+    "scale": "Vector3(1.0, 1.0, 1.0)",
+    "type": "ComputerControlBlock"
+  },
+  {
+    "position": "Vector3(-4.0, 1.0, 0.0)",
+    "rotation": "Vector3(0.0, 0.0, 0.0)",
+    "scale": "Vector3(1.0, 1.0, 1.0)",
+    "type": "ComputerControlBlock"
+  },
+  {
+    "position": "Vector3(-5.0, 0.0, 0.0)",
+    "rotation": "Vector3(0.0, 0.0, 0.0)",
+    "scale": "Vector3(1.0, 1.0, 1.0)",
+    "type": "ElectronicControlBlock"
+  }
+]

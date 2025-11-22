@@ -55,9 +55,9 @@ func restore(data : Array) -> void:
 		var packed_scene = ui._elements_dict[node_info.type][0]
 		
 		var node = packed_scene.instantiate()
-		node.position = FAG_Utils.Vector3_from_JSON(node_info.position)
-		node.rotation = FAG_Utils.Vector3_from_JSON(node_info.rotation)
-		node.scale = FAG_Utils.Vector3_from_JSON(node_info.scale)
+		node.position = node_info.position
+		node.rotation = node_info.rotation
+		node.scale = node_info.scale
 		if "block_config" in node_info:
 			node.set_meta("block_config", node_info.block_config)
 		

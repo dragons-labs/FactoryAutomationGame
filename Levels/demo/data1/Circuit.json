@@ -1,45 +1,45 @@
 {
   "Elements": [
     {
-      "position": "Vector2(-100, -80)",
-      "rotation": 0,
-      "scale": "Vector2(1, 1)",
+      "position": "Vector2(-100.0, -80.0)",
+      "rotation": 0.0,
+      "scale": "Vector2(1.0, 1.0)",
       "type": "NetConnector",
       "values": {
         "Value": "Vcc"
       }
     },
     {
-      "position": "Vector2(0, -80)",
-      "rotation": 0,
-      "scale": "Vector2(1, 1)",
+      "position": "Vector2(0.0, -80.0)",
+      "rotation": 0.0,
+      "scale": "Vector2(1.0, 1.0)",
       "type": "NetConnector",
       "values": {
         "Value": "producer_object_ready_@in"
       }
     },
     {
-      "position": "Vector2(0, 0)",
-      "rotation": 0,
-      "scale": "Vector2(1, 1)",
+      "position": "Vector2(0.0, 0.0)",
+      "rotation": 0.0,
+      "scale": "Vector2(1.0, 1.0)",
       "type": "NetConnector",
       "values": {
         "Value": "producer_release_object_@out"
       }
     },
     {
-      "position": "Vector2(0, 80)",
-      "rotation": 0,
-      "scale": "Vector2(1, 1)",
+      "position": "Vector2(0.0, 80.0)",
+      "rotation": 0.0,
+      "scale": "Vector2(1.0, 1.0)",
       "type": "NetConnector",
       "values": {
         "Value": "producer_control_enabled_@out"
       }
     },
     {
-      "position": "Vector2(-100, -20)",
-      "rotation": 0,
-      "scale": "Vector2(1, 1)",
+      "position": "Vector2(-100.0, -20.0)",
+      "rotation": 0.0,
+      "scale": "Vector2(1.0, 1.0)",
       "type": "GND",
       "values": {
 

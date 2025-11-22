@@ -144,14 +144,14 @@ func restore_defaults():
 
 func serialise() -> Dictionary:
 	return {
-		"target_transform": FAG_Utils.serialise_Transform3D(_target.transform),
+		"target_transform": _target.transform,
 		"camera_position": _camera.position,
 		"camera_fov": _camera.fov,
 	}
 
 func restore(data : Dictionary) -> void:
-	_target.transform = FAG_Utils.Transform3D_from_JSON(data["target_transform"])
-	_camera.position = FAG_Utils.Vector3_from_JSON(data["camera_position"])
+	_target.transform = data["target_transform"]
+	_camera.position = data["camera_position"]
 	_camera.fov = data["camera_fov"]
 
 

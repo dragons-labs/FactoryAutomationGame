@@ -57,61 +57,70 @@ static func _match_double_click(action_name : String, event : InputEvent, result
 # JSON
 #
 
+## load variable to JSON file
 static func load_from_json_file(path : String) -> Variant:
 	var save_info_file = FileAccess.open(path, FileAccess.READ)
-	return JSON.parse_string(save_info_file.get_as_text())
+	return from_JSON(save_info_file.get_as_text())
 
+## convert results of `to_JSON` back in original variable
+static func from_JSON(data: String) -> Variant:
+	return _from_JSON(JSON.parse_string(data))
+
+static func _from_JSON(data: Variant) -> Variant:
+	if data is Dictionary:
+		var keys = data.keys()
+		for k in keys:
+			var new_key = _str_to_var(k)
+			data[new_key] = _from_JSON(data[k])
+			if typeof(k) != typeof(new_key) or k != new_key:
+				data.erase(k)
+	elif data is Array:
+		for i in range(len(data)):
+			data[i] = _from_JSON(data[i])
+	else:
+		return _str_to_var(data)
+	return data
+
+static func _str_to_var(data: Variant) -> Variant:
+	if typeof(data) in [TYPE_BOOL, TYPE_INT, TYPE_FLOAT]:
+		return data
+	var ret = str_to_var(data)
+	if typeof(ret) in [TYPE_BOOL, TYPE_INT, TYPE_FLOAT] and var_to_str(ret) != data:
+		# strings begin with number should be still strings
+		return data
+	if ret != null:
+		return ret
+	return data
+
+## write variable to JSON file
 static func write_to_json_file(path : String, data : Variant) -> void:
 	var save_info_file = FileAccess.open(path, FileAccess.WRITE)
-	save_info_file.store_string(JSON.stringify(data, "  "))
+	save_info_file.store_string(to_JSON(data))
 
-static func serialise_Transform3D(data: Transform3D) -> Dictionary:
-	return {'x': data.basis.x, 'y': data.basis.y, 'z': data.basis.z, 'o': data.origin}
+## convert variable to JSON
+## (it's not as robust and versatile as JSON.from_native, but it produces nicer JSON output)
+static func to_JSON(data: Variant) -> String:
+	return JSON.stringify(_to_JSON(data), "  ")
 
-static func Transform3D_from_JSON(data : Variant) -> Transform3D:
-	if data is Transform3D:
+static func _to_JSON(data: Variant) -> Variant:
+	var data_out
+	if data is Dictionary:
+		data_out = {}
+		for k in data:
+			data_out[_var_to_str(k)] = _to_JSON(data[k])
+	elif data is Array:
+		data_out = []
+		for e in data:
+			data_out.append(_to_JSON(e))
+	else:
+		return _var_to_str(data)
+	return data_out
+
+static func _var_to_str(data: Variant) -> Variant:
+	if typeof(data) in [TYPE_BOOL, TYPE_INT, TYPE_FLOAT, TYPE_STRING, TYPE_STRING_NAME, TYPE_NODE_PATH]:
 		return data
-	if data is not Dictionary:
-		printerr("Invalid data ", data, " passed to Vector3_from_JSON")
-		return Transform3D.IDENTITY
-	for e in ['x', 'y', 'z', 'o']:
-		if not e in data:
-			printerr("Invalid data ", data, " passed to Vector3_from_JSON")
-			return Transform3D.IDENTITY
-	
-	return Transform3D(
-		Vector3_from_JSON(data['x']),
-		Vector3_from_JSON(data['y']),
-		Vector3_from_JSON(data['z']),
-		Vector3_from_JSON(data['o']),
-	)
-
-static func Vector3_from_JSON(data : Variant) -> Vector3:
-	if data is Vector3:
-		return data
-	if data is not String or data[0] != '(':
-		printerr("Invalid data ", data, " passed to Vector3_from_JSON")
-		return Vector3.ZERO
-	
-	var data_splited = data.substr(1, data.length()-2).split(",")
-	return Vector3(
-		data_splited[0].to_float(),
-		data_splited[1].to_float(),
-		data_splited[2].to_float()
-	)
-
-static func Vector2_from_JSON(data : Variant) -> Vector2:
-	if data is Vector2:
-		return data
-	if data is not String or data[0] != '(':
-		printerr("Invalid data ", data, " passed to Vector2_from_JSON")
-		return Vector2.ZERO
-	
-	var data_splited = data.substr(1, data.length()-2).split(",")
-	return Vector2(
-		data_splited[0].to_float(),
-		data_splited[1].to_float()
-	)
+	else:
+		return var_to_str(data)
 
 
 #

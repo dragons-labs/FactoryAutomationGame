@@ -58,13 +58,13 @@ func restore(data : Array, elements : Dictionary, offset := Vector2.ZERO, duplic
 			continue
 		
 		var element = packed_scene.instantiate()
-		element.position = FAG_Utils.Vector2_from_JSON(element_info.position) + offset
+		element.position = element_info.position + offset
 		element.rotation = element_info.rotation
-		element.scale = FAG_Utils.Vector2_from_JSON(element_info.scale)
+		element.scale = element_info.scale
 		
 		for info_node in element.get_children():
 			if info_node.name in element_info.values:
-				info_node.text = element_info.values[info_node.name]
+				info_node.text = str(element_info.values[info_node.name])
 		
 		main_node.add_child(element)
 		

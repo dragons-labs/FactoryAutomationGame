@@ -47,7 +47,7 @@ func restore(data : Array, offset := Vector2.ZERO, duplicate_mode := false) -> v
 		_new_line.width = line_width
 		_new_line.default_color = line_color
 		for point in line_info:
-			_new_line.add_point(FAG_Utils.Vector2_from_JSON(point) + offset)
+			_new_line.add_point(point + offset)
 		main_node.add_child(_new_line)
 		if duplicate_mode:
 			segments.append({"line": _new_line})
