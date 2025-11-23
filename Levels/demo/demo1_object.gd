@@ -10,7 +10,9 @@
 
 extends RigidBody3D
 
-@onready var _factory_root := get_tree().current_scene.find_child("FactoryRoot")
+var _factory_root
+func init(factory_root):
+	_factory_root = factory_root
 
 var factory_object_info = {
 	"type": "box",
@@ -18,17 +20,17 @@ var factory_object_info = {
 }
 
 func start_painting():
-	_is_painted = true
+	_is_painting = true
 	var material = StandardMaterial3D.new() # TODO this should be done in better way ... but it's for test only
 	$FactoryElementVisual.set_surface_override_material(0, material)
 	material.albedo_color = factory_object_info.color
-	while _is_painted:
+	while _is_painting:
 		await _factory_root.factory_control.create_timer(0.4).timeout
-		if _is_painted and factory_object_info.color.r >= 0.2:
+		if _is_painting and factory_object_info.color.r >= 0.2:
 			factory_object_info.color.r -= 0.2
 			material.albedo_color = factory_object_info.color
 
 func end_painting():
-	_is_painted = false
+	_is_painting = false
 
-var _is_painted = false
+var _is_painting = false

@@ -10,6 +10,9 @@
 [node name="ApplicationRoot" type="Node"]
 process_mode = 3
 
+[node name="ConsoleReconfig" type="Node" parent="."]
+script = ExtResource("6_f2ney")
+
 [node name="FactoryRoot" parent="." instance=ExtResource("1_lan0v")]
 unique_name_in_owner = true
 
@@ -27,8 +30,5 @@ script = ExtResource("4_f2ney")
 unique_name_in_owner = true
 scaling_3d_scale = 2.0
 visible = false
-
-[node name="ConsoleReconfig" type="Node" parent="."]
-script = ExtResource("6_f2ney")
 
 [connection signal="show_manual" from="FactoryRoot" to="ManualBrowser" method="show_info"]

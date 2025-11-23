@@ -16,7 +16,7 @@
   },
   {
     "block_config": {
-      "signal_number": 6.0
+      "signal_number": 16.0
     },
     "block_name": "io_expander_1",
     "position": "Vector3(-3.0, 0.0, 0.0)",
@@ -66,9 +66,64 @@
     "type": "ComputerControlBlock"
   },
   {
+    "position": "Vector3(-4.0, 2.0, 0.0)",
+    "rotation": "Vector3(0.0, 0.0, 0.0)",
+    "scale": "Vector3(1.0, 1.0, 1.0)",
+    "type": "ComputerControlBlock"
+  },
+  {
     "position": "Vector3(-5.0, 0.0, 0.0)",
     "rotation": "Vector3(0.0, 0.0, 0.0)",
     "scale": "Vector3(1.0, 1.0, 1.0)",
     "type": "ElectronicControlBlock"
+  },
+  {
+    "position": "Vector3(-2, 0, -2)",
+    "rotation": "Vector3(0, 0, 0)",
+    "scale": "Vector3(3, 1, 1)",
+    "type": "ConveyorBelt"
+  },
+  {
+    "position": "Vector3(0, 0, -2)",
+    "rotation": "Vector3(0, 1.5707964, 0)",
+    "scale": "Vector3(1, 1, 1)",
+    "type": "ConveyorBelt"
+  },
+  {
+    "position": "Vector3(0, 0, -5)",
+    "rotation": "Vector3(0, 1.5707964, 0)",
+    "scale": "Vector3(1, 1, 1)",
+    "type": "ConveyorBelt"
+  },
+  {
+    "block_name": "",
+    "position": "Vector3(0, 0, -3)",
+    "rotation": "Vector3(0, 1.5707964, -3.1415927)",
+    "scale": "Vector3(-1, -1, -1)",
+    "type": "ConveyorFastSplitter"
+  },
+  {
+    "position": "Vector3(1, 0, -5)",
+    "rotation": "Vector3(0, 1.5707963, 0)",
+    "scale": "Vector3(1, 1, 1)",
+    "type": "ConveyorBelt"
+  },
+  {
+    "position": "Vector3(1, 0, -3)",
+    "rotation": "Vector3(0, 1.5707963, 0)",
+    "scale": "Vector3(1, 1, 1)",
+    "type": "ConveyorBelt"
+  },
+  {
+    "position": "Vector3(0, 0, -4)",
+    "rotation": "Vector3(0, 1.5707963, 0)",
+    "scale": "Vector3(1, 1, 1)",
+    "type": "Painter"
+  },
+  {
+    "position": "Vector3(1, 0, -4)",
+    "rotation": "Vector3(0, 1.5707963, 0)",
+    "scale": "Vector3(1, 1, 1)",
+    "type": "Painter"
   }
 ]

@@ -33,7 +33,8 @@
     }
   },
 
-  "demo1" : {
+  "demo/data1" : {
+    "is_saved_data": true,
     "unlocked_by": [["painter/painter_computer"]],
     "name": {
       "en": "Demo Level",

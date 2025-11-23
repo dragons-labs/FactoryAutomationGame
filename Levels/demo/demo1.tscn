@@ -1,9 +1,9 @@
 [gd_scene load_steps=12 format=3 uid="uid://e4olapltxjwe"]
 
-[ext_resource type="Script" uid="uid://by7jufi3k7hiq" path="res://Levels/demo1.gd" id="1_7y1sa"]
+[ext_resource type="Script" path="res://Levels/demo/demo1.gd" id="1_7y1sa"]
 [ext_resource type="PackedScene" uid="uid://ilbgjjdg2jch" path="res://Factory/FactoryBlocks/Consumer.tscn" id="2_gbgwv"]
 [ext_resource type="PackedScene" uid="uid://b5boyct3stll1" path="res://Factory/FactoryBlocks/Producer.tscn" id="3_3l6sj"]
-[ext_resource type="Script" uid="uid://casoo68phafdc" path="res://Levels/demo1_object.gd" id="4_b36je"]
+[ext_resource type="Script" path="res://Levels/demo/demo1_object.gd" id="4_b36je"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kkeuu"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -65,7 +65,10 @@ shape = SubResource("BoxShape3D_vt021")
 [node name="FactoryBlocks" type="Node3D" parent="."]
 
 [node name="Consumer" parent="FactoryBlocks" instance=ExtResource("2_gbgwv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -6)
+
+[node name="Consumer2" parent="FactoryBlocks" instance=ExtResource("2_gbgwv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
 
 [node name="Producer" parent="FactoryBlocks" node_paths=PackedStringArray("object") instance=ExtResource("3_3l6sj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, -2)
@@ -73,6 +76,7 @@ object = NodePath("../../ComponentsTemplates/Object_Demo1")
 timer_period = 0.7
 
 [node name="ComponentsTemplates" type="Node3D" parent="."]
+process_mode = 4
 visible = false
 
 [node name="Object_Demo1" type="RigidBody3D" parent="ComponentsTemplates"]

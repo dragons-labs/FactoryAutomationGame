@@ -12,7 +12,7 @@ config_version=5
 
 config/name="FactoryAutomation"
 config/version="1.0.0"
-run/main_scene="res://ApplicationRoot.tscn"
+run/main_scene="uid://d11ibc61xmf0s"
 config/features=PackedStringArray("4.5")
 
 [autoload]
@@ -21,6 +21,7 @@ FAG_Settings="*res://Utils/Settings/Settings.gd"
 FAG_WindowManager="*res://Utils/WindowManager.gd"
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 LimboConsole="*res://addons/limbo_console/limbo_console.gd"
+ApplicationRoot="*res://ApplicationRoot.tscn"
 
 [debug]
 
@@ -37,7 +38,16 @@ naming/script_name_casing=1
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/script-ide/plugin.cfg", "res://addons/script_ide-last_script_per_scene_tab/plugin.cfg", "res://addons/godot_xterm/plugin.cfg", "res://addons/repl/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_xterm/plugin.cfg", "res://addons/repl/plugin.cfg", "res://addons/script-ide/plugin.cfg", "res://addons/script_ide-last_script_per_scene_tab/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
+
+[gdunit4]
+
+ui/toolbar/run_overall=true
+settings/common/update_notification_enabled=false
+settings/test/test_lookup_folder="tests"
+report/assert/strict_number_type_compare=false
+ui/inspector/tree_sort_mode=1
+Shortcuts/editor/run_test_debug=PackedInt32Array(4194325, 4194336)
 
 [global_group]
 
@@ -88,6 +98,10 @@ locale/translations=PackedStringArray("res://Utils/Camera/translate/Camera.en.tr
 3d_physics/layer_1="Physics world (collisions)"
 3d_physics/layer_2="Factory product detection"
 3d_physics/layer_32="GUI 3D"
+
+[network]
+
+limits/debugger/max_chars_per_second=131072
 
 [physics]
 

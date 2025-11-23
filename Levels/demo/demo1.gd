@@ -101,6 +101,7 @@ func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 		# (global level) outputs to control blocks
 		{
 			"Vcc" : ["Vcc", "Vcc", "dc 3.3"],
+			"PowerOnReset" : ["PowerOnReset", "V_PowerOnReset", "0 PULSE(3.3V 0 100ms)"],
 		},
 		# (global level) input from control blocks
 		{},
@@ -144,6 +145,10 @@ var _valid_product_counter = 0
 func _on_factory_start() -> void:
 	_valid_product_counter = 0
 	print("START")
+	_factory_root.factory_control.create_timer(120).timeout.connect(_on_timer_timeout)
 
 func _on_factory_stop() -> void:
 	print("STOP")
+
+func _on_timer_timeout(_val : float) -> void:
+	_factory_root.production_timeout()

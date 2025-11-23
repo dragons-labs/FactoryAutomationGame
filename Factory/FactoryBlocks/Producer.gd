@@ -19,13 +19,13 @@ func init(factory_root, block_name = null):
 	factory_root.factory_stop.connect(_on_factory_stop)
 	factory_root.factory_start.connect(_on_factory_start)
 	
-	_objects_root = factory_root.objects_root
+	_factory_root = factory_root
 
 
 @export var object : RigidBody3D
 @export var timer_period := 1.0
 
-var _objects_root
+var _factory_root
 var _object_is_ready := false
 var _timer = null
 
@@ -44,9 +44,10 @@ func _on_timer_timeout(delay : float) -> void:
 func _release_object(delay := 0.0) -> void:
 	_block_control.set_signal_value("producer_object_ready", 0)
 	var element : Node3D = object.duplicate()
-	_objects_root.add_child(element)
+	_factory_root.objects_root.add_child(element)
 	element.global_position = global_position
 	element.visible = true
+	element.init(_factory_root)
 	_object_is_ready = false
 	_timer.reset(timer_period - delay)
 

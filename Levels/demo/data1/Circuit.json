@@ -1,50 +1,760 @@
 {
   "Elements": [
     {
-      "position": "Vector2(-100.0, -80.0)",
+      "position": "Vector2(-200, -380)",
       "rotation": 0.0,
-      "scale": "Vector2(1.0, 1.0)",
+      "scale": "Vector2(1, 1)",
+      "type": "NetConnector",
+      "values": {
+        "Value": "splitter_object_inside_@in"
+      }
+    },
+    {
+      "position": "Vector2(680, -260)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NetConnector",
+      "values": {
+        "Value": "splitter_push_@out"
+      }
+    },
+    {
+      "position": "Vector2(60, -140)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "AND",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(60, -20)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "AND",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(400, -60)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Voltmeter",
+      "values": {
+        "Value": "0.7019410551"
+      }
+    },
+    {
+      "position": "Vector2(-120, -320)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Voltmeter",
+      "values": {
+        "Value": "0"
+      }
+    },
+    {
+      "position": "Vector2(160, -20)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NOT",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(160, -140)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NOT",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(320, -100)",
+      "rotation": -1.57079637050629,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+        "Value": "100k"
+      }
+    },
+    {
+      "position": "Vector2(320, -20)",
+      "rotation": -1.57079637050629,
+      "scale": "Vector2(1, 1)",
+      "type": "Capacitor",
+      "values": {
+        "Value": "1u"
+      }
+    },
+    {
+      "position": "Vector2(320, 20)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "GND",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(-40, -160)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NOT",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(-220, -40)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NetConnector",
+      "values": {
+        "Value": "PowerOnReset"
+      }
+    },
+    {
+      "position": "Vector2(-40, 0)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NOT",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(420, -200)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "AND",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(620, -260)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "AND",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(520, -240)",
+      "rotation": -6.28318548202515,
+      "scale": "Vector2(1, 1)",
+      "type": "NOT",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(-140, 0)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "OR",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(520, -60)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Voltmeter",
+      "values": {
+        "Value": "0"
+      }
+    },
+    {
+      "position": "Vector2(720, -180)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Voltmeter",
+      "values": {
+        "Value": "0"
+      }
+    },
+    {
+      "position": "Vector2(-360, 60)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Voltmeter",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(400, 600)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NPN",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(60, 520)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NetConnector",
+      "values": {
+        "Value": "io_expander_1_signal_12_@in"
+      }
+    },
+    {
+      "position": "Vector2(280, 600)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+        "Value": "10k"
+      }
+    },
+    {
+      "position": "Vector2(400, 480)",
+      "rotation": -1.57079994678497,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+        "Value": "200"
+      }
+    },
+    {
+      "position": "Vector2(220, 360)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
       "type": "NetConnector",
       "values": {
         "Value": "Vcc"
       }
     },
     {
-      "position": "Vector2(0.0, -80.0)",
+      "position": "Vector2(480, 740)",
       "rotation": 0.0,
-      "scale": "Vector2(1.0, 1.0)",
-      "type": "NetConnector",
+      "scale": "Vector2(1, 1)",
+      "type": "Ammeter",
       "values": {
-        "Value": "producer_object_ready_@in"
+        "Value": "0"
       }
     },
     {
-      "position": "Vector2(0.0, 0.0)",
+      "position": "Vector2(560, 780)",
       "rotation": 0.0,
-      "scale": "Vector2(1.0, 1.0)",
-      "type": "NetConnector",
-      "values": {
-        "Value": "producer_release_object_@out"
-      }
-    },
-    {
-      "position": "Vector2(0.0, 80.0)",
-      "rotation": 0.0,
-      "scale": "Vector2(1.0, 1.0)",
-      "type": "NetConnector",
-      "values": {
-        "Value": "producer_control_enabled_@out"
-      }
-    },
-    {
-      "position": "Vector2(-100.0, -20.0)",
-      "rotation": 0.0,
-      "scale": "Vector2(1.0, 1.0)",
+      "scale": "Vector2(1, 1)",
       "type": "GND",
       "values": {
 
       }
+    },
+    {
+      "position": "Vector2(160, 600)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Ammeter",
+      "values": {
+        "Value": "0"
+      }
+    },
+    {
+      "position": "Vector2(320, 400)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Ammeter",
+      "values": {
+        "Value": "0"
+      }
+    },
+    {
+      "position": "Vector2(620, 540)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Voltmeter",
+      "values": {
+        "Value": "0"
+      }
+    },
+    {
+      "position": "Vector2(1060, 280)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NetConnector",
+      "values": {
+        "Value": "io_expander_1_signal_10_@in"
+      }
+    },
+    {
+      "position": "Vector2(1200, 460)",
+      "rotation": -1.57079994678497,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+        "Value": "10k"
+      }
+    },
+    {
+      "position": "Vector2(1200, 580)",
+      "rotation": -1.57079994678497,
+      "scale": "Vector2(1, 1)",
+      "type": "Capacitor",
+      "values": {
+        "Value": "100u"
+      }
+    },
+    {
+      "position": "Vector2(1200, 660)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "GND",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1580, 460)",
+      "rotation": -3.1415901184082,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1740, 460)",
+      "rotation": -3.1415901184082,
+      "scale": "Vector2(1, -1)",
+      "type": "Resistor",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1580, 360)",
+      "rotation": -1.57079994678497,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1740, 360)",
+      "rotation": -1.57079994678497,
+      "scale": "Vector2(1, -1)",
+      "type": "Resistor",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1580, 260)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1740, 260)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, -1)",
+      "type": "Resistor",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1740, 580)",
+      "rotation": -4.71238994598389,
+      "scale": "Vector2(1, -1)",
+      "type": "Resistor",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1580, 580)",
+      "rotation": -4.71238994598389,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1660, 680)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "GND",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1120, 360)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Ammeter",
+      "values": {
+        "Value": "-0.145489617"
+      }
+    },
+    {
+      "position": "Vector2(1280, 520)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Voltmeter",
+      "values": {
+        "Value": "1.9132715192"
+      }
+    },
+    {
+      "position": "Vector2(1300, 380)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Voltmeter",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1160, -280)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NetConnector",
+      "values": {
+        "Value": "Vcc"
+      }
+    },
+    {
+      "position": "Vector2(1660, 40)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NetConnector",
+      "values": {
+        "Value": "io_expander_1_signal_08_@in"
+      }
+    },
+    {
+      "position": "Vector2(1380, 80)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "GND",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1380, 40)",
+      "rotation": -1.57079637050629,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+        "Value": "1k"
+      }
+    },
+    {
+      "position": "Vector2(1240, 80)",
+      "rotation": -3.14159274101257,
+      "scale": "Vector2(1, -1)",
+      "type": "Voltmeter",
+      "values": {
+        "Value": "3.1549279926"
+      }
+    },
+    {
+      "position": "Vector2(1380, -100)",
+      "rotation": -3.14159274101257,
+      "scale": "Vector2(1, -1)",
+      "type": "PNP",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1580, 0)",
+      "rotation": -7.85398197174072,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+        "Value": "100k"
+      }
+    },
+    {
+      "position": "Vector2(1020, -60)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "NetConnector",
+      "values": {
+        "Value": "io_expander_1_signal_09_@out"
+      }
+    },
+    {
+      "position": "Vector2(1480, -100)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Resistor",
+      "values": {
+        "Value": "100k"
+      }
+    },
+    {
+      "position": "Vector2(1260, -200)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Ammeter",
+      "values": {
+        "Value": "3.2152365972"
+      }
+    },
+    {
+      "position": "Vector2(1580, -100)",
+      "rotation": -7.85398197174072,
+      "scale": "Vector2(1, 1)",
+      "type": "NPN",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1640, -100)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "GND",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1540, 40)",
+      "rotation": 0.0,
+      "scale": "Vector2(1, 1)",
+      "type": "Diode",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1620, 40)",
+      "rotation": -3.14159274101257,
+      "scale": "Vector2(1, 1)",
+      "type": "Diode",
+      "values": {
+
+      }
+    },
+    {
+      "position": "Vector2(1020, 520)",
+      "rotation": -1.57079637050629,
+      "scale": "Vector2(1, 1)",
+      "type": "NetConnector",
+      "values": {
+        "Value": "io_expander_1_signal_11_@out"
+      }
     }
   ],
-  "Lines": []
+  "Lines": [
+    [
+      "Vector2(20, -40)",
+      "Vector2(220, -140)"
+    ],
+    [
+      "Vector2(20, -120)",
+      "Vector2(220, -20)"
+    ],
+    [
+      "Vector2(-200, -380)",
+      "Vector2(-200, -160)",
+      "Vector2(-80, -160)"
+    ],
+    [
+      "Vector2(320, -60)",
+      "Vector2(360, -60)"
+    ],
+    [
+      "Vector2(-160, -320)",
+      "Vector2(-200, -320)"
+    ],
+    [
+      "Vector2(-180, -20)",
+      "Vector2(-220, -20)",
+      "Vector2(-220, -40)"
+    ],
+    [
+      "Vector2(220, -140)",
+      "Vector2(320, -140)",
+      "Vector2(320, -140)"
+    ],
+    [
+      "Vector2(360, -60)",
+      "Vector2(360, -180)",
+      "Vector2(380, -180)"
+    ],
+    [
+      "Vector2(380, -220)",
+      "Vector2(-200, -220)"
+    ],
+    [
+      "Vector2(580, -280)",
+      "Vector2(380, -280)",
+      "Vector2(380, -220)"
+    ],
+    [
+      "Vector2(480, 100)",
+      "Vector2(-220, 100)",
+      "Vector2(-220, 20)",
+      "Vector2(-180, 20)"
+    ],
+    [
+      "Vector2(480, -240)",
+      "Vector2(480, -200)"
+    ],
+    [
+      "Vector2(680, -260)",
+      "Vector2(680, -260)",
+      "Vector2(680, -180)"
+    ],
+    [
+      "Vector2(480, -200)",
+      "Vector2(480, 100)"
+    ],
+    [
+      "Vector2(-400, 60)",
+      "Vector2(-220, -20)"
+    ],
+    [
+      "Vector2(240, 600)",
+      "Vector2(200, 600)"
+    ],
+    [
+      "Vector2(320, 600)",
+      "Vector2(340, 600)"
+    ],
+    [
+      "Vector2(400, 440)",
+      "Vector2(400, 400)",
+      "Vector2(360, 400)"
+    ],
+    [
+      "Vector2(400, 660)",
+      "Vector2(400, 740)",
+      "Vector2(440, 740)"
+    ],
+    [
+      "Vector2(520, 740)",
+      "Vector2(560, 740)",
+      "Vector2(560, 780)"
+    ],
+    [
+      "Vector2(400, 520)",
+      "Vector2(400, 540)",
+      "Vector2(580, 540)"
+    ],
+    [
+      "Vector2(60, 520)",
+      "Vector2(60, 600)",
+      "Vector2(120, 600)"
+    ],
+    [
+      "Vector2(280, 400)",
+      "Vector2(220, 400)",
+      "Vector2(220, 360)"
+    ],
+    [
+      "Vector2(1200, 420)",
+      "Vector2(1200, 360)",
+      "Vector2(1160, 360)"
+    ],
+    [
+      "Vector2(1200, 500)",
+      "Vector2(1200, 540)"
+    ],
+    [
+      "Vector2(1200, 620)",
+      "Vector2(1200, 660)"
+    ],
+    [
+      "Vector2(1200, 520)"
+    ],
+    [
+      "Vector2(1060, 280)",
+      "Vector2(1060, 360)",
+      "Vector2(1080, 360)"
+    ],
+    [
+      "Vector2(1660, 680)",
+      "Vector2(1660, 260)"
+    ],
+    [
+      "Vector2(1580, 540)",
+      "Vector2(1660, 540)"
+    ],
+    [
+      "Vector2(1660, 540)",
+      "Vector2(1740, 540)"
+    ],
+    [
+      "Vector2(1700, 460)",
+      "Vector2(1660, 460)"
+    ],
+    [
+      "Vector2(1660, 460)",
+      "Vector2(1620, 460)"
+    ],
+    [
+      "Vector2(1580, 320)",
+      "Vector2(1660, 320)"
+    ],
+    [
+      "Vector2(1660, 320)",
+      "Vector2(1740, 320)"
+    ],
+    [
+      "Vector2(1700, 260)",
+      "Vector2(1620, 260)"
+    ],
+    [
+      "Vector2(1200, 520)",
+      "Vector2(1240, 520)"
+    ],
+    [
+      "Vector2(1200, 380)",
+      "Vector2(1260, 380)"
+    ],
+    [
+      "Vector2(1380, -160)",
+      "Vector2(1380, -200)",
+      "Vector2(1300, -200)"
+    ],
+    [
+      "Vector2(1380, 0)",
+      "Vector2(1380, -40)",
+      "Vector2(1020, -40)",
+      "Vector2(1020, -60)"
+    ],
+    [
+      "Vector2(1160, -280)",
+      "Vector2(1160, -200)",
+      "Vector2(1220, -200)"
+    ],
+    [
+      "Vector2(1280, -40)",
+      "Vector2(1280, 80)"
+    ],
+    [
+      "Vector2(1500, 40)",
+      "Vector2(1500, -40)",
+      "Vector2(1380, -40)"
+    ],
+    [
+      "Vector2(1020, 520)",
+      "Vector2(1200, 520)"
+    ]
+  ]
 }

@@ -16,3 +16,6 @@
 #[submodule "addons/3rdparty/_godot-cpp"]
 #	path = addons/3rdparty/_godot-cpp
 #	url = https://github.com/godotengine/godot-cpp
+[submodule "addons/3rdparty/gdUnit4"]
+	path = addons/3rdparty/gdUnit4
+	url = https://github.com/MikeSchulze/gdUnit4

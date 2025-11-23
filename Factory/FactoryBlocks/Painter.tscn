@@ -16,7 +16,7 @@ size = Vector3(1, 0.5, 0.79)
 [node name="Painter" type="Node3D" groups=["FactoryProccesors"]]
 script = ExtResource("2_enkqh")
 exclusive_owner = true
-speed = 0.6
+speed = 0.52
 ui_name = "FACTORY_BLOCK_NAME_Painter"
 ui_icon = ExtResource("1_cmfor")
 object_type = "Painter"

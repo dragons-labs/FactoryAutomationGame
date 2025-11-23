@@ -10,7 +10,9 @@
 
 extends RigidBody3D
 
-@onready var _factory_root := get_tree().current_scene.find_child("FactoryRoot")
+var _factory_root
+func init(factory_root):
+	_factory_root = factory_root
 
 var factory_object_info = {
 	"type": "box",

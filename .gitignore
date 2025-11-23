@@ -18,6 +18,9 @@
 # bbcode manual pages build from (custom) markdown
 /Manual/generated-bbcode/
 
+# GdUnit4 reports
+/reports/
+
 # temporary dir for multiple tasks
 /tmp/
 
