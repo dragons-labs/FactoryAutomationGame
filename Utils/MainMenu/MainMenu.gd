@@ -199,8 +199,7 @@ var _was_paused := false
 
 func _on_quit_pressed() -> void:
 	print("Quit request")
-	get_tree().paused = true
-	await _game_root.factory_control.close()
+	await _game_root.close()
 	get_tree().quit()
 
 func _notification(what):

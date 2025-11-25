@@ -11,8 +11,30 @@ extends Node
 @onready var user_blocks_root := $UserBlocksRoot
 @onready var ui := $FactoryUI
 
+## start signal for factory blocks
 signal factory_start()
+
+## stop signal for factory blocks
 signal factory_stop()
+
+## start signal emitted after started factory block just before switch UI to working state
+signal factory_started()
+
+## stop signal emitted after stopped factory block just before switch UI to working state
+signal factory_stopped()
+
+## pause signal emitted after emergency stop occurred, just before switch UI to pause state and show message
+signal emergency_stopped()
+
+## close signal emitted at end of close() function
+signal factory_closed()
+
+## load signal emitted after level is loaded
+signal level_loaded()
+
+## load signal emitted after save is restored
+signal save_loaded()
+
 
 var level_scene_node : Node3D
 
@@ -24,6 +46,8 @@ const SAVE_INFO_FILE := "/save_info.json"
 ### load / save / restore
 
 func load_level(level_id : String, save_dir := "") -> void:
+	print_rich("[color=cyan][b]Loading level " + level_id + " ...[/b][/color]")
+	
 	level_scene_node = load(LEVELS_DIR + level_id + ".tscn").instantiate()
 	level_scene_node.name = "FactoryLevel"
 	level_scene_node.process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -103,10 +127,15 @@ func load_level(level_id : String, save_dir := "") -> void:
 				added_path += "/"
 			FAG_Utils.write_to_json_file(GAME_PROGRESS_SAVE, game_progress)
 	
-	_factory_state = FACTORY_STOP
+	_factory_state = FactoryState.STOP
 	_start_stop_hud_ui()
+	
+	print_rich("[color=cyan][b]Level loaded.[/b][/color]")
+	level_loaded.emit()
 
 func save(save_dir : String) -> void:
+	print_rich("[color=cyan][b]Writing save file " + save_dir + " ...[/b][/color]")
+	
 	var result = DirAccess.make_dir_recursive_absolute(save_dir)
 	if result != OK and result != ERR_ALREADY_EXISTS:
 		print("Error while creating save directory: ", result)
@@ -130,28 +159,47 @@ func save(save_dir : String) -> void:
 			factory_control.computer_control_blocks[id].get_child(0).send_message_via_msg_bus("request_sync") # TODO request also pause ???
 			await FAG_Utils.real_time_wait(0.3)  # TODO wait for sync not for timer
 			DirAccess.copy_absolute("user://workdir/disk_%d.img" % id, save_dir + "/disk_%d.img" % id)
+	
+	print_rich("[color=cyan][b]Save file written.[/b][/color]")
 
 func restore(save_dir : String) -> void:
 	var save_info = FAG_Utils.load_from_json_file(save_dir + SAVE_INFO_FILE)
 	load_level(save_info['level'], save_dir)
 	
+	print_rich("[color=cyan][b]Restoring save file " + save_dir + " ...[/b][/color]")
+	
 	factory_builder.restore(FAG_Utils.load_from_json_file(save_dir + "/Factory.json"))
 	factory_control.circuit_simulator.restore(FAG_Utils.load_from_json_file(save_dir + "/Circuit.json"))
 	if 'camera' in save_info:
 		factory_builder.camera.restore(save_info['camera'])
+	
+	print_rich("[color=cyan][b]Save file restored.[/b][/color]")
+	save_loaded.emit()
 
 func close() -> void:
+	print_rich("[color=cyan][b]Closing factory ...[/b][/color]")
+	_start_canceled = true	
+	
+	print("Pausing tree ...")
 	get_tree().paused = true
+	
 	await factory_control.close()
+	
+	print("Closing 3D world ...")
 	factory_builder.close()
 	if level_scene_node:
-		_factory_state = FACTORY_STOP | ON_CHANGE
+		_factory_state = FactoryState.STOP | FactoryState.ON_CHANGE
 		remove_child(level_scene_node)
 		level_scene_node.queue_free()
 		level_scene_node = null
 	for node in objects_root.get_children():
 		node.queue_free()
+	
 	_reset_stats()
+	%Message.hide()
+	
+	print_rich("[color=cyan][b]Factory is closed.[/b][/color]")
+	factory_closed.emit()
 
 func is_loaded() -> bool:
 	return level_scene_node != null
@@ -160,11 +208,13 @@ func is_loaded() -> bool:
 ### start / stop / pause / visibility
 
 func run_factory() -> void:
-	if _factory_state & FACTORY_RUNNING:
+	if _factory_state & FactoryState.RUNNING:
 		printerr("Factory already started")
 		return
 	
-	_factory_state = FACTORY_RUNNING | ON_CHANGE | FACTORY_STARTING
+	print_rich("[color=cyan][b]Starting factory ...[/b][/color]")
+	_factory_state = FactoryState.RUNNING | FactoryState.ON_CHANGE | FactoryState.STARTING
+	_start_canceled = false
 	_factory_paused = false
 	_factory_start_allowed = get_tree().paused
 	_factory_speed = game_speed.get_value()
@@ -180,48 +230,75 @@ func run_factory() -> void:
 	# continue (after control is started) in _on_control_running()
 
 func _on_control_running() -> void:
-	print(" starting")
+	_factory_state |= FactoryState.CONTROL_IS_RUNNING
 	while not _factory_start_allowed:
-		await FAG_Utils.real_time_wait(0.1)
 		# wait for _factory_start_allowed
+		await FAG_Utils.real_time_wait(0.1)
+	if _start_canceled: return
+	
+	print("Unpausing tree ...")
 	get_tree().paused = false
+	
 	await FAG_Utils.real_time_wait(0.1) # some time to process control circuit signals before emit start ... important for control enabled signals
+	if _start_canceled: return
+	
+	print("Sending start signal to factory block ...")
 	factory_start.emit()
+	
 	await FAG_Utils.real_time_wait(0.2)
-	_factory_state &= ~FACTORY_STARTING
-	_factory_state &= ~ON_CHANGE
+	if _start_canceled: return
+
+	_factory_state &= ~FactoryState.STARTING
+	_factory_state &= ~FactoryState.ON_CHANGE
+	
+	print_rich("[color=cyan][b]Factory is running.[/b][/color]")
+	factory_started.emit()
 	_start_stop_hud_ui()
 
 func _physics_process(delta):
-	if not _factory_state & FACTORY_RUNNING or _factory_state & EMERGENCY_STOP:
+	if not _factory_state & FactoryState.RUNNING or _factory_state & FactoryState.EMERGENCY_STOP:
 		return
 	
 	factory_control.tick(delta, _factory_paused)
 
 func stop_factory() -> void:
-	if not (_factory_state & FACTORY_RUNNING):
+	if not (_factory_state & FactoryState.RUNNING):
 		printerr("Factory is not started")
 		return
-	
-	_factory_state = FACTORY_STOP | ON_CHANGE
+	if _factory_state & FactoryState.STARTING:
+		printerr("Using stop while factory is started ... this may cause undefined behavior")
+		
+	print_rich("[color=cyan][b]Stopping factory ...[/b][/color]")
+	_start_canceled = true
+	_factory_state = FactoryState.STOP | FactoryState.ON_CHANGE
 	_start_stop_hud_ui()
+	
+	print("Pausing tree ...")
 	get_tree().paused = true
+	
 	factory_control.stop()
+	
+	print("Removing products ...")
 	for node in objects_root.get_children():
 		node.queue_free()
+	
+	print("Sending stop signal to factory block ...")
 	factory_stop.emit()
 	
 	factory_builder.ui.set_editor_enabled(true)
 	Engine.call_deferred("set_time_scale", 1.0)
 	
 	await FAG_Utils.real_time_wait(0.2)
-	_factory_state &= ~ON_CHANGE
+	_factory_state &= ~FactoryState.ON_CHANGE
+	
+	print_rich("[color=cyan][b]Factory is stopped.[/b][/color]")
+	factory_stopped.emit()
 	_start_stop_hud_ui()
 
 func pause_factory():
 	_factory_start_allowed = false
 	
-	if not _factory_state & FACTORY_RUNNING or _factory_state & EMERGENCY_STOP or _factory_state & FACTORY_STARTING:
+	if not _factory_state & FactoryState.RUNNING or _factory_state & FactoryState.EMERGENCY_STOP or _factory_state & FactoryState.STARTING:
 		return
 	
 	_factory_paused = true
@@ -231,7 +308,7 @@ func pause_factory():
 func unpause_factory():
 	_factory_start_allowed = true
 	
-	if not _factory_state & FACTORY_RUNNING or _factory_state & EMERGENCY_STOP or _factory_state & FACTORY_STARTING:
+	if not _factory_state & FactoryState.RUNNING or _factory_state & FactoryState.EMERGENCY_STOP or _factory_state & FactoryState.STARTING:
 		return
 	
 	_factory_paused = false
@@ -261,7 +338,7 @@ func set_visibility(value : bool) -> void:
 ### factory speed control
 
 func _on_game_speed_value_changed(value: float) -> void:
-	if not _factory_state & FACTORY_RUNNING:
+	if not _factory_state & FactoryState.RUNNING:
 		_factory_speed = value
 		return
 	
@@ -278,7 +355,7 @@ func _on_game_speed_value_changed(value: float) -> void:
 	Engine.call_deferred("set_time_scale", _factory_speed)
 
 func _on_start_stop_pressed() -> void:
-	if _factory_state == FACTORY_STOP:
+	if _factory_state == FactoryState.STOP:
 		run_factory()
 	else:
 		stop_factory()
@@ -290,25 +367,25 @@ func _on_pause_pressed() -> void:
 		pause_factory()
 	_start_stop_hud_ui()
 
-enum { FACTORY_RUNNING = 0b00001 , FACTORY_STOP = 0b00010, ON_CHANGE = 0b00100, EMERGENCY_STOP = 0b01000, FACTORY_STARTING = 0b10000}
+enum FactoryState { RUNNING = (1 << 0) , STOP = (1 << 1), ON_CHANGE = (1 << 2), EMERGENCY_STOP = (1 << 3), STARTING = (1 << 4), CONTROL_IS_RUNNING = (1 << 5)}
 
 func _start_stop_hud_ui():
 	print("_start_stop_hud_ui _factory_state=%x" % _factory_state)
-	if _factory_state & FACTORY_STOP:
+	if _factory_state & FactoryState.STOP:
 		%StartStop.text = tr("FACTORY_START")
 		%StartStop.disabled = true
-	if _factory_state & FACTORY_RUNNING:
+	if _factory_state & FactoryState.RUNNING:
 		%StartStop.text = tr("FACTORY_STOP")
 		%StartStop.disabled = true
 	
-	if _factory_state & ON_CHANGE:
+	if _factory_state & FactoryState.ON_CHANGE:
 		%StartStop.disabled = true
 		%Pause.disabled = true
 	else:
 		%StartStop.disabled = false
-		%Pause.disabled = not (_factory_state & FACTORY_RUNNING)
+		%Pause.disabled = not (_factory_state & FactoryState.RUNNING)
 	
-	if _factory_state & EMERGENCY_STOP :
+	if _factory_state & FactoryState.EMERGENCY_STOP :
 		%Pause.disabled = true
 	
 	if _factory_paused:
@@ -317,10 +394,10 @@ func _start_stop_hud_ui():
 		%Pause.text = "FACTORY_PAUSE"
 
 var _factory_state
-var _factory_paused
 var _factory_speed
-var _factory_start_allowed
-
+var _factory_paused: bool
+var _factory_start_allowed: bool
+var _start_canceled: bool
 
 ### factory errors handling
 
@@ -356,14 +433,18 @@ func _on_conflict_error(info : Array) -> void:
 	)
 
 func emergency_stop(title : String, message : String):
-	if _factory_state & EMERGENCY_STOP:
+	if _factory_state & FactoryState.EMERGENCY_STOP:
 		return
-	_factory_state = FACTORY_RUNNING | EMERGENCY_STOP
+	_factory_state = FactoryState.RUNNING | FactoryState.EMERGENCY_STOP
 	_factory_paused = true
+	_start_canceled = true
 	get_tree().paused = true
 	factory_control.circuit_simulator.gdspice.emergency_stop()
+	
+	emergency_stopped.emit()
+	
 	_start_stop_hud_ui()
-	FAG_WindowManager.hide_all_windows(self)
+	FAG_WindowManager.hide_all_windows()
 	%Message_Title.text = tr(title)
 	%Message_Text.text = tr(message)
 	%Message.show()
@@ -385,7 +466,7 @@ func production_timeout():
 		)
 	
 func validate_product(node : RigidBody3D):
-	if not check_win_loss_conditions or not _factory_state & FACTORY_RUNNING:
+	if not check_win_loss_conditions or not _factory_state & FactoryState.RUNNING:
 		return
 	
 	var status = level_scene_node.validate_product(node)
@@ -463,7 +544,7 @@ func _update_circuit_element_count(element: Node2D, val: int) -> void:
 
 func _ready() -> void:
 	set_visibility(false)
-	_factory_state = FACTORY_STOP
+	_factory_state = FactoryState.STOP
 	_factory_paused = true
 	_start_stop_hud_ui()
 	factory_builder.on_block_add.connect(_update_block_count.bind(1))

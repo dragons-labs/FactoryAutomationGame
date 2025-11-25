@@ -70,10 +70,25 @@ func set_signal_value(signal_name : String, value : float) -> void:
 #region   start / tick / stop / close
 
 func start(use_circuit_simulation, circuit_simulation_time_step, circuit_simulation_max_time) -> void:
+	print_rich("[color=dark_cyan][b]Starting factory control system ...[/b][/color]")
+	_start_canceled = false
 	simulation_time = 0
 	simulation_on_time = true
 	internal_signals_values.clear()
 	
+	# all computer's systems need be in READY state (if used)
+	if len(computer_control_blocks) != 0:
+		# computers are start while adding blocks
+		# but we need check if they are ready
+		# (to avoid start factory when computers are booting)
+		_update_computer_systems_simulation_ready_state()
+		
+		while _computer_systems_simulation_ready_state != READY:
+			await FAG_Utils.real_time_wait(0.025)
+	else:
+		_computer_systems_simulation_ready_state = UNUSED
+	
+	# if electronic circuit simulation is used need be init and in READY state
 	if use_circuit_simulation:
 		_circuit_simulation_ready_state = NOT_READY
 		circuit_simulator.init_circuit(
@@ -85,16 +100,25 @@ func start(use_circuit_simulation, circuit_simulation_time_step, circuit_simulat
 		_circuit_simulation_max_time = circuit_simulation_max_time
 		# NOTE: we ignore value returned by init_circuit (error list) and do not show UI error here
 		#       because NO_GND is not an issue if circuit connect only input/output signals
+		
+		while _circuit_simulation_ready_state != READY:
+			await FAG_Utils.real_time_wait(0.025)
 	else:
 		_circuit_simulation_ready_state = UNUSED
 	
+	# check if start was not canceled while we were waiting for READY state
+	if _start_canceled:
+		return
+	
+	# if electronic circuit simulation is used need be started
+	if _circuit_simulation_ready_state == READY:
+		circuit_simulator.start( _circuit_simulation_time_step, _circuit_simulation_max_time )
+	
 	# NOTE: computer system simulations are running during work in editor
 	# (are start/stop while adding/removing blocks) so no need to start/restart here
-	# but need check ready (to avoid start factory when computers are booting)
-	_update_computer_systems_simulation_ready_state()
 	
-	# call `circuit_simulator.start()` and emit running when all system are ready
-	_start_step2()
+	print_rich("[color=dark_cyan][b]Factory control system is running.[/b][/color]")
+	running.emit()
 
 func tick(delta: float, paused : bool) -> void:
 	# if electronic circuit simulation is used then check if it's "on time" ... if it's delayed then pause 3d factory processing
@@ -138,12 +162,17 @@ func tick(delta: float, paused : bool) -> void:
 			_timers[i] = null
 
 func stop() -> void:
+	print_rich("[color=dark_cyan][b]Stopping factory control system ...[/b][/color]")
+	_start_canceled = true
 	_timers.clear()
 	circuit_simulator.stop()
 	for element in computer_control_blocks.values():
 		element.get_child(0).time_step(-1)
+	print_rich("[color=dark_cyan][b]Factory control system is stopped.[/b][/color]")
 
 func close() -> void:
+	print_rich("[color=dark_cyan][b]Closing factory control system ...[/b][/color]")
+	_start_canceled = true
 	circuit_simulator.stop()
 	for element in computer_control_blocks.values():
 		element.get_child(0).stop()
@@ -160,6 +189,7 @@ func close() -> void:
 	netnames.clear()
 	
 	circuit_simulator.close()
+	print_rich("[color=dark_cyan][b]Factory control system is closed.[/b][/color]")
 
 #endregion
 
@@ -328,6 +358,8 @@ func setup_computer_control_blocks(element : Node3D) -> void:
 		printerr("WARNING: starting computer system ", computer_id, " without configuration info - this system will be stateless.")
 		computer_system_simulator.computer_system_id = computer_id
 		computer_system_simulator.start()
+	
+	_update_computer_systems_simulation_ready_state()
 
 func remove_computer_control_blocks(element : Node3D) -> void:
 	var computer_id = element.get_meta("computer_id")
@@ -385,20 +417,9 @@ func create_timer(time : float, one_shot := true):
 
 #region   ready check private callbacks
 
-func _start_step2() -> void:
-	if _circuit_simulation_ready_state != NOT_READY and _computer_systems_simulation_ready_state != NOT_READY:
-		if _circuit_simulation_ready_state == READY:
-			circuit_simulator.start( _circuit_simulation_time_step, _circuit_simulation_max_time )
-		running.emit()
-
 func _on_circuit_simulation_ready_state() -> void:
 	print("circuit simulation is ready")
 	_circuit_simulation_ready_state = READY
-	_start_step2()
-
-func _on_computer_systems_simulation_ready_state() -> void:
-	_update_computer_systems_simulation_ready_state()
-	_start_step2()
 
 func  _update_computer_systems_simulation_ready_state() -> void:
 	if len(computer_control_blocks) == 0:
@@ -409,8 +430,8 @@ func  _update_computer_systems_simulation_ready_state() -> void:
 			var computer_system = element.get_child(0)
 			if not computer_system.is_running_and_ready():
 				new_state = NOT_READY
-				if not computer_system.computer_system_is_run_and_ready.is_connected(_on_computer_systems_simulation_ready_state):
-					computer_system.computer_system_is_run_and_ready.connect(_on_computer_systems_simulation_ready_state, CONNECT_ONE_SHOT)
+				if not computer_system.computer_system_is_run_and_ready.is_connected(_update_computer_systems_simulation_ready_state):
+					computer_system.computer_system_is_run_and_ready.connect(_update_computer_systems_simulation_ready_state, CONNECT_ONE_SHOT)
 		_computer_systems_simulation_ready_state = new_state
 	print("computer systems simulation ready state: ", _computer_systems_simulation_ready_state)
 
@@ -477,15 +498,15 @@ func _ready() -> void:
 @onready var circuit_simulator_window := %ElectronicsSimulatorWindow
 
 var computer_systems_configuration := {}
-var computer_control_blocks = {}
-var computer_networks = {}
+var computer_control_blocks := {}
+var computer_networks := {}
 
-var input_to_circuit_from_factory = {}
-var outputs_from_circuit_to_factory = {}
-var external_circuit_entries = []
-var netnames = []
+var input_to_circuit_from_factory := {}
+var outputs_from_circuit_to_factory := {}
+var external_circuit_entries := []
+var netnames := []
 
-var internal_signals_values = {}
+var internal_signals_values := {}
 
 enum { UNUSED, NOT_READY, READY }
 var _circuit_simulation_ready_state := UNUSED
@@ -494,11 +515,12 @@ var _computer_systems_simulation_ready_state := UNUSED
 var _circuit_simulation_time_step
 var _circuit_simulation_max_time
 
-var simulation_on_time
+var simulation_on_time : bool
 var simulation_time
-var _pause_count = 0
+var _pause_count := 0
 
-var _timers = []
+var _timers := []
+var _start_canceled: bool
 
 enum {ELECTRONICS, COMPUTER, NONE, CONFLICT}
 
