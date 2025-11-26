@@ -52,6 +52,18 @@ static func _match_double_click(action_name : String, event : InputEvent, result
 	
 	return result
 
+static func event_as_text(event : InputEvent) -> String:
+	if event  is InputEventKey:
+		if event.physical_keycode & KEY_SPECIAL == KEY_SPECIAL:
+			# do not use DisplayServer.keyboard_get_keycode_from_physical mapping for numpad (it map numpad 8 as Up for some reasons) and other special
+			return event.as_text_physical_keycode().replace(" ", "")
+		else:
+			var keycode = DisplayServer.keyboard_get_keycode_from_physical(event.physical_keycode)
+			var text = OS.get_keycode_string(keycode | event.get_keycode_with_modifiers())
+			return text.replace(" ", "")
+	else:
+		return event.as_text().replace(" ", "")
+
 
 #
 # JSON

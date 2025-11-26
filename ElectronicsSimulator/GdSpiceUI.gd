@@ -275,7 +275,6 @@ func update_measurements():
 					oscilloscopes[base_element][0].skip = false
 				else:
 					# TODO add all new values (not just the last one) to avoid loss of resolution and weird x-axis scale 
-					# TODO / BUG fix drawing constant zero value graphs
 					oscilloscopes[base_element][1].add_point(time, value)
 					oscilloscopes[base_element][0].chart.queue_redraw()
 

@@ -259,6 +259,7 @@ func _show_file_dialog(mode) -> void:
 func _on_file_dialog_file_selected(path: String) -> void:
 	if _file_dialog.file_mode == FileDialog.FILE_MODE_OPEN_FILE:
 		print("World editor IMPORT request for: ", path)
+		_ui_set_cursor(duplicate_cursor)
 		do_import.emit(path)
 	elif _file_dialog.file_mode == FileDialog.FILE_MODE_SAVE_FILE:
 		print("World editor SAVE request for: ", path)

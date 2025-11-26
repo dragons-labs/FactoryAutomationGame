@@ -213,7 +213,7 @@ func _on_action_remap_finish(event : Variant) -> void:
 	var new_event_info = {}
 	if event:
 		if event is InputEventKey:
-			new_event_info["key"] = event.keycode
+			new_event_info["key"] = event.physical_keycode
 		elif event is InputEventMouseButton:
 			new_event_info["button"] = event.button_index
 			new_event_info["double_click"] = event.double_click

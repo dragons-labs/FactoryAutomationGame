@@ -112,19 +112,18 @@ func setup_and_show(
 		visible = true
 		$MarginContainer/Action/Label.text = label_text
 		
-		var button = $MarginContainer/Action/VBoxContainer/HBoxContainer/PrimaryKey
-		if len(events) > 0:
-			button.text = events[0].as_text()
-			button.pressed.connect(button_callback.bind([group_name, action_name, 0, button, ui_remap_info, events[0]]))
-		else:
-			button.pressed.connect(button_callback.bind([group_name, action_name, 0, button, ui_remap_info, null]))
+		var buttons = [
+			$MarginContainer/Action/VBoxContainer/HBoxContainer/PrimaryKey,
+			$MarginContainer/Action/VBoxContainer/HBoxContainer/SecondaryKey
+		]
 		
-		button = $MarginContainer/Action/VBoxContainer/HBoxContainer/SecondaryKey
-		if len(events) > 1:
-			button.text = events[1].as_text()
-			button.pressed.connect(button_callback.bind([group_name, action_name, 1, button, ui_remap_info, events[1]]))
-		else:
-			button.pressed.connect(button_callback.bind([group_name, action_name, 1, button, ui_remap_info, null]))
+		for i in len(buttons):
+			var button = buttons[i]
+			var event = null
+			if len(events) > i:
+				event = events[i]
+				button.text = FAG_Utils.event_as_text(event)
+			button.pressed.connect(button_callback.bind([group_name, action_name, i, button, ui_remap_info, event]))
 "
 
 [node name="SettingsDialog" type="VBoxContainer"]

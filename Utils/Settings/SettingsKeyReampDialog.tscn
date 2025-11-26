@@ -10,15 +10,17 @@ func on_input(event: InputEvent) -> bool:
 	if FAG_Settings.action_rempaing and (event is InputEventKey) and event.pressed:
 		_last_event_to_remap = event
 		%KeyReamp_Key.text = event.as_text()
+		get_viewport().set_input_as_handled()
 		return true
 	return false
 
-func on_unhandled_input(event: InputEvent) -> bool:
+func _unhandled_input(event: InputEvent) -> void:
 	if FAG_Settings.action_rempaing and event is InputEventMouseButton and event.pressed:
 		_last_event_to_remap = event
 		%KeyReamp_Key.text = event.as_text()
-		return true
-	return false
+		get_viewport().set_input_as_handled()
+	else:
+		on_input(event)
 
 func setup_and_show(ui_action_name: String, old_event : InputEvent) -> void:
 	%KeyReampInfo_Info.text=tr(\"MAIN_MENU_SETTINGS_UPDATE_KEY_MAPPING_FOR_%s\") % tr(ui_action_name)

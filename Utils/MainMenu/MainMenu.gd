@@ -267,8 +267,5 @@ func _input(event: InputEvent):
 		else:
 			_show()
 
-func _unhandled_input(event: InputEvent) -> void:
-	%SettingsKeyReampDialog.on_unhandled_input(event)
-
 func _switch_to_normal() -> void:
 	_set_mode(Mode.NORMAL)

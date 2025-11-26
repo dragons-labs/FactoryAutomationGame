@@ -60,8 +60,8 @@ func close() -> void:
 
 var last_signal_value: float
 
-func assert_factory_signal_value(name: String) -> GdUnitFloatAssert:
-	last_signal_value = float(factory_control.get_signal_value(name))
+func assert_factory_signal_value(signal_name: String) -> GdUnitFloatAssert:
+	last_signal_value = float(factory_control.get_signal_value(signal_name))
 	return __lazy_load("res://addons/gdUnit4/src/asserts/GdUnitFloatAssertImpl.gd").new(last_signal_value)
 
 func debug_factory_values(signal_list) -> Dictionary:
