@@ -353,7 +353,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					if _editor_enabled:
 						if _raycast_result:
 							if _active_ui_tool == SELECT:
-								_set_move_mode()
+								@warning_ignore("missing_await") _async_set_move_mode()
 							elif _active_ui_tool == SCALE:
 								_active_ui_tool = SCALE_IN_PROGRESS
 							do_on_raycast_result.emit(_active_ui_tool, point, _raycast_result)
@@ -377,7 +377,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		# selected / edit existed element mode and mouse move
 		elif event is InputEventMouseMotion:
-			_set_move_mode(true)
+			@warning_ignore("missing_await") _async_set_move_mode(true)
 			if _active_ui_tool == MOVE:
 				do_move_step.emit(get_local_mouse_position())
 			elif _active_ui_tool == SCALE_IN_PROGRESS:
@@ -385,7 +385,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			elif _active_ui_tool == SELECT and not _selection_box.is_done:
 				_selection_box.set_second(get_local_mouse_position())
 
-func _set_move_mode(immediately := false):
+func _async_set_move_mode(immediately := false):
 	if not immediately:
 		await FAG_Utils.real_time_wait(0.13)
 	# 1. timers are "processed after all of the nodes in the current frame"

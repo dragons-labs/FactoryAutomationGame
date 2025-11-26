@@ -157,5 +157,5 @@ process_mode = 1
 [connection signal="value_changed" from="FactoryUI/RunAndSpeedControl/GameSpeed" to="." method="_on_game_speed_value_changed"]
 [connection signal="pressed" from="FactoryUI/RunAndSpeedControl/HBoxContainer/TaskInfo" to="." method="show_task_info"]
 [connection signal="pressed" from="FactoryUI/RunAndSpeedControl/HBoxContainer/Pause" to="." method="_on_pause_pressed"]
-[connection signal="pressed" from="FactoryUI/RunAndSpeedControl/HBoxContainer/StartStop" to="." method="_on_start_stop_pressed"]
+[connection signal="pressed" from="FactoryUI/RunAndSpeedControl/HBoxContainer/StartStop" to="." method="_async_on_start_stop_pressed"]
 [connection signal="pressed" from="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer/OK" to="." method="_on_errormsg_ok_pressed"]

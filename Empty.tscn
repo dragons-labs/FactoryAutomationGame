@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d11ibc61xmf0s"]
 
-[node name="Empty" type="Node"]
+[node name="Empty" type="Node" unique_id=53736773]
 editor_description = "An empty scene used as the starting scene.
 
 Real root scene (ApplicationRoot.tscn) is loaded via Autoload, due to the destruction of the main scene between subsequent test calls by gdUnit (without destroying the rest of the application)."

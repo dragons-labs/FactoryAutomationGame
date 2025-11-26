@@ -21,10 +21,10 @@ var skip = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_on_manual_time_enabled_button_toggled(false)
+	@warning_ignore("missing_await") _async_on_manual_time_enabled_button_toggled(false)
 	FAG_WindowManager.init_window(self)
 
-func _on_manual_time_enabled_button_toggled(toggled_on: bool) -> void:
+func _async_on_manual_time_enabled_button_toggled(toggled_on: bool) -> void:
 	if toggled_on:
 		var curr_time = chart.x_domain.ub - 0.001
 		_start_time_slider.max_value = curr_time

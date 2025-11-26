@@ -181,7 +181,7 @@ layout_mode = 2
 [connection signal="pressed" from="PanelContainer/Buttons/StartLevel" to="." method="_on_load_level_pressed"]
 [connection signal="pressed" from="PanelContainer/Buttons/LoadSave" to="." method="_on_load_save_pressed"]
 [connection signal="pressed" from="PanelContainer/Buttons/Settings" to="." method="_on_settings_pressed"]
-[connection signal="pressed" from="PanelContainer/Buttons/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="PanelContainer/Buttons/Quit" to="." method="_async_on_quit_pressed"]
 [connection signal="text_submitted" from="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/NewSaveSlot/NewSaveSlotName" to="." method="_on_add_save_slot_pressed"]
 [connection signal="pressed" from="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/NewSaveSlot/AddSaveSlot" to="." method="_on_add_save_slot_pressed"]
 [connection signal="item_selected" from="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/LoadDialog_ItemList" to="." method="_on_item_list_item_selected"]

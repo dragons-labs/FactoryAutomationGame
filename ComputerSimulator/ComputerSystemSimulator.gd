@@ -128,7 +128,7 @@ func start():
 	_pid = _run_qemu(user_port, msg_port, vnc_port)
 	print("Computer system emulator %d -> pid = %d "  % [computer_system_id, _pid])
 
-func stop():
+func async_stop():
 	print("Stop computer system emulator %d (pid %d)" % [computer_system_id, _pid])
 	if _pid > 0:
 		running_state = IS_STOPPING
@@ -160,9 +160,9 @@ func stop():
 	_msg_bus_stream = null
 	running_state = IS_NOT_RUNNING
 
-func wait_for_stop():
+func async_wait_for_stop():
 	if running_state & IS_RUNNING:
-		stop()
+		@warning_ignore("missing_await") async_stop()
 	for x in range(on_close_timeout * 10):
 		if running_state == IS_NOT_RUNNING:
 			return

@@ -69,7 +69,7 @@ func set_signal_value(signal_name : String, value : float) -> void:
 
 #region   start / tick / stop / close
 
-func start(use_circuit_simulation, circuit_simulation_time_step, circuit_simulation_max_time) -> void:
+func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_simulation_max_time) -> void:
 	print_rich("[color=dark_cyan][b]Starting factory control system ...[/b][/color]")
 	_start_canceled = false
 	simulation_time = 0
@@ -170,14 +170,14 @@ func stop() -> void:
 		element.get_child(0).time_step(-1)
 	print_rich("[color=dark_cyan][b]Factory control system is stopped.[/b][/color]")
 
-func close() -> void:
+func async_close() -> void:
 	print_rich("[color=dark_cyan][b]Closing factory control system ...[/b][/color]")
 	_start_canceled = true
 	circuit_simulator.stop()
 	for element in computer_control_blocks.values():
-		element.get_child(0).stop()
+		@warning_ignore("missing_await") element.get_child(0).async_stop()
 	for element in computer_control_blocks.values():
-		await element.get_child(0).wait_for_stop()
+		await element.get_child(0).async_wait_for_stop()
 	for echo_service in computer_networks.values():
 		echo_service.stop()
 	
@@ -364,7 +364,7 @@ func setup_computer_control_blocks(element : Node3D) -> void:
 func remove_computer_control_blocks(element : Node3D) -> void:
 	var computer_id = element.get_meta("computer_id")
 	FAG_WindowManager.set_windows_visibility_recursive(computer_control_blocks[computer_id], false)
-	computer_control_blocks[computer_id].get_child(0).stop()
+	computer_control_blocks[computer_id].get_child(0).async_stop()
 	computer_control_blocks.erase(computer_id)
 
 #endregion

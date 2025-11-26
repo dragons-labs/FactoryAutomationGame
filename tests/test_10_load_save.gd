@@ -5,7 +5,7 @@ extends FAG_TestGame
 
 func test_factory_computers():
 	var save_path := create_temp_dir("saves") + "/test"
-	factory_root.save(save_path)
+	factory_root.async_save(save_path)
 	
 	assert_bool(FileAccess.file_exists(save_path+"/save_info.json")).is_true()
 	

@@ -112,17 +112,17 @@ func _on_load_pressed() -> void:
 		if _current_mode == Mode.LOAD:
 			var level_info = item_list.get_item_metadata(selected[0])
 			if level_info["is_saved_data"]:
-				_load_level_or_save("", _game_root.LEVELS_DIR + level_info.id)
+				@warning_ignore("missing_await") _async_load_level_or_save("", _game_root.LEVELS_DIR + level_info.id)
 			else:
-				_load_level_or_save(level_info.id, "")
+				@warning_ignore("missing_await") _async_load_level_or_save(level_info.id, "")
 		elif _current_mode == Mode.LOAD_SAVE:
 			var metadata = item_list.get_item_metadata(selected[0])
-			_load_level_or_save("", metadata.path)
+			@warning_ignore("missing_await") _async_load_level_or_save("", metadata.path)
 
-func _load_level_or_save(level_id := "", save_path := ""):
+func _async_load_level_or_save(level_id := "", save_path := ""):
 	_show(Mode.LOADING)
 	FAG_WindowManager.cancel_hideen_windows_list()
-	await _game_root.close()
+	await _game_root.async_close()
 	
 	if level_id:
 		_game_root.load_level(level_id)
@@ -144,11 +144,11 @@ func _on_save_pressed() -> void:
 			%OverwriteConfirmationDialog.dialog_text = tr("MAIN_MENU_SAVE_%s_OVERWRITE_CONFIRM_TEXT") % save_name
 			%OverwriteConfirmationDialog.show()
 		else:
-			_game_root.save(save_dir)
+			_game_root.async_save(save_dir)
 			_set_mode(Mode.NORMAL)
 
 func _on_overwrite_confirmation_dialog_confirmed() -> void:
-	_game_root.save(_save_path_to_confirm)
+	_game_root.async_save(_save_path_to_confirm)
 	_set_mode(Mode.NORMAL)
 
 func _list_saves() -> void:
@@ -197,14 +197,14 @@ var _was_paused := false
 
 ### Application close
 
-func _on_quit_pressed() -> void:
+func _async_on_quit_pressed() -> void:
 	print("Quit request")
-	await _game_root.close()
+	await _game_root.async_close()
 	get_tree().quit()
 
 func _notification(what):
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		_on_quit_pressed()
+		@warning_ignore("missing_await") _async_on_quit_pressed()
 
 
 ### Console commands
@@ -243,12 +243,12 @@ func _ready():
 		var idx = args.find("--load-save")
 		if idx >= 0 and len(args) > idx+1:
 			print("[cmdline] load save: ", args[idx+1])
-			call_deferred("_load_level_or_save", "", args[idx+1])
+			call_deferred("_async_load_level_or_save", "", args[idx+1])
 			return
 		idx = args.find("--load-level")
 		if idx >= 0 and len(args) > idx+1:
 			print("[cmdline] load level: ", args[idx+1])
-			call_deferred("_load_level_or_save", args[idx+1], "")
+			call_deferred("_async_load_level_or_save", args[idx+1], "")
 			return
 	call_deferred("_show")
 

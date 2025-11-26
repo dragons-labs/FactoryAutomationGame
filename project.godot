@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="FactoryAutomation"
-config/version="1.0.0"
+config/version="0.4.0"
 run/main_scene="uid://d11ibc61xmf0s"
-config/features=PackedStringArray("4.5")
+config/features=PackedStringArray("4.6")
 
 [autoload]
 
@@ -26,6 +26,7 @@ ApplicationRoot="*res://ApplicationRoot.tscn"
 [debug]
 
 gdscript/warnings/static_called_on_instance=0
+gdscript/warnings/missing_await=2
 
 [display]
 

@@ -16,6 +16,12 @@ mkdir -p $TARGET/FAG_$PLATFORM
 # fake Windows dll for gdcef ... real file will be added later
 [ -f cef_artifacts/libgdcef.dll ] || :> cef_artifacts/libgdcef.dll
 
+if [ "$PLATFORM" = "Windows" ]; then
+	if ! [ -f ElectronicsSimulator/GdSpice/bin/libgdspice.windows.template_debug.x86_64.dll ]; then
+		just build-windows-libs
+	fi
+fi
+
 # standard export based on settings from export_presets.cfg
 cat << EOF > export_presets.cfg
 [preset.0]

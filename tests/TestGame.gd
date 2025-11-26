@@ -30,7 +30,7 @@ func load_save(save_to_load := default_save_to_load) -> void:
 	main_menu = ApplicationRoot.get_node("MainMenu")
 	factory_control = factory_root.factory_control
 	monitor_signals(factory_root, false)
-	main_menu.call_deferred("_load_level_or_save", "", save_to_load)
+	main_menu.call_deferred("_async_load_level_or_save", "", save_to_load)
 	await runner.simulate_frames(1)
 	print_rich("[color=green][b]LOADED[/b][/color]")
 
@@ -46,13 +46,13 @@ func start_factory() -> bool:
 
 func stop_factory() -> bool:
 	print_rich("[color=orange_red][b]STOPPING[/b][/color]")
-	factory_root.stop_factory()
+	factory_root.async_stop_factory()
 	await assert_signal(factory_root).is_emitted('factory_stopped')
 	return not is_failure()
 
 func close() -> void:
 	print_rich("[color=orange_red][b]CLOSING[/b][/color]")
-	await factory_root.close()
+	await factory_root.async_close()
 	#await assert_signal(factory_root).is_emitted('factory_closed')
 	print_rich("[color=green][b]CLOSED[/b][/color]")
 	# main_menu.print_orphan_nodes()

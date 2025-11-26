@@ -34,7 +34,7 @@ func _check_visible(title = null):
 
 func before_test() -> void:
 	print_rich("[color=green][b]RELOAD[/b][/color]")
-	await main_menu._load_level_or_save("", default_save_to_load)
+	await main_menu._async_load_level_or_save("", default_save_to_load)
 	await runner.simulate_frames(1)
 	print_rich("[color=green][b]LOADED[/b][/color]")
 

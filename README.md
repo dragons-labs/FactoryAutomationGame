@@ -30,26 +30,9 @@ The game offers full simulation of electronic circuits (based on ngspice) and co
 ## Build Instruction (on Linux platform)
 
 1. clone project repository: `git clone https://github.com/dragons-labs/FactoryAutomationGame/`
-2. use `git submodule update --init` to download addons dependencies
-3. build *GodotXterm* addon
+2. run `just` command in project root repo directory
 
-    * use `addons/godot_xterm/native/build.sh`
-    * (for Windows export option) use also `scons build_library=no platform=windows arch=x86_64` in `addons/godot_xterm/native/`
-
-4. build *GdSpice*
-
-    * run `scons` in `ElectronicsSimulator/GdSpice/`
-    * (for Windows export option) use also `scons platform=windows arch=x86_64` in `ElectronicsSimulator/GdSpice/`
-
-5. build or download binary release of *GDCEF*
-
-    * binary files should be placed in `addons/3rdparty/gdcef/build/Linux` and (for Windows export option) in `addons/3rdparty/gdcef/build/Windows`
-    * *GDCEF* should be build with `cef_artifacts` as binary / artifact directory
-
-6. build game manual by running `scons` in `Manual/`
-7. open `project.godot` in Godot 4.3 (or higher), **ignore errors** and close editor after import is complete
-8. open `project.godot` in Godot editor again (there should be no errors)
-9. run project
+**Important:** This version require Godot 4.6-dev4 or higher. For Godot 4.5 version see godot4.5 branch.
 
 You can also export project for Linux and Windows platform using `./export.sh` script (do not directly use export option in editor).
 Use `./export.sh` to export amd64 Linux version or `./export.sh Windows` to export amd64 Windows version.

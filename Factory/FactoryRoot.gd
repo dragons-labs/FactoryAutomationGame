@@ -133,7 +133,7 @@ func load_level(level_id : String, save_dir := "") -> void:
 	print_rich("[color=cyan][b]Level loaded.[/b][/color]")
 	level_loaded.emit()
 
-func save(save_dir : String) -> void:
+func async_save(save_dir : String) -> void:
 	print_rich("[color=cyan][b]Writing save file " + save_dir + " ...[/b][/color]")
 	
 	var result = DirAccess.make_dir_recursive_absolute(save_dir)
@@ -176,14 +176,14 @@ func restore(save_dir : String) -> void:
 	print_rich("[color=cyan][b]Save file restored.[/b][/color]")
 	save_loaded.emit()
 
-func close() -> void:
+func async_close() -> void:
 	print_rich("[color=cyan][b]Closing factory ...[/b][/color]")
 	_start_canceled = true	
 	
 	print("Pausing tree ...")
 	get_tree().paused = true
 	
-	await factory_control.close()
+	await factory_control.async_close()
 	
 	print("Closing 3D world ...")
 	factory_builder.close()
@@ -222,14 +222,14 @@ func run_factory() -> void:
 	factory_builder.ui.set_editor_enabled(false)
 	_start_stop_hud_ui()
 	
-	factory_control.start(
+	@warning_ignore("missing_await") factory_control.async_start(
 		_stats.block_count_per_type.get("ElectronicControlBlock", 0) > 0,
 		level_scene_node.circuit_simulation_time_step,
 		level_scene_node.circuit_simulation_max_time
 	)
-	# continue (after control is started) in _on_control_running()
+	# continue (after control is started) in _async_on_control_running()
 
-func _on_control_running() -> void:
+func _async_on_control_running() -> void:
 	_factory_state |= FactoryState.CONTROL_IS_RUNNING
 	while not _factory_start_allowed:
 		# wait for _factory_start_allowed
@@ -261,7 +261,7 @@ func _physics_process(delta):
 	
 	factory_control.tick(delta, _factory_paused)
 
-func stop_factory() -> void:
+func async_stop_factory() -> void:
 	if not (_factory_state & FactoryState.RUNNING):
 		printerr("Factory is not started")
 		return
@@ -354,11 +354,11 @@ func _on_game_speed_value_changed(value: float) -> void:
 	_factory_speed = value
 	Engine.call_deferred("set_time_scale", _factory_speed)
 
-func _on_start_stop_pressed() -> void:
+func _async_on_start_stop_pressed() -> void:
 	if _factory_state == FactoryState.STOP:
 		run_factory()
 	else:
-		stop_factory()
+		@warning_ignore("missing_await") async_stop_factory()
 
 func _on_pause_pressed() -> void:
 	if _factory_paused:
@@ -561,7 +561,7 @@ func _ready() -> void:
 	factory_control.circuit_simulator.overvoltage_protection.connect(_on_circuit_simulation_overvoltage)
 	factory_control.circuit_simulator.simulation_error.connect(_on_simulation_error)
 	factory_control.conflict_error.connect(_on_conflict_error)
-	factory_control.running.connect(_on_control_running)
+	factory_control.running.connect(_async_on_control_running)
 	
 	_reset_stats()
 	
