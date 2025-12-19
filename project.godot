@@ -17,6 +17,9 @@ config/features=PackedStringArray("4.6")
 
 [autoload]
 
+ModLoaderStore="*res://addons/mod_loader/mod_loader_store.gd"
+ModLoader="*res://addons/mod_loader/mod_loader.gd"
+FAG_Utils="*res://Utils/Utils.gd"
 FAG_Settings="*res://Utils/Settings/Settings.gd"
 FAG_WindowManager="*res://Utils/WindowManager.gd"
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"

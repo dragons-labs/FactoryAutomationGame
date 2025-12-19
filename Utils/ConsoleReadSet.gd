@@ -1,12 +1,10 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-class_name FAG_ConsoleReadSet
-
 var _object = null
 var _name : String
 
-func _init(object, name : String, variables : Array[String]):
+func _init(object, name : String, variables : Array):
 	_object = object
 	_name = name
 	

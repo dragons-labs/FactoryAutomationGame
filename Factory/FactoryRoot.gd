@@ -565,7 +565,7 @@ func _ready() -> void:
 	
 	_reset_stats()
 	
-	_console_read_set = FAG_ConsoleReadSet.new(self, "factory", ["check_win_loss_conditions"])
+	_console_read_set = FAG_Utils.ConsoleReadSet.new(self, "factory", ["check_win_loss_conditions"])
 	
 	LimboConsole.register_command(_factory_producer, "factory producer", "Perform operation on all (default) or selected (last argument) producers.")
 	LimboConsole.add_argument_autocomplete_source("factory producer", 0, func(): return ["start", "stop", "step", "set_time"])

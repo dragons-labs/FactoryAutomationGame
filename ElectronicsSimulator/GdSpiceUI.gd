@@ -4,7 +4,7 @@
 extends GdSpice
 
 
-### netlists and measurer list preparation
+### netlists and measures list preparation
 
 var measurements := {}
 var fuses := []
@@ -26,7 +26,7 @@ func reset():
 	_last_on_process_time = -1
 
 func get_ngspice_netlist(
-		grid : FAG_2DGrid_World,
+		grid : Object,
 		external_nets_input_to_circuit_from_factory : Array,
 		external_nets_outputs_from_circuit_to_factory : Array,
 		external_circuit_entries : Array
@@ -34,10 +34,10 @@ func get_ngspice_netlist(
 	
 	var circuit := ["factory control"]
 	var errors := []
-	var netlist := grid.get_netlist()
-	var gnd_net := netlist.find_net_by_one_of_names("GND")
+	var netlist : Object = grid.get_nets()
+	var gnd_net : Object = netlist.find_net_by_one_of_names("GND")
 	var strong_nets := ["GND"]
-	var all_elements := grid.gElements.get_all_elements()
+	var all_elements : Array = grid.gElements.get_all_elements()
 	
 	reset()
 	
@@ -131,8 +131,8 @@ func get_ngspice_netlist(
 ### measurer graphs (oscilloscopes) system
 
 @onready var _chart_properties := _create_chart_properties()
-const _chart_window_packed_scene := preload("res://ElectronicsSimulator/ChartWindow.tscn")
-const _colors := [Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.WHITE, Color.BLACK]
+var _chart_window_packed_scene : PackedScene = load("res://ElectronicsSimulator/ChartWindow.tscn")
+var _colors := [Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.WHITE, Color.BLACK]
 
 func _create_chart_properties() -> ChartProperties:
 	var chart_properties := ChartProperties.new()

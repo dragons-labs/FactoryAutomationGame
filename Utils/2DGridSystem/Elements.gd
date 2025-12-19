@@ -1,12 +1,6 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-class_name FAG_2DGrid_Elements
- 
-signal on_element_add(element: Node2D)
-signal on_element_remove(element: Node2D)
-
-
 ### Constructor and requires read-only properties values
 
 var main_node : Node2D = null
@@ -266,3 +260,9 @@ func _add_element(element : Node2D) -> void:
 func _remove_element(element : Node2D) -> void:
 	main_node.remove_child(element)
 	on_element_remove.emit(element)
+
+
+### Signals
+
+signal on_element_add(element: Node2D)
+signal on_element_remove(element: Node2D)

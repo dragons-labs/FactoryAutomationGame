@@ -118,9 +118,7 @@ func init(factory_root : Node3D, id : String, from_save : bool) -> void:
 	_factory_root.factory_stop.connect(_on_factory_stop)
 	if not from_save:
 		_factory_root.factory_control.circuit_simulator.restore(
-			FAG_Utils.load_from_json_file(
-				get_script().resource_path.get_base_dir() + "/demo1.circuit"
-			)
+			FAG_Utils.load_from_json_file( FAG_Utils.get_absolute_path(self, "demo1.circuit") )
 		)
 
 ## level gameplay logic - function is call when product is consumed and should return:

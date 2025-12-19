@@ -28,7 +28,7 @@ signal on_element_click(element: Node2D, long: bool)
 ### Init
 
 @onready var undo_redo := UndoRedo.new()
-@onready var grid := FAG_2DGrid_World.new(%Nodes, undo_redo, grid_size)
+@onready var grid : Object = FAG_Utils.load(self, "World.gd").new(%Nodes, undo_redo, grid_size)
 @onready var ui := %WorldEditorUI
 
 func _init() -> void:

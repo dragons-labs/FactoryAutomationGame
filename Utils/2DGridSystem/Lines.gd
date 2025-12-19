@@ -1,9 +1,6 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-class_name FAG_2DGrid_Lines
-
-
 ### Constructor and requires read-only properties values
 
 var main_node : Node2D = null
@@ -30,7 +27,7 @@ var line_width := 3
 var line_color := Color.WHITE
 var orthogonal_lines := true
 var marker_radius_multipler := 1.75
-
+var ConnectionMarker : Object = FAG_Utils.load(self, "ConnectionMarker.gd")
 
 ### Serialise / Restore
 
@@ -53,6 +50,7 @@ func restore(data : Array, offset := Vector2.ZERO, duplicate_mode := false) -> v
 			segments.append({"line": _new_line})
 	if duplicate_mode:
 		init_duplicate(segments, offset, false)
+	update_connections()
 
 ### Undo Redo counters (for pseudo action merging)
 
@@ -529,10 +527,8 @@ func update_connections() -> void:
 				if line.has_node(marker_node_name):
 					marker = line.get_node(marker_node_name)
 				else:
-					marker = FAG_2DGrid_ConnectionMarker.new()
+					marker = ConnectionMarker.new(line_color, line.width * marker_radius_multipler)
 					marker.name = marker_node_name
-					marker.color = line_color
-					marker.radius = line.width * marker_radius_multipler
 					line.add_child(marker)
 				marker.global_position = point
 			else:

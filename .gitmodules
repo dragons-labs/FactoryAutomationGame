@@ -19,3 +19,6 @@
 [submodule "addons/3rdparty/gdUnit4"]
 	path = addons/3rdparty/gdUnit4
 	url = https://github.com/MikeSchulze/gdUnit4
+[submodule "addons/3rdparty/godot-mod-loader"]
+	path = addons/3rdparty/godot-mod-loader
+	url = https://github.com/GodotModding/godot-mod-loader/

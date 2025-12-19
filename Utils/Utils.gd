@@ -1,8 +1,7 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-extends RefCounted
-class_name FAG_Utils
+extends Node
 
 #
 # 2D geometry
@@ -73,6 +72,10 @@ static func event_as_text(event : InputEvent) -> String:
 static func load_from_json_file(path : String) -> Variant:
 	var save_info_file = FileAccess.open(path, FileAccess.READ)
 	return from_JSON(save_info_file.get_as_text())
+
+## `load_from_json_file` variant using relative path
+static func load_from_json_file2(script : Object, path : String) -> Variant:
+	return load_from_json_file( get_absolute_path(script, path) )
 
 ## convert results of `to_JSON` back in original variable
 static func from_JSON(data: String) -> Variant:
@@ -150,8 +153,11 @@ static func globalize_path(path : String) -> String:
 		else:
 			return OS.get_executable_path().get_base_dir().path_join(path)
 
-static func get_system_path_to_script_dir(caller : Variant) -> String:
-	return globalize_path( caller.get_script().resource_path.get_base_dir() )
+static func get_absolute_path(script : Object, path : String) -> String:
+	return script.get_script().resource_path.get_base_dir() + "/" + path
+
+static func load(script : Object, path : String) -> Resource:
+	return load(get_absolute_path(script, path))
 
 static func copy_dir_absolute(src: String, dst: String) -> void:
 	var src_dir = DirAccess.open(src)
@@ -237,3 +243,5 @@ static func abs_max(a : Variant, b : Variant) -> Variant:
 		return a
 	else:
 		return b
+
+static var ConsoleReadSet = load("res://Utils/ConsoleReadSet.gd")

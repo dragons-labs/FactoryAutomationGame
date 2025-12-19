@@ -3,10 +3,13 @@
 
 @tool
 extends Node2D
-class_name FAG_2DGrid_ConnectionMarker
 
-@export var color := Color.WHITE
-@export var radius := 5
+var _color : Color
+var _radius : float
+
+func _init(color := Color.WHITE, radius := 5):
+	_color = color
+	_radius = radius
 
 func _draw() -> void:
-	draw_circle(Vector2.ZERO, radius, color)
+	draw_circle(Vector2.ZERO, _radius, _color)

@@ -67,7 +67,7 @@ func _ready() -> void:
 		_world = get_parent()
 	
 	if ui_enabled:
-		_ui = load(get_script().resource_path.get_base_dir() + "/UI_Settings_Camera2D.tscn").instantiate()
+		_ui = FAG_Utils.load(self, "UI_Settings_Camera2D.tscn").instantiate()
 		_ui.center_on_zoom_enabled.connect(func(val) : center_camera_on_zoom = val)
 		_ui.reset_view.connect(reset_view)
 		add_child(_ui)

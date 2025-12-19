@@ -108,6 +108,7 @@ func get_netlist_entry(netlist, id, value_name := "Value"):
 
 var connections_node : Node2D = null
 var image : Sprite2D = null
+var ConnectionMarker : Object = FAG_Utils.load(self, "ConnectionMarker.gd")
 
 func _update_connections() -> void:
 	for n in connections_node.get_children():
@@ -116,10 +117,8 @@ func _update_connections() -> void:
 	var i = 0
 	for point in connections:
 		i += 1
-		var new_node = FAG_2DGrid_ConnectionMarker.new()
+		var new_node = ConnectionMarker.new(connection_color, connection_radius)
 		new_node.name = "T" + str(i)
-		new_node.color = connection_color
-		new_node.radius = connection_radius
 		new_node.position = point
 		connections_node.add_child(new_node) 
 

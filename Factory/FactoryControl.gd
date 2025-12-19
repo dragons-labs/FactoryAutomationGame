@@ -348,7 +348,7 @@ func setup_computer_control_blocks(element : Node3D) -> void:
 		
 		var nedwork_id = computer_systems_configuration[computer_id].get("nedwork_id", 0)
 		if not nedwork_id in computer_networks:
-			computer_networks[nedwork_id] = FAG_TCPEcho.new()
+			computer_networks[nedwork_id] = load("res://Utils/TCPEcho.gd").new()
 			add_child(computer_networks[nedwork_id])
 		computer_systems_configuration[computer_id].tcp_echo_service_port = computer_networks[nedwork_id].get_port()
 		
@@ -490,7 +490,7 @@ func _signal_value_with_info(signal_name : String, info : Array) -> String:
 func _ready() -> void:
 	circuit_simulator.gdspice.simulation_is_ready_to_run.connect(_on_circuit_simulation_ready_state)
 	
-	_console_read_set = FAG_ConsoleReadSet.new(self, "control", [])
+	_console_read_set = FAG_Utils.ConsoleReadSet.new(self, "control", [])
 	LimboConsole.register_command(_list_all_signals, "control list", "List all signals")
 	LimboConsole.register_command(set_signal_value, "control set_signal", "Set signal value")
 
