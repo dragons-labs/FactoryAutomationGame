@@ -12,13 +12,16 @@ set -e
 PACKAGES="$PACKAGES base-files libc-bin ncurses-bin ncurses-base"
 
 # `computer_system_controller` dependencies
-PACKAGES="$PACKAGES libstdc++6 libgcc-s1 libfuse3-3"
+PACKAGES="$PACKAGES libstdc++6 libgcc-s1 libfuse3-4"
 
 # shell tools
 PACKAGES="$PACKAGES busybox"
 PACKAGES="$PACKAGES bash"
 PACKAGES="$PACKAGES tmux"
 PACKAGES="$PACKAGES zsh"
+
+# shell tools - gnu utils (~14 MB, but provided also in minimal versions by busybox)
+PACKAGES="$PACKAGES coreutils diffutils findutils gzip sed tar gawk"
 
 # C compilers (~ 32 MB)
 PACKAGES="$PACKAGES tcc libc6-dev"
@@ -36,18 +39,12 @@ PACKAGES="$PACKAGES gcc g++"
 # C/C++ compilers (LLVM) (~380 MB)
 PACKAGES="$PACKAGES clang"
 
-# shell tools - gnu utils (~14 MB, but provided also in minimal versions by busybox)
-PACKAGES="$PACKAGES coreutils diffutils findutils gzip sed tar gawk"
-
 # nettools
-PACKAGES="$PACKAGES iproute2 net-tools inetutils-traceroute iputils-tracepath nftables socat netcat-openbsd mtr" # not "inetutils-ping" ("setuid: Function not implemented" issue)
+PACKAGES="$PACKAGES iproute2 net-tools inetutils-ping inetutils-traceroute iputils-tracepath nftables socat netcat-openbsd mtr-tiny"
 
-
-# when true create disk image instead of initrd
-DISK_MODE=true
 
 # when true try build minimal system (remove some standard packages, do not install locale files, etc) ... useful for initrd build
-MINIMAL_SYSTEM="! $DISK_MODE"
+MINIMAL_SYSTEM="false"
 
 
 # Debian temporary packages - will be removed if not used in PACKAGES (and MINIMAL_SYSTEM is set to true)
@@ -59,13 +56,12 @@ FAKE_PKG="tar awk"
 
 
 MIRROR=${MIRROR:="http://ftp.icm.edu.pl/pub/Linux/debian/"}
-SUITE="stable"
-INSTALL_PATH="/dev/shm/root"
-TMP_DIR="/dev/shm"
+SUITE="trixie"
+TMP_DIR=`mktemp -d`
+INSTALL_PATH="$TMP_DIR/rootfs.tar"
 BASE_DIR=$(realpath $(dirname "$0"))
 
-
-if eval $MINIMAL_SYSTEM; then
+if $MINIMAL_SYSTEM; then
 	#
 	# remove packages included in PACKAGES from DEBIAN_TEMPORARY*
 	#
@@ -101,7 +97,8 @@ EOF
 		rmdir -p $pkg_name/DEBIAN
 	}
 	
-	cd "$TMP_DIR"
+	mkdir -p "$TMP_DIR/custom_debs"
+	cd "$TMP_DIR/custom_debs"
 	for pkg in $FAKE_PKG; do
 		if ! echo "$DEBIAN_TEMPORARY1 $DEBIAN_TEMPORARY2 $PACKAGES" | grep -wq "$pkg"; then
 			create_fake_busybox_deb $pkg
@@ -114,6 +111,7 @@ EOF
 	#
 	
 	MINIMAL_SYSTEM_MMDEBSTRAP_OPTIONS_1="
+		--setup-hook='copy-in $TMP_DIR/custom_debs /tmp' \
 		--dpkgopt='path-exclude=/usr/share/man/*' \
 		--dpkgopt='path-include=/usr/share/man/man[1-9]/*' \
 		--dpkgopt='path-exclude=/usr/share/locale/*'
@@ -126,53 +124,10 @@ fi
 
 
 #
-# install system using mmdebstrap
-#
-
-cd "$BASE_DIR"
-mmdebstrap \
-	--variant=custom \
-	--aptopt='Apt::Install-Recommends "false"' \
-	$MINIMAL_SYSTEM_MMDEBSTRAP_OPTIONS_1 \
-	--include="$BASE_DIR/bin/busybox_1.36.1-6_amd64.deb" \
-	--include="$DEBIAN_TEMPORARY1 $DEBIAN_TEMPORARY2 $PACKAGES" \
-	--setup-hook='if ls '"$TMP_DIR"'/busybox-*.deb; then dpkg --root="$1" --log="$1/var/log/dpkg.log" --install `ls '"$TMP_DIR"'/busybox-*.deb`; fi' \
-	--extract-hook='
-		# busybox
-		if [ -x "$1/bin/busybox" ]; then
-			chroot "$1" /bin/busybox --install -s
-			rm -f "$1/usr/bin/pager"
-			echo "#!/bin/sh" > "$1/usr/bin/pager"
-			echo "exec /usr/bin/less" >> "$1/usr/bin/pager"
-			chmod +x "$1/usr/bin/pager"
-		fi
-	' \
-	--extract-hook='
-		# /etc/passwd and /etc/group entries required by base-files
-		if [ ! -f "$1/etc/passwd" ]; then
-			echo "root:x:0:0:root:/root:/bin/bash" > "$1/etc/passwd"
-		fi
-		if [ ! -f "$1/etc/group" ]; then
-			echo "root:x:0:" > "$1/etc/group"
-			echo "mail:x:8:" >> "$1/etc/group"
-			echo "utmp:x:43:" >> "$1/etc/group"
-		fi
-	' \
-	--customize-hook='
-		[ "'"$DEBIAN_TEMPORARY1"'" != "" ] && chroot "$1" dpkg --force-all --purge '"$DEBIAN_TEMPORARY1"'
-		[ "'"$DEBIAN_TEMPORARY2"'" != "" ] && chroot "$1" dpkg --force-all --purge '"$DEBIAN_TEMPORARY2"'
-		chroot "$1" /bin/busybox --install -s
-	' \
-	--hook-dir=/usr/share/mmdebstrap/hooks/merged-usr \
-	--hook-dir=/usr/share/mmdebstrap/hooks/file-mirror-automount \
-	${SUITE} "${INSTALL_PATH}" ${MIRROR}
-
-
-#
 # prepare /init
 #
 
-cat << EOF > "${INSTALL_PATH}/init"
+cat << 'EOF' > "${TMP_DIR}/init"
 #!/bin/sh
 
 #                                                     #
@@ -181,18 +136,24 @@ cat << EOF > "${INSTALL_PATH}/init"
 #   Edited version will be ignored on next startup.   #
 #    Use /mnt/local/init.sh for custom auto-start.    #
 
+echo "Export variables"
+
+export LC_ALL=C.UTF-8
+
+
+echo "Mount filesystems"
+
 mount -t proc none /proc
 mount -t sysfs none /sys
 mount -t devpts none /dev/pts
 
-EOF
 
-$DISK_MODE && mkdir -p ${INSTALL_PATH}/.overlayrootfs/{ro,rw,fs}
-$DISK_MODE && cat << 'EOF' >> "${INSTALL_PATH}/init"
+echo "Prepare overlayrootfs"
+
 OVERLAY=/.overlayrootfs
 NEWROOT=$OVERLAY/fs
 
-mount / $OVERLAY/ro
+mount --bind / $OVERLAY/ro
 mount -o remount,ro $OVERLAY/ro
 
 mount -t tmpfs tmpfs $OVERLAY/rw/
@@ -213,9 +174,9 @@ mount -t tmpfs tmpfs $NEWROOT/tmp
 
 CHROOT="chroot $NEWROOT"
 
-EOF
 
-cat << 'EOF' >> "${INSTALL_PATH}/init"
+echo "Check and recreate devices"
+
 [ -c $NEWROOT/dev/null ]    || (rm -f $NEWROOT/dev/null;    mknod $NEWROOT/dev/null c 1 3)
 [ -c $NEWROOT/dev/zero ]    || (rm -f $NEWROOT/dev/zero;    mknod $NEWROOT/dev/zero c 1 5)
 [ -c $NEWROOT/dev/urandom ] || (rm -f $NEWROOT/dev/urandom; mknod $NEWROOT/dev/urandom c 1 9)
@@ -224,10 +185,16 @@ cat << 'EOF' >> "${INSTALL_PATH}/init"
 [ -c $NEWROOT/dev/ttyS1 ]   || (rm -f $NEWROOT/dev/ttyS1;   mknod $NEWROOT/dev/ttyS1 c 4 65)
 [ -c $NEWROOT/dev/fuse ]    || (rm -f $NEWROOT/dev/fuse;    mknod $NEWROOT/dev/fuse c 10 229)
 
+mkdir -p "$NEWROOT/dev/factory_control"
+
+
+echo "Mount 9p filesystems"
+
 mount -t 9p -o trans=virtio private_fs $NEWROOT/mnt/local -oversion=9p2000.L
 mount -t 9p -o trans=virtio common_fs $NEWROOT/mnt/global -oversion=9p2000.L
 
-export LC_ALL=C.UTF-8
+
+echo "Create in-chroot to overlayrootfs startup files"
 
 cat << EOF2 > $NEWROOT/tmp/bash.login.sh
 #!/bin/sh
@@ -236,70 +203,128 @@ EOF2
 chmod +x $NEWROOT/tmp/bash.login.sh
 
 cat << EOF2 > $NEWROOT/tmp/bash.bashrc
-set -o ignoreeof
-alias exit="echo NO EXIT FROM THIS SHELL"
-reset
-
-# start computer system controller
-/tmp/computer_system_controller
-while [ ! -f /dev/factory_control/ready ]; do sleep 0.1; done
-
-# execute user autostart
-if [ -f /mnt/local/init.sh ]; then
-	echo "Starting user autostart (/mnt/local/init.sh)"
-	. /mnt/local/init.sh
-	echo "User autostart (/mnt/local/init.sh) executed"
-else
-	echo "User autostart (/mnt/local/init.sh) not found."
-fi
-
-# report ready
-echo 1 > /dev/factory_control/ready
-
-# configure user environment and cleanup
-. /etc/bash.bashrc
-rm /tmp/bash.bashrc /tmp/bash.login.sh /tmp/computer_system_controller
+	set -o ignoreeof
+	alias exit="echo NO EXIT FROM THIS SHELL"
+	
+	echo "Start factory controller"
+	/tmp/computer_system_controller
+	
+	echo "Waiting for factory controller start ..."
+	while [ ! -f /dev/factory_control/ready ]; do sleep 0.1; done
+	
+	# execute user autostart
+	if [ -f /mnt/local/init.sh ]; then
+		echo "Starting user autostart (/mnt/local/init.sh)"
+		. /mnt/local/init.sh
+		echo "User autostart (/mnt/local/init.sh) executed"
+	else
+		echo "User autostart (/mnt/local/init.sh) not found"
+	fi
+	
+	echo "Report ready"
+	echo 1 > /dev/factory_control/ready
+	
+	echo "Configure user environment and cleanup"
+	. /etc/bash.bashrc
+	rm /tmp/bash.bashrc /tmp/bash.login.sh /tmp/computer_system_controller
+	
+	echo ""
 EOF2
 
 cp /usr/local/sbin/computer_system_controller $NEWROOT/tmp/computer_system_controller
 
+
+echo "Chroot to overlayrootfs"
+
 exec $CHROOT getty -l /tmp/bash.login.sh -n 0 ttyS0
 EOF
-chmod a+x,a-w "${INSTALL_PATH}/init"
-
-mkdir -p ${INSTALL_PATH}/mnt/{local,global}
-
-
-#
-# fixes after using fakeroot
-#
-
-# if we are using fakeroot then content of /dev is not devices ... remove it to avoid "Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000000"
-
-if ! [ -c "${INSTALL_PATH}/dev/null" ]; then
-	rm -fr "${INSTALL_PATH}/dev"
-	mkdir -p "${INSTALL_PATH}/dev/pts" "${INSTALL_PATH}/dev/shm"
-fi
-
-
-# symlink created inside fakechroot can be broken, so fix them
-find ${INSTALL_PATH} -type l | while read l; do
-	t=$(readlink "$l")
-	if echo "$t" | grep -q "^${INSTALL_PATH}"; then
-		ln -sf "$(echo "$t" | sed -e "s#^${INSTALL_PATH}/*#/#")" "$l"
-	fi
-done
-
 
 #
 # build computer system controller
 #
 
-g++ "$BASE_DIR/computer_system_controller.cpp" -I/usr/include/fuse3 -lfuse3 -o "${INSTALL_PATH}/usr/local/sbin/computer_system_controller"
-chmod a+x,a-w "${INSTALL_PATH}/usr/local/sbin/computer_system_controller"
-mkdir -p "${INSTALL_PATH}/dev/factory_control"
+g++ "$BASE_DIR/computer_system_controller.cpp" -I/usr/include/fuse3 -lfuse3 -o "${TMP_DIR}/computer_system_controller"
 
-cp "$BASE_DIR/factory_control.py" "${INSTALL_PATH}/usr/local/lib/python3.11/dist-packages/"
+
+#
+# install system using mmdebstrap
+#
+
+cd "$BASE_DIR"
+mmdebstrap \
+	--variant=custom \
+	--mode=unshare \
+	--aptopt='Apt::Install-Recommends "false"' \
+	$MINIMAL_SYSTEM_MMDEBSTRAP_OPTIONS_1 \
+	--include="$DEBIAN_TEMPORARY1 $DEBIAN_TEMPORARY2 $PACKAGES" \
+	--setup-hook='
+		if [ -d "$1/tmp/custom_debs" ]; then
+			dpkg --root="$1" --log="$1/var/log/dpkg.log" --install "$1/tmp/custom_debs"/*.deb
+			rm -fr "$1/tmp/custom_debs"
+		fi
+	' \
+	--extract-hook='
+		# busybox
+		if [ -x "$1/bin/busybox" ]; then
+			chroot "$1" /bin/busybox --install -s
+			rm -f "$1/usr/bin/pager"
+			echo "#!/bin/sh" > "$1/usr/bin/pager"
+			echo "exec /usr/bin/less" >> "$1/usr/bin/pager"
+			chmod +x "$1/usr/bin/pager"
+		fi
+		# /etc/passwd and /etc/group entries required by base-files
+		if [ ! -f "$1/etc/passwd" ]; then
+			echo "root:x:0:0:root:/root:/bin/bash" > "$1/etc/passwd"
+		fi
+		if [ ! -f "$1/etc/group" ]; then
+			echo "root:x:0:" > "$1/etc/group"
+			echo "mail:x:8:" >> "$1/etc/group"
+			echo "utmp:x:43:" >> "$1/etc/group"
+		fi
+		# avoid errors in --customize-hook="copy-in ... while no python
+		mkdir -p "$1/usr/local/lib/python3.13/dist-packages"
+	' \
+	--customize-hook="copy-in '$TMP_DIR/init' /" \
+	--customize-hook="copy-in '$TMP_DIR/computer_system_controller' /usr/local/sbin/" \
+	--customize-hook="copy-in '$BASE_DIR/factory_control.py' /usr/local/lib/python3.13/dist-packages/" \
+	--customize-hook='
+		[ "'"$DEBIAN_TEMPORARY1"'" != "" ] && chroot "$1" dpkg --force-all --purge '"$DEBIAN_TEMPORARY1"'
+		[ "'"$DEBIAN_TEMPORARY2"'" != "" ] && chroot "$1" dpkg --force-all --purge '"$DEBIAN_TEMPORARY2"'
+		chroot "$1" /bin/busybox --install -s
+		mkdir -p "$1/mnt/local" "$1/mnt/global" "$1/.overlayrootfs/ro" "$1/.overlayrootfs/rw" "$1/.overlayrootfs/fs"
+		chmod a+x,a-w "$1/usr/local/sbin/computer_system_controller" "$1/init"
+	' \
+	--hook-dir=/usr/share/mmdebstrap/hooks/merged-usr \
+	--hook-dir=/usr/share/mmdebstrap/hooks/file-mirror-automount \
+	${SUITE} "${INSTALL_PATH}" ${MIRROR}
+
+
+#
+# final fixes
+#
+
+cd "$TMP_DIR"
+mkdir rootfs_patch
+cd rootfs_patch
+
+mkdir -p dev/factory_control dev/pts
+tar -rf "${INSTALL_PATH}" --owner=0 --group=0 .
+
+cd /
+tar -cf "$TMP_DIR/dev.tar" ./dev/ttyS[01]
+tar -Af "${INSTALL_PATH}" "$TMP_DIR/dev.tar"
+
+
+#
+# extract copyright info
+#
+
+mkdir -p "$BASE_DIR/bin/rootfs.img.copyright"
+
+cd "$TMP_DIR"
+tar -xf "${INSTALL_PATH}" --wildcards './usr/share/doc/*/copyright'
+cd "usr/share/doc/"
+for f in */copyright; do mv "$f" "$BASE_DIR/bin/rootfs.img.copyright"/$(dirname $f).copyright; done
 
 
 #
@@ -307,14 +332,16 @@ cp "$BASE_DIR/factory_control.py" "${INSTALL_PATH}/usr/local/lib/python3.11/dist
 #
 
 mkdir -p "$BASE_DIR/bin"
-if $DISK_MODE; then
-	virt-make-fs --format=qcow2 --size=+50M --blocksize=4096 "${INSTALL_PATH}" "$BASE_DIR/bin/rootfs.img"
-	if [ ! -f "$BASE_DIR/bin/empty_100MB.img" ]; then
-		mkdir "${TMP_DIR}/empty"
-		virt-make-fs --format=qcow2 --size=+100M --blocksize=4096 "${TMP_DIR}/empty" "$TMP_DIR/empty_100MB.img"
-		cp "$TMP_DIR/empty_100MB.img" "$BASE_DIR/bin/empty_100MB.img"
-	fi
-else
-	cd "${INSTALL_PATH}"
-	find . -print0 | cpio --null -ov --format=newc | gzip -9 > "$BASE_DIR/bin/initramfs.cpio.gz"
+virt-make-fs --format=qcow2 --size=+50M --blocksize=4096 "${INSTALL_PATH}" "$BASE_DIR/bin/rootfs.img"
+if [ ! -f "$BASE_DIR/bin/empty_100MB.img" ]; then
+	mkdir "${TMP_DIR}/empty"
+	virt-make-fs --format=qcow2 --size=+100M --blocksize=4096 "${TMP_DIR}/empty" "$TMP_DIR/empty_100MB.img"
+	cp "$TMP_DIR/empty_100MB.img" "$BASE_DIR/bin/empty_100MB.img"
 fi
+
+
+#
+# remove temporary dir
+#
+
+rm -fr "$TMP_DIR"

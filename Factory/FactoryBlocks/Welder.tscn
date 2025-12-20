@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://bvjcwpnhd84ge" path="res://Factory/FactoryBlocks/images/Welder.svg" id="1_43dem"]
 [ext_resource type="Script" uid="uid://cjok68xnckq1n" path="res://Factory/FactoryBlocks/Welder.gd" id="1_kb8ux"]
-[ext_resource type="ArrayMesh" path="res://.godot/imported/Welder.tres" id="3_w8g46"]
+[ext_resource type="ArrayMesh" path="res://imported/Welder.tres" id="3_w8g46"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tavap"]
 size = Vector3(1, 0.5, 2)

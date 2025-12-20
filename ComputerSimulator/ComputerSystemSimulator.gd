@@ -200,12 +200,23 @@ func _run_qemu(user_port, msg_port, vnc_port):
 		args.append("-drive")
 		args.append("file=" + FAG_Utils.globalize_path(writable_disk_image) + ",index=1,media=disk,if=virtio,read-only=off")
 	
-	print("Starting qemu with args: ", args)
+	args.append("-L")
+	args.append(FAG_Utils.globalize_path("qemu/share"))
 	
+	var path: String
 	if OS.get_name() == "Windows":
-		return OS.create_process("qemu/qemu-system-x86_64.exe", args)
+		path = FAG_Utils.globalize_path("qemu/bin/qemu-system-x86_64.exe")
+		if not FileAccess.file_exists(path):
+			path = "qemu-system-x86_64.exe"
 	else:
-		return OS.create_process("qemu-system-x86_64", args)
+		path = FAG_Utils.globalize_path("qemu/qemu-system-x86_64")
+		if not FileAccess.file_exists(path):
+			path = "qemu-system-x86_64"
+		else:
+			OS.set_environment("LD_LIBRARY_PATH", FAG_Utils.globalize_path("qemu") + ":" +  OS.get_environment("LD_LIBRARY_PATH"))
+	
+	print("Starting qemu (", path, "), with args: ", args)
+	return OS.create_process(path, args)
 
 
 var _user_console_server := TCPServer.new()

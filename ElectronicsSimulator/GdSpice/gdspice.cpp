@@ -10,9 +10,20 @@
 #include <thread>
 #include <iostream>
 #include <math.h>
+#include <stdlib.h>
 
 #ifdef USE_DLOPEN
-#include <dlfcn.h>
+	#include <dlfcn.h>
+	#ifdef _WIN32
+		#include <windows.h>
+		#include <winbase.h>
+		#undef ERROR
+		#define NGSPICE_DLL_DEFAULT_FILE "libngspice-0.dll"
+	#else
+		#define NGSPICE_DLL_DEFAULT_FILE "libngspice.so"
+	#endif
+#else
+	#define NGSPICE_DLL_DEFAULT_FILE "unused"
 #endif
 
 GdSpice::GdSpice() {
@@ -35,6 +46,9 @@ bool GdSpice::init(const godot::String& libngspice, int _verbose) {
 	verbose = _verbose;
 	
 	#ifdef USE_DLOPEN
+	#ifdef _WIN32
+	SetDllDirectoryA("ngspice");
+	#endif
 	ngSpice_dll = dlopen(libngspice.utf8().get_data(), RTLD_NOW);
 	if (!ngSpice_dll) {
 		godot::UtilityFunctions::printerr(("[GdSpice] ERROR: can't load libngspice: " + libngspice).utf8().get_data());
@@ -59,6 +73,14 @@ bool GdSpice::init(const godot::String& libngspice, int _verbose) {
 		godot::UtilityFunctions::print("[GdSpice] init sync thread returned: ", ret);
 	
 	return true;
+}
+
+void GdSpice::set_env(const godot::String& name, const godot::String& value) {
+	#ifdef _WIN32
+		putenv((name + godot::String("=") + value).utf8().get_data());
+	#else
+		setenv(name.utf8().get_data(), value.utf8().get_data(), 1);
+	#endif
 }
 
 void GdSpice::load(const godot::PackedStringArray& circuit) {
@@ -242,7 +264,7 @@ void GdSpice::set_voltages_currents(const godot::String& point_name, double valu
 }
 
 void GdSpice::_bind_methods() {
-	godot::ClassDB::bind_method(godot::D_METHOD("init"), &GdSpice::init, DEFVAL("libngspice.so"), DEFVAL(2));
+	godot::ClassDB::bind_method(godot::D_METHOD("init"), &GdSpice::init, DEFVAL(NGSPICE_DLL_DEFAULT_FILE), DEFVAL(2));
 	godot::ClassDB::bind_method(godot::D_METHOD("load"), &GdSpice::load);
 	godot::ClassDB::bind_method(godot::D_METHOD("start"), &GdSpice::start, DEFVAL(true));
 	godot::ClassDB::bind_method(godot::D_METHOD("try_step"), &GdSpice::try_step);
@@ -261,6 +283,7 @@ void GdSpice::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("is_running"), &GdSpice::is_running);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_time_simulation"), &GdSpice::get_time_simulation);
 	
+	godot::ClassDB::bind_method(godot::D_METHOD("set_env"), &GdSpice::set_env);
 	
 	BIND_PROPERTY(GdSpice, time_game, FLOAT)
 	BIND_PROPERTY(GdSpice, sleep_time, INT)

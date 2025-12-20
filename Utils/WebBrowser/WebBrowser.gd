@@ -123,7 +123,7 @@ func _init_GDCef():
 			"locale":"en-US",
 			"enable_media_stream": true,
 			"artifacts": "res://cef_artifacts",
-			"exported_artifacts": FAG_Utils.globalize_path("cef_artifacts" if OS.get_name() != "Windows" else ""), # TODO TEST without "cef_artifacts" dir for Windows platform
+			"exported_artifacts": FAG_Utils.globalize_path("cef_artifacts")
 	}):
 		printerr("GDCef init error: ", _gdcef.get_error())
 		return

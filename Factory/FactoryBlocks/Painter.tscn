@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dc7u1k063xcs1" path="res://Factory/FactoryBlocks/images/Painter.svg" id="1_cmfor"]
 [ext_resource type="Script" uid="uid://dgd5g3p6qd5xo" path="res://Factory/FactoryBlocks/Painter.gd" id="2_enkqh"]
-[ext_resource type="ArrayMesh" path="res://.godot/imported/Painter.tres" id="3_truhm"]
+[ext_resource type="ArrayMesh" path="res://imported/Painter.tres" id="3_truhm"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_45hpx"]
 size = Vector3(1, 0.5, 1)

@@ -3,7 +3,8 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
 
-DEFAULT_GODOT_CCP_PATH = '../../addons/3rdparty/_godot-cpp/'
+PROJECT_ROOT_PATH = '../../'
+DEFAULT_GODOT_CCP_PATH = PROJECT_ROOT_PATH + 'addons/3rdparty/_godot-cpp/'
 AUTO_BUILD_GODOT_LIB_WHEN_MISSED = False
 
 # set debug options
@@ -81,13 +82,17 @@ Ignore('.', 'compile_commands.json')
 # add godot ignore file to output directory
 env.Textfile('#/bin/.gdignore', [''])
 
+# use dlopen and serach also in `ngspice` dir
+env.Append(CXXFLAGS=['-DUSE_DLOPEN'], RPATH='ngspice')
 
 # platform specific settings
 if env['platform'] == "windows":
-	env.Append(CPPPATH=["#/bin/win64/include/"])
-	env.Append(LIBS=File('bin/win64/dll-mingw/libngspice-0.dll'), RPATH='.')
-else:
-	env.Append(CXXFLAGS=['-DUSE_DLOPEN'])
+	os.system('''
+		if [ ! -d bin/mingw64 ]; then
+			sh ''' + PROJECT_ROOT_PATH + '''Utils/msys2_pacman.sh bin mingw-w64-x86_64-ngspice mingw-w64-x86_64-dlfcn
+		fi
+	''')
+	env.Append(CPPPATH=["#/bin/mingw64/include/"], LIBS=File('bin/mingw64/lib/libdl.a'))
 
 # define lib sources
 env.Append(CPPPATH=["."])

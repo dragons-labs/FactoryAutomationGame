@@ -123,6 +123,10 @@ public:
 	/// @}
 	#endif
 	
+	/// set enviroment variable in this extensions
+	/// (for some reasons variables set by Godot's `OS.set_environment()` are not visible in this extension on windows)
+	void set_env(const godot::String& name, const godot::String& value);
+	
 private:
 	#ifdef USE_DLOPEN
 	/// pointer to ngSpice dynamic library opened via dlopen

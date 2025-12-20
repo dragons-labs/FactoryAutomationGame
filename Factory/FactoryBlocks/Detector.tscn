@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://hb7dvw1kiafa" path="res://Factory/FactoryBlocks/images/Detector.svg" id="1_ne86n"]
 [ext_resource type="Script" uid="uid://beo454y5saaow" path="res://Factory/FactoryBlocks/Detector.gd" id="2_enkqh"]
-[ext_resource type="ArrayMesh" path="res://.godot/imported/Detector.tres" id="3_txfn6"]
+[ext_resource type="ArrayMesh" path="res://imported/Detector.tres" id="3_txfn6"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_45hpx"]
 size = Vector3(1, 0.5, 1)

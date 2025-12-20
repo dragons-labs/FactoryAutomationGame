@@ -46,7 +46,7 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://.godot/imported/Consumer.tres",
+"save_to_file/fallback_path": "res://imported/Consumer.tres",
 "save_to_file/path": "uid://o5yh8ikbts4q"
 },
 "Blocks_ControlBlock": {
@@ -56,7 +56,7 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://.godot/imported/ControlBlock.tres",
+"save_to_file/fallback_path": "res://imported/ControlBlock.tres",
 "save_to_file/path": "uid://cq76rvmc1vinb"
 },
 "Blocks_ConveyorBelt": {
@@ -66,7 +66,7 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://.godot/imported/ConveyorBelt.tres",
+"save_to_file/fallback_path": "res://imported/ConveyorBelt.tres",
 "save_to_file/path": "uid://j8r5vkukrhtj"
 },
 "Blocks_ConveyorBelt_simple": {
@@ -76,7 +76,7 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://.godot/imported/ConveyorBeltSimple.tres",
+"save_to_file/fallback_path": "res://imported/ConveyorBeltSimple.tres",
 "save_to_file/path": "uid://chqwiyrtjuhax"
 },
 "Blocks_ConveyorSplitter": {
@@ -86,7 +86,7 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://.godot/imported/ConveyorSplitter.tres",
+"save_to_file/fallback_path": "res://imported/ConveyorSplitter.tres",
 "save_to_file/path": "uid://clwuiu11ielg4"
 },
 "Blocks_ConveyorSplitterFast": {
@@ -96,7 +96,7 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://.godot/imported/ConveyorSplitterFast.tres",
+"save_to_file/fallback_path": "res://imported/ConveyorSplitterFast.tres",
 "save_to_file/path": "uid://rc6xw00nwnrd"
 },
 "Blocks_Detector": {
@@ -106,7 +106,7 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://.godot/imported/Detector.tres",
+"save_to_file/fallback_path": "res://imported/Detector.tres",
 "save_to_file/path": "uid://bsus2yiqmhe7u"
 },
 "Blocks_Painter": {
@@ -116,7 +116,7 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://.godot/imported/Painter.tres",
+"save_to_file/fallback_path": "res://imported/Painter.tres",
 "save_to_file/path": "uid://clg3ug7acwl75"
 },
 "Blocks_Producer": {
@@ -126,7 +126,7 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://.godot/imported/Producer.tres",
+"save_to_file/fallback_path": "res://imported/Producer.tres",
 "save_to_file/path": "uid://b0g3rl31p0ljl"
 },
 "Blocks_Welder": {
@@ -136,7 +136,7 @@ _subresources={
 "lods/normal_merge_angle": 60.0,
 "lods/normal_split_angle": 25.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://.godot/imported/Welder.tres",
+"save_to_file/fallback_path": "res://imported/Welder.tres",
 "save_to_file/path": "uid://d0o3udek8lhnq"
 }
 }
@@ -151,6 +151,7 @@ blender/meshes/colors=false
 blender/meshes/uvs=true
 blender/meshes/normals=true
 blender/meshes/export_geometry_nodes_instances=false
+blender/meshes/gpu_instances=false
 blender/meshes/tangents=true
 blender/meshes/skins=2
 blender/meshes/export_bones_deforming_mesh_only=false

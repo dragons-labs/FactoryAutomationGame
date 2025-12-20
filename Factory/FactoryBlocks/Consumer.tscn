@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://yxwpvqin8bet" path="res://Factory/FactoryBlocks/images/Consumer.svg" id="1_r6csw"]
 [ext_resource type="Script" uid="uid://b16opmwyrwuoo" path="res://Factory/FactoryBlocks/Consumer.gd" id="2_hk5bj"]
-[ext_resource type="ArrayMesh" path="res://.godot/imported/Consumer.tres" id="3_cxrsc"]
+[ext_resource type="ArrayMesh" path="res://imported/Consumer.tres" id="3_cxrsc"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_45hpx"]
 size = Vector3(0.79, 0.5, 0.79)

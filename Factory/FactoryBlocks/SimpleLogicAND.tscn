@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bad7gc8yj1tsv" path="res://Factory/FactoryBlocks/SimpleLogic.gd" id="1_lnnks"]
 [ext_resource type="Texture2D" uid="uid://dtw2i6i0r1wpi" path="res://ElectronicsSimulator/Components/images/and-icon.svg" id="2_2r4my"]
-[ext_resource type="ArrayMesh" path="res://.godot/imported/ControlBlock.tres" id="3_6v8xk"]
+[ext_resource type="ArrayMesh" path="res://imported/ControlBlock.tres" id="3_6v8xk"]
 [ext_resource type="Texture2D" uid="uid://bfa735k70eaym" path="res://Factory/FactoryBlocks/3d_models/SimpleLogicAND.svg" id="4_2r4my"]
 [ext_resource type="PackedScene" uid="uid://cy0brqivxb2l1" path="res://Utils/Gui3DNode/Gui3DNode.tscn" id="5_6v8xk"]
 [ext_resource type="PackedScene" uid="uid://bkvq73e4cq523" path="res://Factory/FactoryBlocks/ui/SelectNames.tscn" id="6_qskco"]

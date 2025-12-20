@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://bjajgxt7t58bd" path="res://Factory/FactoryBlocks/images/ComputerControlBlock.svg" id="1_a3dtk"]
 [ext_resource type="Script" uid="uid://bxicm2k6m7lkg" path="res://Factory/FactoryBlock.gd" id="1_r7foq"]
-[ext_resource type="ArrayMesh" path="res://.godot/imported/ControlBlock.tres" id="2_2xuij"]
+[ext_resource type="ArrayMesh" path="res://imported/ControlBlock.tres" id="2_2xuij"]
 [ext_resource type="Material" path="res://Factory/FactoryBlocks/3d_models/ComputerControlBlock.material.tres" id="3_l7mko"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_uwn0y"]

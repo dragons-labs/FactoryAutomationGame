@@ -32,7 +32,7 @@ The game offers full simulation of electronic circuits (based on ngspice) and co
 1. clone project repository: `git clone https://github.com/dragons-labs/FactoryAutomationGame/`
 2. run `just` command in project root repo directory
 
-**Important:** This version require Godot 4.6-dev4 or higher. For Godot 4.5 version see godot4.5 branch.
+**Important:** This version require Godot 4.6-beta2 or higher.
 
 You can also export project for Linux and Windows platform using `./export.sh` script (do not directly use export option in editor).
 Use `./export.sh` to export amd64 Linux version or `./export.sh Windows` to export amd64 Windows version.

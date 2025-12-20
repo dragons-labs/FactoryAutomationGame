@@ -133,6 +133,10 @@ func _ready():
 	grid_editor.ui.get_node("%Actions/Save").tooltip_text = "ELECTRONIC_EDITOR_SAVE_TOOLTIP"
 	
 	gdspice.simulation_error.connect(_on_simulation_error)
+	var path = FAG_Utils.globalize_path("ngspice")
+	if FileAccess.file_exists(path + "/spinit"):
+		print("[GdSpice] Use local spinit from: ", path)
+		gdspice.set_env("SPICE_SCRIPTS", path)
 	gdspice.init()
 	gdspice.verbose = 2
 

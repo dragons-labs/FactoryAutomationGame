@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cyq3ourvyqtbj" path="res://Factory/FactoryBlocks/Producer.gd" id="1_hqsx2"]
 [ext_resource type="Texture2D" uid="uid://bwbw34p1rjfk3" path="res://Factory/FactoryBlocks/images/Producer.svg" id="2_5gikm"]
-[ext_resource type="ArrayMesh" path="res://.godot/imported/Producer.tres" id="3_8nnfk"]
+[ext_resource type="ArrayMesh" path="res://imported/Producer.tres" id="3_8nnfk"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_uwn0y"]
 

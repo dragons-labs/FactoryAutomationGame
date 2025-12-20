@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: NONE
+# SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: CC0-1.0
 
 # Normalize EOL for all files that Git considers text files.

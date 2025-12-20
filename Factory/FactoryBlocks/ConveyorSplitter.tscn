@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b5c7qywf7gwes" path="res://Factory/FactoryBlocks/ConveyorSplitter.gd" id="1_kb8ux"]
 [ext_resource type="Texture2D" uid="uid://dlb8llxt1rnj7" path="res://Factory/FactoryBlocks/images/ConveyorSplitter.svg" id="1_omw6g"]
-[ext_resource type="ArrayMesh" path="res://.godot/imported/ConveyorSplitter.tres" id="3_wnwaj"]
+[ext_resource type="ArrayMesh" path="res://imported/ConveyorSplitter.tres" id="3_wnwaj"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wwg4c"]
 size = Vector3(1, 0.5, 1)
