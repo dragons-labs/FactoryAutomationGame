@@ -13,6 +13,7 @@ extends Node2D
 signal overcurrent_protection(fuse : String, value : float)
 signal overvoltage_protection(net : String, value : float)
 signal simulation_error()
+signal init_error()
 
 
 @onready var gdspice := %"GdSpice+UI"
@@ -137,7 +138,8 @@ func _ready():
 	if FileAccess.file_exists(path + "/spinit"):
 		print("[GdSpice] Use local spinit from: ", path)
 		gdspice.set_env("SPICE_SCRIPTS", path)
-	gdspice.init()
+	if not gdspice.init():
+		init_error.emit()
 	gdspice.verbose = 2
 
 func _on_element_click(element, _long):

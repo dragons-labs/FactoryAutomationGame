@@ -213,7 +213,7 @@ func run_factory() -> void:
 		return
 	
 	print_rich("[color=cyan][b]Starting factory ...[/b][/color]")
-	_factory_state = FactoryState.RUNNING | FactoryState.ON_CHANGE | FactoryState.STARTING
+	_factory_state = FactoryState.RUNNING | FactoryState.STARTING
 	_start_canceled = false
 	_factory_paused = false
 	_factory_start_allowed = get_tree().paused
@@ -230,7 +230,12 @@ func run_factory() -> void:
 	# continue (after control is started) in _async_on_control_running()
 
 func _async_on_control_running() -> void:
+	if _start_canceled: return
+
 	_factory_state |= FactoryState.CONTROL_IS_RUNNING
+	_factory_state |= FactoryState.ON_CHANGE
+	_start_stop_hud_ui()
+	
 	while not _factory_start_allowed:
 		# wait for _factory_start_allowed
 		await FAG_Utils.real_time_wait(0.1)
@@ -265,7 +270,7 @@ func async_stop_factory() -> void:
 	if not (_factory_state & FactoryState.RUNNING):
 		printerr("Factory is not started")
 		return
-	if _factory_state & FactoryState.STARTING:
+	if _factory_state & FactoryState.STARTING and _factory_state & FactoryState.ON_CHANGE:
 		printerr("Using stop while factory is started ... this may cause undefined behavior")
 		
 	print_rich("[color=cyan][b]Stopping factory ...[/b][/color]")
@@ -276,7 +281,7 @@ func async_stop_factory() -> void:
 	print("Pausing tree ...")
 	get_tree().paused = true
 	
-	factory_control.stop()
+	await factory_control.async_stop()
 	
 	print("Removing products ...")
 	for node in objects_root.get_children():
@@ -383,7 +388,7 @@ func _start_stop_hud_ui():
 		%Pause.disabled = true
 	else:
 		%StartStop.disabled = false
-		%Pause.disabled = not (_factory_state & FactoryState.RUNNING)
+		%Pause.disabled = not (_factory_state & FactoryState.RUNNING and not _factory_state & FactoryState.STARTING)
 	
 	if _factory_state & FactoryState.EMERGENCY_STOP :
 		%Pause.disabled = true
@@ -415,8 +420,8 @@ func _on_circuit_simulation_overvoltage(net : String, value : float) -> void:
 		"FACTORY_OVERVOLTAGE_ERROR_TEXT"
 	)
 
-func _on_simulation_error() -> void:
-	printerr("_on_simulation_error")
+func _on_simulation_error(message: String) -> void:
+	printerr("_on_simulation_error: ", message)
 	emergency_stop(
 		"FACTORY_ERROR_TITLE",
 		"FACTORY_ERROR_TEXT"
@@ -559,7 +564,7 @@ func _ready() -> void:
 	factory_control.circuit_simulator.grid_editor.grid.gElements.on_element_remove.connect(_update_circuit_element_count.bind(-1))
 	factory_control.circuit_simulator.overcurrent_protection.connect(_on_circuit_simulation_overcurrent)
 	factory_control.circuit_simulator.overvoltage_protection.connect(_on_circuit_simulation_overvoltage)
-	factory_control.circuit_simulator.simulation_error.connect(_on_simulation_error)
+	factory_control.simulation_error.connect(_on_simulation_error)  # FIXME zastąpić sygnałem factory_control
 	factory_control.conflict_error.connect(_on_conflict_error)
 	factory_control.running.connect(_async_on_control_running)
 	

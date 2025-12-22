@@ -24,7 +24,7 @@ func _get_signal_value(signal_name : String, default : Variant = 0) -> Array:
 			value1 = circuit_simulator.gdspice.get_last_value(electric_signal)
 	
 	var value2 = null
-	var value2_source = null
+	var value2_source_id = null
 	for computer_id in computer_control_blocks:
 		var computer_system = computer_control_blocks[computer_id].get_child(0)
 		if computer_system.is_running_and_ready() and signal_name in computer_system.computer_output_names:
@@ -33,24 +33,24 @@ func _get_signal_value(signal_name : String, default : Variant = 0) -> Array:
 			if new_value != null:
 				if value2 == null:
 					value2 = float(new_value)
-					value2_source = computer_id
+					value2_source_id = computer_id
 				elif not is_equal_approx(float(new_value), value2):
 					new_value = float(new_value)
-					return [(value2+new_value)/2, CONFLICT, value2_source, new_value, value2, computer_id]
+					return [(value2+new_value)/2, CONFLICT, value2_source_id, new_value, value2, computer_id]
 	
 	if value2 == null:
 		value2 = internal_signals_values.get(signal_name)
-		value2_source = "internal"
+		value2_source_id = "internal"
 	
 	if value1 != null and value2 != null:
 		if not is_equal_approx(value1, value2):
-			return [(value1+value2)/2, CONFLICT, value2_source, value1, value2]
+			return [(value1+value2)/2, CONFLICT, value2_source_id, value1, value2]
 		else:
-			return [value2, COMPUTER, value2_source]
+			return [value2, COMPUTER, value2_source_id]
 	elif value1 != null:
-		return [value1, ELECTRONICS]
+		return [value1, CIRCUIT]
 	elif value2 != null:
-		return [value2, COMPUTER, value2_source]
+		return [value2, COMPUTER, value2_source_id]
 	else:
 		return [default, NONE]
 
@@ -69,9 +69,13 @@ func set_signal_value(signal_name : String, value : float) -> void:
 
 #region   start / tick / stop / close
 
-func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_simulation_max_time) -> void:
+func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_simulation_max_time) -> bool:
+	if _running_state != NOT_RUNNING:
+		printerr("Start aborted - running_state != NOT_RUNNING (running_state == ", _running_state, ")")
+		return false
+	_running_state = STARTING
+	
 	print_rich("[color=dark_cyan][b]Starting factory control system ...[/b][/color]")
-	_start_canceled = false
 	simulation_time = 0
 	simulation_on_time = true
 	internal_signals_values.clear()
@@ -83,14 +87,18 @@ func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_s
 		# (to avoid start factory when computers are booting)
 		_update_computer_systems_simulation_ready_state()
 		
-		while _computer_systems_simulation_ready_state != READY:
-			await FAG_Utils.real_time_wait(0.025)
+		if not await _async_wait_for_ready(COMPUTER, "computer"): return false
 	else:
-		_computer_systems_simulation_ready_state = UNUSED
+		_system_state[COMPUTER] = UNUSED
 	
 	# if electronic circuit simulation is used need be init and in READY state
 	if use_circuit_simulation:
-		_circuit_simulation_ready_state = NOT_READY
+		if _system_state[CIRCUIT] == INIT_FAIL:
+			printerr("Start aborted - circuit simulation in INIT_FAIL state")
+			_running_state = START_CANCELED_ACK
+			return false
+		
+		_system_state[CIRCUIT] = NOT_READY
 		circuit_simulator.init_circuit(
 			input_to_circuit_from_factory.values(),
 			outputs_from_circuit_to_factory.values(),
@@ -101,28 +109,30 @@ func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_s
 		# NOTE: we ignore value returned by init_circuit (error list) and do not show UI error here
 		#       because NO_GND is not an issue if circuit connect only input/output signals
 		
-		while _circuit_simulation_ready_state != READY:
-			await FAG_Utils.real_time_wait(0.025)
-	else:
-		_circuit_simulation_ready_state = UNUSED
+		if not await _async_wait_for_ready(CIRCUIT, "circuit"): return false
+	elif _system_state[CIRCUIT] != INIT_FAIL:
+		_system_state[CIRCUIT] = UNUSED
 	
 	# check if start was not canceled while we were waiting for READY state
-	if _start_canceled:
-		return
+	if _running_state == START_CANCELED:
+		_running_state = START_CANCELED_ACK
+		return false
 	
 	# if electronic circuit simulation is used need be started
-	if _circuit_simulation_ready_state == READY:
+	if _system_state[CIRCUIT] == READY:
 		circuit_simulator.start( _circuit_simulation_time_step, _circuit_simulation_max_time )
 	
 	# NOTE: computer system simulations are running during work in editor
 	# (are start/stop while adding/removing blocks) so no need to start/restart here
 	
 	print_rich("[color=dark_cyan][b]Factory control system is running.[/b][/color]")
+	_running_state = RUNNING
 	running.emit()
+	return true
 
 func tick(delta: float, paused : bool) -> void:
 	# if electronic circuit simulation is used then check if it's "on time" ... if it's delayed then pause 3d factory processing
-	if _circuit_simulation_ready_state == READY:
+	if _system_state[CIRCUIT] == READY:
 		var status = circuit_simulator.try_step(simulation_time)
 		if status[0]: # running and "on time"
 			if not simulation_on_time:
@@ -161,19 +171,28 @@ func tick(delta: float, paused : bool) -> void:
 		if _timers[i] and _timers[i].update(delta):
 			_timers[i] = null
 
-func stop() -> void:
+func async_stop() -> void:
 	print_rich("[color=dark_cyan][b]Stopping factory control system ...[/b][/color]")
-	_start_canceled = true
+	
+	# if stop requested while starting then wait for break starting function before continue stopping
+	if _running_state == STARTING or _running_state == START_CANCELED:
+		_running_state = START_CANCELED
+		print("Wait for starting canceled acknowledgement")
+		while _running_state == START_CANCELED:
+			await FAG_Utils.real_time_wait(0.025)
+	
 	_timers.clear()
 	circuit_simulator.stop()
 	for element in computer_control_blocks.values():
 		element.get_child(0).time_step(-1)
+	
+	_running_state = NOT_RUNNING
 	print_rich("[color=dark_cyan][b]Factory control system is stopped.[/b][/color]")
 
 func async_close() -> void:
+	await async_stop()
+	
 	print_rich("[color=dark_cyan][b]Closing factory control system ...[/b][/color]")
-	_start_canceled = true
-	circuit_simulator.stop()
 	for element in computer_control_blocks.values():
 		@warning_ignore("missing_await") element.get_child(0).async_stop()
 	for element in computer_control_blocks.values():
@@ -415,25 +434,53 @@ func create_timer(time : float, one_shot := true):
 #endregion
 
 
-#region   ready check private callbacks
+#region   ready check private callbacks and helpers
+
+func _async_wait_for_ready(subsystem : int, name : String):
+	while true:
+		if _running_state == START_CANCELED:
+			_running_state = START_CANCELED_ACK
+			return false
+		if _system_state[subsystem] == FAIL:
+			printerr("Start aborted - " + name + " system simulation in FAIL state")
+			_running_state = START_CANCELED_ACK
+			return false
+		if _system_state[subsystem] == READY:
+			return true
+		await FAG_Utils.real_time_wait(0.025)
+
+func _on_electronics_simulator_init_error() -> void:
+	_system_state[CIRCUIT] = INIT_FAIL
+	simulation_error.emit("circuit simulation init error")
+
+func _on_simulation_error() -> void:
+	_system_state[CIRCUIT] = FAIL
+	simulation_error.emit("circuit simulation runtime error")
 
 func _on_circuit_simulation_ready_state() -> void:
 	print("circuit simulation is ready")
-	_circuit_simulation_ready_state = READY
+	_system_state[CIRCUIT] = READY
+
+func _on_computer_system_simulator_crash(computer_system_id: Variant, after_ready: bool) -> void:
+	_system_state[COMPUTER] = FAIL
+	simulation_error.emit("computer simulation crash error")
 
 func  _update_computer_systems_simulation_ready_state() -> void:
 	if len(computer_control_blocks) == 0:
-		_computer_systems_simulation_ready_state = UNUSED
+		_system_state[COMPUTER] = UNUSED
 	else:
 		var new_state = READY
 		for element in computer_control_blocks.values():
 			var computer_system = element.get_child(0)
+			if not computer_system.is_running():
+				new_state = FAIL
+				break
 			if not computer_system.is_running_and_ready():
 				new_state = NOT_READY
 				if not computer_system.computer_system_is_run_and_ready.is_connected(_update_computer_systems_simulation_ready_state):
 					computer_system.computer_system_is_run_and_ready.connect(_update_computer_systems_simulation_ready_state, CONNECT_ONE_SHOT)
-		_computer_systems_simulation_ready_state = new_state
-	print("computer systems simulation ready state: ", _computer_systems_simulation_ready_state)
+		_system_state[COMPUTER] = new_state
+	print("computer systems simulation ready state: ", _system_state[COMPUTER])
 
 #endregion
 
@@ -472,7 +519,7 @@ func _list_all_signals() -> void:
 func _signal_value_with_info(signal_name : String, info : Array) -> String:
 	var ret = signal_name + " → " + str(info[0])
 	match info[1]:
-		ELECTRONICS:
+		CIRCUIT:
 			ret += " (from electronic circuit)"
 		COMPUTER:
 			ret += " (from computer system #" + str(info[2]) + ")"
@@ -508,9 +555,11 @@ var netnames := []
 
 var internal_signals_values := {}
 
-enum { UNUSED, NOT_READY, READY }
-var _circuit_simulation_ready_state := UNUSED
-var _computer_systems_simulation_ready_state := UNUSED
+enum { NOT_RUNNING, STARTING, START_CANCELED, START_CANCELED_ACK, RUNNING } # RunningState
+enum { UNUSED, NOT_READY, READY, INIT_FAIL, FAIL } # ReadyState
+enum { CIRCUIT = 0, COMPUTER = 1, NONE = 65, CONFLICT = 66 } # SystemID / ValueSource
+var _running_state := NOT_RUNNING
+var _system_state := [ UNUSED, UNUSED ]
 
 var _circuit_simulation_time_step
 var _circuit_simulation_max_time
@@ -520,14 +569,12 @@ var simulation_time
 var _pause_count := 0
 
 var _timers := []
-var _start_canceled: bool
-
-enum {ELECTRONICS, COMPUTER, NONE, CONFLICT}
 
 var _console_read_set # to keep console read/set variable interface
 
 signal factory_tick(time : float, delta_time : float)
 signal conflict_error(info : Array)
+signal simulation_error(message: String)
 signal running()
 
 #endregion

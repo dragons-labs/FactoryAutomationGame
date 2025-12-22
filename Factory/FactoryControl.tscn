@@ -54,3 +54,7 @@ wrap_controls = true
 script = SubResource("GDScript_mvkar")
 
 [node name="ComputerSystemSimulator" parent="ComputerSystemSimulatorWindow" instance=ExtResource("3_8pluw")]
+
+[connection signal="init_error" from="ElectronicsSimulatorWindow/ElectronicsSimulator" to="." method="_on_electronics_simulator_init_error"]
+[connection signal="simulation_error" from="ElectronicsSimulatorWindow/ElectronicsSimulator" to="." method="_on_simulation_error"]
+[connection signal="system_crash" from="ComputerSystemSimulatorWindow/ComputerSystemSimulator" to="." method="_on_computer_system_simulator_crash"]

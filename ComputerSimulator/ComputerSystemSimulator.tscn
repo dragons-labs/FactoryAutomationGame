@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://ccu02jb7hng1k"]
+[gd_scene format=3 uid="uid://ccu02jb7hng1k"]
 
-[ext_resource type="Theme" path="res://ComputerSimulator/ui_theme/terminal_theme_xterm.tres" id="1_efv1g"]
+[ext_resource type="Theme" uid="uid://bd6w0urvwbcha" path="res://ComputerSimulator/ui_theme/terminal_theme_xterm.tres" id="1_efv1g"]
 [ext_resource type="Script" uid="uid://c30fxrvoegipu" path="res://ComputerSimulator/ComputerSystemSimulator.gd" id="2_xu8fq"]
 [ext_resource type="Script" uid="uid://dght7htmnn1pb" path="res://Utils/VNC.gd" id="3_0aypa"]
 
@@ -60,3 +60,9 @@ focus_mode = 2
 expand_mode = 1
 script = ExtResource("3_0aypa")
 port = 0
+
+[node name="CheckAlive" type="Timer" parent="."]
+wait_time = 5.0
+ignore_time_scale = true
+
+[connection signal="timeout" from="CheckAlive" to="." method="_on_check_alive_timeout"]

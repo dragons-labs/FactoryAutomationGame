@@ -44,6 +44,9 @@ signal msg_bus_command(command : String, sender : Variant)
 ## emit when reach ready state
 signal computer_system_is_run_and_ready()
 
+## emit when detected error in system start or running (qemu process not existed)
+signal system_crash(computer_system_id: Variant, after_ready: bool)
+
 @onready var terminal := %Terminal
 @onready var vnc_client := %VNC_Display
 @onready var code_editor := %CodeEditor
@@ -126,12 +129,18 @@ func start():
 	# start qemu
 	
 	_pid = _run_qemu(user_port, msg_port, vnc_port)
-	print("Computer system emulator %d -> pid = %d "  % [computer_system_id, _pid])
+	if _pid > 0:
+		print("Computer system emulator %d -> pid = %d "  % [computer_system_id, _pid])
+		$CheckAlive.start()
+	else:
+		printerr("Computer system emulator %d not started (_run_qemu returned: %d)"  % [computer_system_id, _pid])
+		system_crash.emit(computer_system_id, false)
 
 func async_stop():
 	print("Stop computer system emulator %d (pid %d)" % [computer_system_id, _pid])
 	if _pid > 0:
 		running_state = IS_STOPPING
+		$CheckAlive.stop()
 		if mode & Mode.TERMINAL:
 			terminal.data_sent.disconnect(_on_data_sent)
 			terminal.size_changed.disconnect(_on_size_changed)
@@ -288,8 +297,19 @@ func _physics_process(_delta):
 					pos = npos + 1
 				_msg_buf = _msg_buf.substr(pos)
 
+func _on_check_alive_timeout() -> void:
+	if not OS.is_process_running(_pid):
+		printerr("Computer system emulator %d (pid = %d) crashed"  % [computer_system_id, _pid])
+		system_crash.emit(computer_system_id, running_state & IS_READY)
+		$CheckAlive.stop()
+		running_state = IS_NOT_RUNNING
+		_pid = 0
+
 func time_step(time : float) -> void:
 	send_message_via_msg_bus("time " + str(time))
+
+func is_running() -> bool:
+	return running_state & IS_RUNNING
 
 func is_running_and_ready() -> bool:
 	return running_state & IS_READY
