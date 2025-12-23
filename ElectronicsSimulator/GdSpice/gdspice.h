@@ -40,11 +40,6 @@ public:
 	/// start (synchronous) simulation
 	void start(const godot::String& simulation_time_step, const godot::String& simulation_max_time);
 	
-	/// when previous simulation step was successfully finished then
-	///   return true and run (in background) simulation until simulation_time < target_game_time 
-	/// otherwise do nothing and return false
-	bool try_step(double target_game_time);
-	
 	/// stop (terminate) simulation
 	void stop();
 	
@@ -75,6 +70,7 @@ public:
 	godot::Array get_timed_values_for_time_step(const godot::PackedStringArray& points_names, int count, double time_start, double time_step);
 	
 	/// set value for external control voltage/current sources
+	/// NOTE: new value will be used  immediately – in current sync step (if it is still being processed) or as the initial value in the next sync step
 	void set_voltages_currents(const godot::String& point_name, double value);
 	
 	/// simulation states

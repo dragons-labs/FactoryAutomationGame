@@ -102,15 +102,6 @@ void GdSpice::start(const godot::String& simulation_time_step, const godot::Stri
 	}
 }
 
-bool GdSpice::try_step(double target_game_time) {
-	if (simulation_state == RUNNING && time_simulation >= time_game) {
-		time_game = target_game_time;
-		return true;
-	} else {
-		return false;
-	}
-}
-
 void GdSpice::stop() {
 	if (simulation_state == NOT_STARTED) {
 		return;
@@ -259,7 +250,6 @@ godot::Array GdSpice::get_timed_values_for_time_step(const godot::PackedStringAr
 }
 
 void GdSpice::set_voltages_currents(const godot::String& point_name, double value) {
-	// TODO setting new value should be delayed to successful sync (`gd_spice->time_simulation >= gd_spice->time_game` condition fulfilled in `on_sync`)
 	external_voltages_currents[point_name.utf8().get_data()] = value;
 }
 
@@ -267,7 +257,6 @@ void GdSpice::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("init"), &GdSpice::init, DEFVAL(NGSPICE_DLL_DEFAULT_FILE), DEFVAL(2));
 	godot::ClassDB::bind_method(godot::D_METHOD("load"), &GdSpice::load);
 	godot::ClassDB::bind_method(godot::D_METHOD("start"), &GdSpice::start, DEFVAL(true));
-	godot::ClassDB::bind_method(godot::D_METHOD("try_step"), &GdSpice::try_step);
 	godot::ClassDB::bind_method(godot::D_METHOD("stop"), &GdSpice::stop);
 	godot::ClassDB::bind_method(godot::D_METHOD("emergency_stop"), &GdSpice::emergency_stop);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_simulation_state"), &GdSpice::get_simulation_state);

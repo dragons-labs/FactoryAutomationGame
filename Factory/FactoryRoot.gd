@@ -548,6 +548,8 @@ func _update_circuit_element_count(element: Node2D, val: int) -> void:
 ### init
 
 func _ready() -> void:
+	process_physics_priority = -5 # NOTE: should be negative (processed factory control before world physics), but grater than ComputerSystemSimulator.process_physics_priority
+	
 	set_visibility(false)
 	_factory_state = FactoryState.STOP
 	_factory_paused = true
@@ -564,7 +566,7 @@ func _ready() -> void:
 	factory_control.circuit_simulator.grid_editor.grid.gElements.on_element_remove.connect(_update_circuit_element_count.bind(-1))
 	factory_control.circuit_simulator.overcurrent_protection.connect(_on_circuit_simulation_overcurrent)
 	factory_control.circuit_simulator.overvoltage_protection.connect(_on_circuit_simulation_overvoltage)
-	factory_control.simulation_error.connect(_on_simulation_error)  # FIXME zastąpić sygnałem factory_control
+	factory_control.simulation_error.connect(_on_simulation_error)
 	factory_control.conflict_error.connect(_on_conflict_error)
 	factory_control.running.connect(_async_on_control_running)
 	

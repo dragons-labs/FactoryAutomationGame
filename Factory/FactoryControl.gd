@@ -58,10 +58,17 @@ func set_signal_value(signal_name : String, value : float) -> void:
 	#print("set_signal_value ", signal_name, " → ", value)
 	if signal_name in input_to_circuit_from_factory:
 		circuit_simulator.gdspice.set_voltages_currents(input_to_circuit_from_factory[signal_name][1], value)
+		# NOTE: new value will be used in the circuit simulation immediately, but due to the synchronization of circuit simulation and the game physics
+		# NOTE: it will be approximately in the range from `simulation_time - 0.2 * current_frame_duration` to `simulation_time + 1.2 * current_frame_duration`
+		# NOTE: this depends on the error in estimating the end time of the previous and current frame (`time_frame_estimation_multiplier` setting)
+		# NOTE: and the circuit simulation step (`circuit_simulation_time_step` argument of `async_start`)
 	for element in computer_control_blocks.values():
 		var computer_system = element.get_child(0)
 		if computer_system.is_running_and_ready() and signal_name in computer_system.computer_input_names:
 			computer_system.set_signal_value(signal_name, value)
+			# NOTE: new value will be used during the simulation of the current frame
+			# NOTE: the delay with which it will be entered depends on the load of the computer system
+			# NOTE: and the implementation of the user program reading these values
 	internal_signals_values[signal_name] = value
 
 #endregion
@@ -77,6 +84,7 @@ func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_s
 	
 	print_rich("[color=dark_cyan][b]Starting factory control system ...[/b][/color]")
 	simulation_time = 0
+	estimated_next_simulation_time = 0.15
 	simulation_on_time = true
 	internal_signals_values.clear()
 	
@@ -121,6 +129,7 @@ func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_s
 	# if electronic circuit simulation is used need be started
 	if _system_state[CIRCUIT] == READY:
 		circuit_simulator.start( _circuit_simulation_time_step, _circuit_simulation_max_time )
+		circuit_simulator.gdspice.set_time_game(estimated_next_simulation_time)
 	
 	# NOTE: computer system simulations are running during work in editor
 	# (are start/stop while adding/removing blocks) so no need to start/restart here
@@ -131,41 +140,62 @@ func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_s
 	return true
 
 func tick(delta: float, paused : bool) -> void:
-	# if electronic circuit simulation is used then check if it's "on time" ... if it's delayed then pause 3d factory processing
-	if _system_state[CIRCUIT] == READY:
-		var status = circuit_simulator.try_step(simulation_time)
-		if status[0]: # running and "on time"
-			if not simulation_on_time:
-				simulation_on_time = true
-				get_tree().paused = paused
-				prints("unpause after emergency pause", _pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), circuit_simulator.gdspice.get_time_simulation())
-			_pause_count = 0
-		elif status[1] == GdSpice.RUNNING: # running and "not time"
-			if simulation_on_time:
-				simulation_on_time = false
-				get_tree().paused = true
-				prints("emergency pause", _pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), circuit_simulator.gdspice.get_time_simulation())
-				# TODO show UI special-pause message like "Factory simulation in progress ... please wait."
-			_pause_count += 1
-			if _pause_count % 60 == 0:
-				prints(_pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), circuit_simulator.gdspice.get_time_simulation())
-			return
-		# else: not running (waiting for start / stopped / error / ...) -> do nothing here
+	# do not update time while game is paused
+	if not get_tree().paused:
+		simulation_time += delta
+		# NOTE: delta value is scaled by current Engine.time_scale (set from _factory_speed)
+		#       but it does NOT reflect game pause state
 	
-	# do not update time while game is pause
+	# if electronic circuit simulation is used then check its state and check if it's "on time"
+	if _system_state[CIRCUIT] == READY:
+		# check simulation errors
+		var circuit_simulation_state = circuit_simulator.check_state()
+		
+		if circuit_simulation_state == GdSpice.RUNNING:
+			# if electronic circuit simulation is delayed then pause 3d factory processing
+			var current_simulation_time = circuit_simulator.gdspice.get_time_simulation()
+			if (current_simulation_time >= min(simulation_time, estimated_next_simulation_time)):
+				# on time
+				if not simulation_on_time:
+					simulation_on_time = true
+					get_tree().paused = paused
+					# prints("unpause after emergency pause", _pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), current_simulation_time)
+				_pause_count = 0
+			else:
+				# not on time
+				if simulation_on_time:
+					simulation_on_time = false
+					get_tree().paused = true
+					# prints("emergency pause", _pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), current_simulation_time)
+					# TODO show UI special-pause message like "Factory simulation in progress ... please wait."
+					circuit_simulator.gdspice.set_time_game(simulation_time)
+				_pause_count += 1
+				if _pause_count % 30 == 0:
+					prints("on emergency pause", _pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), current_simulation_time)
+				return
+	
+	# do not process factory control logic if game is paused
 	# (the previous code must be processed also during pause - for unpausing)
 	if get_tree().paused:
 		return
 	
-	simulation_time = simulation_time + delta
-	# NOTE: delta value is scaled by current Engine.time_scale (set from _factory_speed)
-	#       but it does NOT reflect game pause state
+	# update circuit simulator UI measurements
+	# it called here to ensure calls with always a greater value of simulation_time and with relatively equal intervals in simulation_time
+	circuit_simulator.gdspice.update_measurements(simulation_time)
 	
-	circuit_simulator.try_step(simulation_time) # electronic circuit simulation will be processing in background
-	factory_tick.emit(simulation_time, delta) # all factory_tick signal's observers will be processed before this function exit
+	# set estimated frame end time as target for electronic circuit simulation
+	estimated_next_simulation_time = simulation_time + delta * time_frame_estimation_multiplier
+	circuit_simulator.gdspice.set_time_game(estimated_next_simulation_time)
+	# electronic circuit simulation will be processing in background
+	
+	# emit `factory_tick` signal
+	# NOTE: all factory_tick signal's observers will be called (and processed if they are not async) before this function exit
+	factory_tick.emit(simulation_time, delta)
+	
+	# update factory time in computer simulation (this can cause finished some factory_sleep)
+	# NOTE: updating computer outputs will be done via _physics_process in ComputerSystemSimulator, called before this function (negative process_physics_priority in ComputerSystemSimulator)
 	for element in computer_control_blocks.values():
-		element.get_child(0).time_step(simulation_time) # update factory time in computer simulation (this can cause finished some factory_sleep)
-		# NOTE: updating computer outputs will be done via _physics_process in ComputerSystemSimulator, called before this function (negative process_physics_priority in ComputerSystemSimulator)
+		element.get_child(0).time_step(simulation_time)
 	
 	for i in range(len(_timers)):
 		if _timers[i] and _timers[i].update(delta):
@@ -544,6 +574,8 @@ func _ready() -> void:
 @onready var circuit_simulator := %ElectronicsSimulator
 @onready var circuit_simulator_window := %ElectronicsSimulatorWindow
 
+@export var time_frame_estimation_multiplier = 1.1
+
 var computer_systems_configuration := {}
 var computer_control_blocks := {}
 var computer_networks := {}
@@ -566,6 +598,7 @@ var _circuit_simulation_max_time
 
 var simulation_on_time : bool
 var simulation_time
+var estimated_next_simulation_time
 var _pause_count := 0
 
 var _timers := []

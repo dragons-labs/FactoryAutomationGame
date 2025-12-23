@@ -85,25 +85,24 @@ func init_circuit(
 func start(simulation_time_step := "10us", simulation_max_time := "600s") -> void:
 	gdspice.start(simulation_time_step, simulation_max_time)
 
-func try_step(time : float) -> Array:
-	if gdspice.try_step(time):
-		gdspice.update_measurements()
-		if current_limit:
-			for fuse in gdspice.fuses:
-				var value = gdspice.get_last_value(fuse)
-				if value > current_limit or value < -current_limit:
-					overcurrent_protection.emit(fuse, value)
-		elif voltage_limit:
-			for net in gdspice.used_nets:
-				var value = gdspice.get_last_value(net)
-				if value > voltage_limit or value < -voltage_limit:
-					overvoltage_protection.emit(net, value)
-		return [true, GdSpice.RUNNING]
-	else:
-		var simulation_state = gdspice.get_simulation_state()
-		if simulation_state == GdSpice.ERROR:
-			_on_simulation_error()
-		return [false, simulation_state]
+func check_state():
+	# check limits
+	if current_limit:
+		for fuse in gdspice.fuses:
+			var value = gdspice.get_last_value(fuse)
+			if value > current_limit or value < -current_limit:
+				overcurrent_protection.emit(fuse, value)
+	if voltage_limit:
+		for net in gdspice.used_nets:
+			var value = gdspice.get_last_value(net)
+			if value > voltage_limit or value < -voltage_limit:
+				overvoltage_protection.emit(net, value)
+	
+	var simulation_state = gdspice.get_simulation_state()
+	if simulation_state == GdSpice.ERROR:
+		_on_simulation_error()
+	
+	return simulation_state
 
 func stop() -> void:
 	print("Stop circuit simulation")

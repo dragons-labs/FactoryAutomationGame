@@ -23,7 +23,6 @@ func reset():
 		oscilloscopes[base_element][0].get_parent().queue_free()
 	oscilloscopes.clear()
 	_last_oscilloscope = null
-	_last_on_process_time = -1
 
 func get_ngspice_netlist(
 		grid : Object,
@@ -257,14 +256,8 @@ func on_measurer_click(base_element : FAG_2DGrid_BaseElement):
 
 ### update oscilloscopes and measurements
 
-var _last_on_process_time = -1
-
-func update_measurements():
-	if measurements and get_simulation_state() == GdSpice.RUNNING:
-		var time = get_time_simulation()
-		if time == _last_on_process_time:
-			return
-		_last_on_process_time = time
+func update_measurements(simulation_time : float):
+	if measurements:
 		for base_element in measurements:
 			var value = get_last_value(measurements[base_element])
 			if base_element.subtype == "Ammeter":
@@ -274,8 +267,7 @@ func update_measurements():
 				if oscilloscopes[base_element][0].skip:
 					oscilloscopes[base_element][0].skip = false
 				else:
-					# TODO add all new values (not just the last one) to avoid loss of resolution and weird x-axis scale 
-					oscilloscopes[base_element][1].add_point(time, value)
+					oscilloscopes[base_element][1].add_point(simulation_time, value)
 					oscilloscopes[base_element][0].chart.queue_redraw()
 
 func _on_chart_time_range_changed(win : Window, win_chart : Chart):
