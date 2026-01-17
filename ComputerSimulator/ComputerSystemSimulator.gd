@@ -277,6 +277,8 @@ func _physics_process(_delta):
 					# print_verbose("Computer system ", computer_system_id, " received command: ", cmd)
 					if cmd == "ping":
 						send_message_via_msg_bus("pong")
+					elif cmd == "ready_to_save":
+						_is_ready_to_save = true
 					elif cmd == "controller_ready":
 						send_message_via_msg_bus("terminal_size_changed %d %d" % [terminal.get_rows(), terminal.get_cols()])
 						send_message_via_msg_bus("input_names " + " ".join(computer_input_names))
@@ -328,6 +330,18 @@ func get_signal_value(signal_name : String, default_value : Variant = 0) -> Vari
 
 func set_signal_value(signal_name : String, signal_value : Variant) -> void:
 	send_message_via_msg_bus("set_input_value " + signal_name + " " + str(signal_value))
+
+var _is_ready_to_save := false
+func before_save() -> void:
+	_is_ready_to_save = false
+	send_message_via_msg_bus("before_save")
+	
+func is_ready_to_save() -> bool:
+	return _is_ready_to_save
+	
+func after_save() -> void:
+	_is_ready_to_save = false
+	send_message_via_msg_bus("after_save")
 
 func send_message_via_msg_bus(string):
 	if _msg_bus_stream:

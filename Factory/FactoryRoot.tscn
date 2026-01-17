@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cr1jneq81cpn2"]
+[gd_scene format=3 uid="uid://cr1jneq81cpn2"]
 
 [ext_resource type="Script" uid="uid://cy3s4cxl70a76" path="res://Factory/FactoryRoot.gd" id="1_88vxl"]
 [ext_resource type="PackedScene" uid="uid://bs8dvw28ifomo" path="res://Factory/FactoryControl.tscn" id="2_cmtbq"]
@@ -90,6 +90,28 @@ text = "FACTORY_START"
 [node name="Control2" type="Control" parent="FactoryUI/RunAndSpeedControl/HBoxContainer"]
 custom_minimum_size = Vector2(10, 0)
 layout_mode = 2
+
+[node name="RunInfo" type="VBoxContainer" parent="FactoryUI"]
+unique_name_in_owner = true
+offset_left = 4.0
+offset_right = 280.0
+offset_bottom = 50.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="FactoryUI/RunInfo"]
+layout_mode = 2
+
+[node name="GameTimeInfo" type="Label" parent="FactoryUI/RunInfo/HBoxContainer"]
+layout_mode = 2
+text = "FACTORY_GAME_TIME"
+
+[node name="GameTimeValue" type="Label" parent="FactoryUI/RunInfo/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SpecialPauseMessage" type="Label" parent="FactoryUI/RunInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "FACTORY_SPECIAL_PAUSE_MESSAGE"
 
 [node name="Message" type="PanelContainer" parent="FactoryUI"]
 unique_name_in_owner = true

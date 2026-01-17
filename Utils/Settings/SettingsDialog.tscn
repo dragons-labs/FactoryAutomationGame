@@ -319,7 +319,7 @@ size_flags_stretch_ratio = 2.0
 
 [node name="Reset" type="Button" parent="Buttons"]
 layout_mode = 2
-text = "MAIN_MENU_RESET_TO_DEFAULT"
+text = "MAIN_MENU_SETTINGS_RESET_TO_DEFAULT"
 
 [node name="Fill2" type="Control" parent="Buttons"]
 layout_mode = 2

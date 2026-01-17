@@ -238,6 +238,8 @@ initial_position = 3
 size = Vector2i(600, 350)
 current_screen = 0
 access = 2
+favorites_enabled = false
+recent_list_enabled = false
 
 [node name="SelectionBox" type="Node2D" parent="."]
 unique_name_in_owner = true

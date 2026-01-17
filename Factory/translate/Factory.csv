@@ -18,6 +18,8 @@ FACTORY_STOP,Stop,Stop
 FACTORY_PAUSE,Pause,Pause
 FACTORY_UNPAUSE,Unpause,Unpause
 FACTORY_TASK_INFO,Task Info,Informacje
+FACTORY_GAME_TIME,Simulation time:,Czas fabryki:
+FACTORY_SPECIAL_PAUSE_MESSAGE,Factory simulation in progress ... please wait, Symulacja w toku ... proszę czekać
 
 FACTORY_BUILDER_BLOCK_NAME_TITLE,Enter name for block,Wprowadź nazwę bloku
 FACTORY_BUILDER_BLOCK_NAME_TEXT,"This name will be used in name of this block input/output signals.\nThe name should be unique and lowercase.","Nazwa ta będzie używana w sygnałach wejścia / wyjścia związanych z blokiem.\nNazwa powinna być unikalna i zapisywana małymi literami."

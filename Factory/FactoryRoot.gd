@@ -10,6 +10,9 @@ extends Node
 @onready var objects_root := $ObjectsRoot
 @onready var user_blocks_root := $UserBlocksRoot
 @onready var ui := $FactoryUI
+@onready var run_info_ui := %RunInfo
+@onready var run_time_ui := %GameTimeValue
+@onready var special_pause_msg := %SpecialPauseMessage
 
 ## start signal for factory blocks
 signal factory_start()
@@ -41,7 +44,7 @@ var level_scene_node : Node3D
 const LEVELS_DIR := "res://Levels/"
 const GAME_PROGRESS_SAVE := "user://game_progress.json"
 const SAVE_INFO_FILE := "/save_info.json"
-
+var AUTOSAVE_PATH_PREFIX : String
 
 ### load / save / restore
 
@@ -133,11 +136,18 @@ func load_level(level_id : String, save_dir := "") -> void:
 	print_rich("[color=cyan][b]Level loaded.[/b][/color]")
 	level_loaded.emit()
 
-func async_save(save_dir : String) -> void:
+func async_save(save_dir : String, backup_dir := "") -> void:
 	print_rich("[color=cyan][b]Writing save file " + save_dir + " ...[/b][/color]")
 	
+	if DirAccess.dir_exists_absolute(save_dir):
+		if backup_dir:
+			FAG_Utils.remove_dir_recursive(backup_dir)
+			DirAccess.rename_absolute(save_dir, backup_dir)
+		else:
+			FAG_Utils.remove_dir_recursive(save_dir)
+	
 	var result = DirAccess.make_dir_recursive_absolute(save_dir)
-	if result != OK and result != ERR_ALREADY_EXISTS:
+	if result != OK:
 		print("Error while creating save directory: ", result)
 	
 	FAG_Utils.write_to_json_file(
@@ -153,12 +163,14 @@ func async_save(save_dir : String) -> void:
 	FAG_Utils.write_to_json_file(save_dir + "/Circuit.json", factory_control.circuit_simulator.serialise())
 	
 	if factory_control.computer_control_blocks:
-		FAG_Utils.remove_dir_recursive(save_dir + "/private_fs")
 		FAG_Utils.copy_dir_absolute("user://workdir/private_fs", save_dir + "/private_fs")
 		for id in factory_control.computer_control_blocks:
-			factory_control.computer_control_blocks[id].get_child(0).send_message_via_msg_bus("request_sync") # TODO request also pause ???
-			await FAG_Utils.real_time_wait(0.3)  # TODO wait for sync not for timer
+			factory_control.computer_control_blocks[id].get_child(0).before_save()
+		for id in factory_control.computer_control_blocks:
+			while not factory_control.computer_control_blocks[id].get_child(0).is_ready_to_save():
+				await FAG_Utils.real_time_wait(0.1)
 			DirAccess.copy_absolute("user://workdir/disk_%d.img" % id, save_dir + "/disk_%d.img" % id)
+			factory_control.computer_control_blocks[id].get_child(0).after_save()
 	
 	print_rich("[color=cyan][b]Save file written.[/b][/color]")
 
@@ -197,7 +209,8 @@ func async_close() -> void:
 	
 	_reset_stats()
 	%Message.hide()
-	
+	run_info_ui.hide()
+
 	print_rich("[color=cyan][b]Factory is closed.[/b][/color]")
 	factory_closed.emit()
 
@@ -220,6 +233,8 @@ func run_factory() -> void:
 	_factory_speed = game_speed.get_value()
 	Engine.call_deferred("set_time_scale", _factory_speed)
 	factory_builder.ui.set_editor_enabled(false)
+	run_info_ui.show()
+	special_pause_msg.show()
 	_start_stop_hud_ui()
 	
 	@warning_ignore("missing_await") factory_control.async_start(
@@ -265,6 +280,7 @@ func _physics_process(delta):
 		return
 	
 	factory_control.tick(delta, _factory_paused)
+	run_time_ui.text = " %.02f s" % factory_control.simulation_time
 
 func async_stop_factory() -> void:
 	if not (_factory_state & FactoryState.RUNNING):
@@ -290,11 +306,12 @@ func async_stop_factory() -> void:
 	print("Sending stop signal to factory block ...")
 	factory_stop.emit()
 	
-	factory_builder.ui.set_editor_enabled(true)
-	Engine.call_deferred("set_time_scale", 1.0)
-	
 	await FAG_Utils.real_time_wait(0.2)
 	_factory_state &= ~FactoryState.ON_CHANGE
+	
+	Engine.call_deferred("set_time_scale", 1.0)
+	factory_builder.ui.set_editor_enabled(true)
+	run_info_ui.hide()
 	
 	print_rich("[color=cyan][b]Factory is stopped.[/b][/color]")
 	factory_stopped.emit()
@@ -361,6 +378,7 @@ func _on_game_speed_value_changed(value: float) -> void:
 
 func _async_on_start_stop_pressed() -> void:
 	if _factory_state == FactoryState.STOP:
+		await async_save(AUTOSAVE_PATH_PREFIX + "_on_factory_run")
 		run_factory()
 	else:
 		@warning_ignore("missing_await") async_stop_factory()
@@ -397,6 +415,9 @@ func _start_stop_hud_ui():
 		%Pause.text = "FACTORY_UNPAUSE"
 	else:
 		%Pause.text = "FACTORY_PAUSE"
+
+func _on_emergency_pause_on_off(value : bool):
+	special_pause_msg.visible = value
 
 var _factory_state
 var _factory_speed
@@ -566,6 +587,7 @@ func _ready() -> void:
 	factory_control.circuit_simulator.grid_editor.grid.gElements.on_element_remove.connect(_update_circuit_element_count.bind(-1))
 	factory_control.circuit_simulator.overcurrent_protection.connect(_on_circuit_simulation_overcurrent)
 	factory_control.circuit_simulator.overvoltage_protection.connect(_on_circuit_simulation_overvoltage)
+	factory_control.emergency_pause_on_off.connect(_on_emergency_pause_on_off)
 	factory_control.simulation_error.connect(_on_simulation_error)
 	factory_control.conflict_error.connect(_on_conflict_error)
 	factory_control.running.connect(_async_on_control_running)

@@ -1,8 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://d4j3lg6cly74v"]
+[gd_scene format=3 uid="uid://d4j3lg6cly74v"]
 
 [ext_resource type="Script" uid="uid://c56rsrwixpp15" path="res://Utils/MainMenu/MainMenu.gd" id="1_w7oy2"]
 [ext_resource type="PackedScene" uid="uid://bntranin4w8tt" path="res://Utils/Settings/SettingsDialog.tscn" id="2_b76km"]
 [ext_resource type="PackedScene" uid="uid://bj4coa65sit82" path="res://Utils/Settings/SettingsKeyReampDialog.tscn" id="3_lbqne"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1r67n"]
+bg_color = Color(0.16565639, 0.16565642, 0.1656563, 1)
 
 [node name="MainMenu" type="CanvasLayer"]
 layer = 2
@@ -24,52 +27,68 @@ grow_vertical = 2
 mouse_filter = 1
 theme_type_variation = &"FullScreenBlocker"
 
-[node name="Buttons" type="VBoxContainer" parent="PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="SavedMessage" type="Label" parent="PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.7882353, 0, 1)
+text = "MAIN_MENU_SAVED_MESSAGE"
+horizontal_alignment = 1
+
+[node name="Space" type="Control" parent="PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="Buttons" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Resume" type="Button" parent="PanelContainer/Buttons"]
+[node name="Resume" type="Button" parent="PanelContainer/VBoxContainer/Buttons"]
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "MAIN_MENU_RESUME_GAME"
 
-[node name="ShowInfo" type="Button" parent="PanelContainer/Buttons"]
+[node name="ShowInfo" type="Button" parent="PanelContainer/VBoxContainer/Buttons"]
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "MAIN_MENU_TASK_INFO"
 
-[node name="SaveGame" type="Button" parent="PanelContainer/Buttons"]
+[node name="SaveGame" type="Button" parent="PanelContainer/VBoxContainer/Buttons"]
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "MAIN_MENU_SAVE_GAME"
 
-[node name="Space" type="Control" parent="PanelContainer/Buttons"]
+[node name="Space" type="Control" parent="PanelContainer/VBoxContainer/Buttons"]
 custom_minimum_size = Vector2(0, 5)
 layout_mode = 2
 
-[node name="StartLevel" type="Button" parent="PanelContainer/Buttons"]
+[node name="StartLevel" type="Button" parent="PanelContainer/VBoxContainer/Buttons"]
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "MAIN_MENU_START_LEVEL"
 
-[node name="LoadSave" type="Button" parent="PanelContainer/Buttons"]
+[node name="LoadSave" type="Button" parent="PanelContainer/VBoxContainer/Buttons"]
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "MAIN_MENU_LOAD_SAVE"
 
-[node name="Space2" type="Control" parent="PanelContainer/Buttons"]
+[node name="Space2" type="Control" parent="PanelContainer/VBoxContainer/Buttons"]
 custom_minimum_size = Vector2(0, 5)
 layout_mode = 2
 
-[node name="Settings" type="Button" parent="PanelContainer/Buttons"]
+[node name="Settings" type="Button" parent="PanelContainer/VBoxContainer/Buttons"]
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "MAIN_MENU_SETTINGS"
 
-[node name="Quit" type="Button" parent="PanelContainer/Buttons"]
+[node name="Quit" type="Button" parent="PanelContainer/VBoxContainer/Buttons"]
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "MAIN_MENU_QUIT"
@@ -77,7 +96,7 @@ text = "MAIN_MENU_QUIT"
 [node name="LoadDialog" type="VBoxContainer" parent="PanelContainer"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(400, 248)
+custom_minimum_size = Vector2(700, 400)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -122,7 +141,12 @@ custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_1r67n")
 bbcode_enabled = true
+
+[node name="Space" type="Control" parent="PanelContainer/LoadDialog"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
 
 [node name="Buttons" type="HBoxContainer" parent="PanelContainer/LoadDialog"]
 layout_mode = 2
@@ -152,6 +176,7 @@ layout_mode = 2
 
 [node name="SettingsDialog" parent="PanelContainer" instance=ExtResource("2_b76km")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 
 [node name="OverwriteConfirmationDialog" type="ConfirmationDialog" parent="PanelContainer"]
@@ -176,13 +201,13 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 
-[connection signal="pressed" from="PanelContainer/Buttons/Resume" to="." method="_hide"]
-[connection signal="pressed" from="PanelContainer/Buttons/ShowInfo" to="." method="_on_show_task_info"]
-[connection signal="pressed" from="PanelContainer/Buttons/SaveGame" to="." method="_on_save_game_pressed"]
-[connection signal="pressed" from="PanelContainer/Buttons/StartLevel" to="." method="_on_load_level_pressed"]
-[connection signal="pressed" from="PanelContainer/Buttons/LoadSave" to="." method="_on_load_save_pressed"]
-[connection signal="pressed" from="PanelContainer/Buttons/Settings" to="." method="_on_settings_pressed"]
-[connection signal="pressed" from="PanelContainer/Buttons/Quit" to="." method="_async_on_quit_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/Buttons/Resume" to="." method="_hide"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/Buttons/ShowInfo" to="." method="_on_show_task_info"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/Buttons/SaveGame" to="." method="_on_save_game_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/Buttons/StartLevel" to="." method="_on_load_level_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/Buttons/LoadSave" to="." method="_on_load_save_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/Buttons/Settings" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/Buttons/Quit" to="." method="_async_on_quit_pressed"]
 [connection signal="text_submitted" from="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/NewSaveSlot/NewSaveSlotName" to="." method="_on_add_save_slot_pressed"]
 [connection signal="pressed" from="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/NewSaveSlot/AddSaveSlot" to="." method="_on_add_save_slot_pressed"]
 [connection signal="item_selected" from="PanelContainer/LoadDialog/HBoxContainer1/VBoxContainer/LoadDialog_ItemList" to="." method="_on_item_list_item_selected"]

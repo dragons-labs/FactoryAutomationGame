@@ -40,13 +40,18 @@ Results will be written to `tmp/export/`.
 
 ## License
 
+**This project consists of materials covered by various licensing terms.**
+
 * Project use per file [REUSE](https://reuse.software/)/SPDX type copyright info.
-  * For SVG files, gdscript files, C++ sources, sh and Python scripts copyright and licence info is inside file, in comments at begin of file.
+  * For SVG files, GDScript files, C++ sources, sh and Python scripts copyright and licence info is inside file, in comments at top of the file.
   * For Godot resources, scenes and binary files copyright and licence info is in `.licence` file.
+
 * Main licence for this project is [MIT](LICENSE)
-* Some files (code borrowed from other projects, media and resources files - like images and fonts, etc) are distributed under other licence term – check REUSE header or `.licence` file for licence and copyright holder info.
-  Full text of all used licenses is included in [LICENSES](LICENSES/) directory.
-* All used elements (including full supply chain) are available under [DFSG](https://www.debian.org/social_contract.pl.html#guidelines)-compatible licenses.
+* Some files (code borrowed from other projects, media and resources files - like images and fonts, etc) are distributed under other licence terms.
+  * Information about the license and copyright holder can be found in the REUSE header or in the `.licence` file.
+  * Full text of all used licenses is included in [LICENSES](LICENSES/) directory.
+
+* All elements used (including full supply chain and all binary distributed files) are available under [DFSG](https://www.debian.org/social_contract.pl.html#guidelines)-compatible licenses.
 
 ### Binary redistribution license information
 

@@ -160,6 +160,7 @@ func tick(delta: float, paused : bool) -> void:
 					simulation_on_time = true
 					get_tree().paused = paused
 					# prints("unpause after emergency pause", _pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), current_simulation_time)
+					emergency_pause_on_off.emit(false)
 				_pause_count = 0
 			else:
 				# not on time
@@ -167,7 +168,7 @@ func tick(delta: float, paused : bool) -> void:
 					simulation_on_time = false
 					get_tree().paused = true
 					# prints("emergency pause", _pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), current_simulation_time)
-					# TODO show UI special-pause message like "Factory simulation in progress ... please wait."
+					emergency_pause_on_off.emit(true)
 					circuit_simulator.gdspice.set_time_game(simulation_time)
 				_pause_count += 1
 				if _pause_count % 30 == 0:
@@ -609,5 +610,6 @@ signal factory_tick(time : float, delta_time : float)
 signal conflict_error(info : Array)
 signal simulation_error(message: String)
 signal running()
+signal emergency_pause_on_off(value : bool)
 
 #endregion

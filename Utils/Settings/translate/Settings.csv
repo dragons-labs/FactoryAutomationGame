@@ -4,6 +4,7 @@ MAIN_MENU_SETTINGS_SECONDARY_KEY_TOOLTIP,Secondary action shortcut. Click to cha
 MAIN_MENU_SETTINGS_KEY_REMAP_TITLE,Changing key/button mapping,Zmiana mapowania klawiszy i przycisków
 MAIN_MENU_SETTINGS_UPDATE_KEY_MAPPING_FOR_%s,"Updating key/button mapping for:\n\n    %s\n\nPlease press key/button or keys/buttons combination and press OK or press 'Remove' to remove current mapping.","Aktualizacja klawisza dla:\n\n    %s\n\nProszę nacisnąć klawisz lub przycisk lub kombinację i nacisnąć OK lub nacisnąć 'Usuń' aby usunąć aktualne przypisanie."
 MAIN_MENU_SETTINGS_REMOVE_MAPPING,Remove,Usuń
+MAIN_MENU_SETTINGS_RESET_TO_DEFAULT,Reset to defaults,Przywróć domyślne
 
 LOCALE_SETTINGS_GROUP_NAME,Locale settings,Ustawienia językowe
 LOCALE_SETTINGS_locale,Language,Język

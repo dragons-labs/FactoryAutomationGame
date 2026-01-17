@@ -4,6 +4,7 @@
 extends CanvasLayer
 
 const SAVE_DIR := "user://saves/"
+const AUTOSAVE_PREFIX := "autosave"
 
 enum Mode {NORMAL, LOAD, LOAD_SAVE, WRITE_SAVE, SETTINGS, LOADING}
 var _current_mode : Mode
@@ -17,6 +18,7 @@ func _set_mode(mode : Mode) -> void:
 	%LoadDialog.hide()
 	%SettingsDialog.hide()
 	%Loading.hide()
+	%SavedMessage.hide()
 	match _current_mode:
 		Mode.NORMAL:
 			var game_is_loaded = _game_root.is_loaded()
@@ -75,11 +77,11 @@ func _on_load_level_pressed() -> void:
 	_set_mode(Mode.LOAD)
 
 func _on_save_game_pressed() -> void:
-	_list_saves()
+	_list_saves(true)
 	_set_mode(Mode.WRITE_SAVE)
 
 func _on_load_save_pressed() -> void:
-	_list_saves()
+	_list_saves(false)
 	_set_mode(Mode.LOAD_SAVE)
 
 func _on_show_task_info() -> void:
@@ -122,6 +124,12 @@ func _on_load_pressed() -> void:
 func _async_load_level_or_save(level_id := "", save_path := ""):
 	_show(Mode.LOADING)
 	FAG_WindowManager.cancel_hideen_windows_list()
+	if _game_root.is_loaded():
+		if save_path == SAVE_DIR + AUTOSAVE_PREFIX + "_on_load":
+			await _game_root.async_save(save_path, save_path + "_2")
+			save_path = save_path + "_2"
+		else:
+			await _game_root.async_save(SAVE_DIR + AUTOSAVE_PREFIX + "_on_load")
 	await _game_root.async_close()
 	
 	if level_id:
@@ -144,17 +152,22 @@ func _on_save_pressed() -> void:
 			%OverwriteConfirmationDialog.dialog_text = tr("MAIN_MENU_SAVE_%s_OVERWRITE_CONFIRM_TEXT") % save_name
 			%OverwriteConfirmationDialog.show()
 		else:
-			_game_root.async_save(save_dir)
-			_set_mode(Mode.NORMAL)
+			await _async_save_and_close(save_dir)
 
 func _on_overwrite_confirmation_dialog_confirmed() -> void:
-	_game_root.async_save(_save_path_to_confirm)
-	_set_mode(Mode.NORMAL)
+	await _async_save_and_close(_save_path_to_confirm)
 
-func _list_saves() -> void:
+func _async_save_and_close(path : String) -> void:
+	await _game_root.async_save(path, SAVE_DIR + AUTOSAVE_PREFIX + "_on_overwrite")
+	_set_mode(Mode.NORMAL)
+	%SavedMessage.show()
+
+func _list_saves(skip_autosaves : bool) -> void:
 	%LoadDialog_ItemInfo.text = ""
 	item_list.clear()
 	for dir_name in DirAccess.get_directories_at(SAVE_DIR):
+		if skip_autosaves and dir_name.begins_with(AUTOSAVE_PREFIX):
+			continue
 		var index = item_list.add_item(dir_name)
 		item_list.set_item_metadata(index, {
 			"path": SAVE_DIR + dir_name
@@ -163,15 +176,17 @@ func _list_saves() -> void:
 func _on_add_save_slot_pressed(text := "") -> void:
 	if not text:
 		text = %NewSaveSlot/NewSaveSlotName.text
-	if text and FAG_Utils.find_item_in_item_list(item_list, text) < 0:
-		var index = item_list.add_item(text)
-		item_list.set_item_metadata(index, {
-			"path": SAVE_DIR + text
-		})
-		item_list.select(index)
-		item_list.move_item(index, 0)
-		item_list.ensure_current_is_visible()
-		%NewSaveSlot/NewSaveSlotName.text = ""
+	if text and FAG_Utils.find_item_in_item_list(item_list, text) < 0 and not text.begins_with(AUTOSAVE_PREFIX):
+		await _async_save_and_close(SAVE_DIR + text)
+		# var index = item_list.add_item(text)
+		# item_list.set_item_metadata(index, {
+		# 	"path": SAVE_DIR + text
+		# })
+		# item_list.select(index)
+		# item_list.move_item(index, 0)
+		# item_list.ensure_current_is_visible()
+		# %NewSaveSlot/NewSaveSlotName.text = ""
+		
 
 
 ### Show / Hide main menu
@@ -199,6 +214,8 @@ var _was_paused := false
 
 func _async_on_quit_pressed() -> void:
 	print("Quit request")
+	if _game_root.is_loaded():
+		await _game_root.async_save(SAVE_DIR + AUTOSAVE_PREFIX + "_on_quit")
 	await _game_root.async_close()
 	get_tree().quit()
 
@@ -238,7 +255,9 @@ func _ready():
 			"unlocked_manuals": ["game", "game/credits"]
 		})
 	%SettingsDialog.visible = false
-
+	
+	_game_root.AUTOSAVE_PATH_PREFIX = SAVE_DIR + AUTOSAVE_PREFIX
+	
 	for args in [OS.get_cmdline_user_args(), OS.get_cmdline_args()]:
 		var idx = args.find("--load-save")
 		if idx >= 0 and len(args) > idx+1:

@@ -28,6 +28,8 @@ std::string time_value = "-2";
 std::condition_variable ready;
 bool configured = false;
 
+void send(const std::string& data);
+
 void execute_command(const std::string& data) {
 	// std::cout << "received command: >>>" << data << "<<<\n";
 	
@@ -54,8 +56,11 @@ void execute_command(const std::string& data) {
 			ping_timer = 0;
 		} else if (command == "request_poweroff") {
 			system("sync; poweroff -f");
-		} else if (command == "request_sync") {
-			system("sync");
+		} else if (command == "before_save") {
+			system("fsfreeze --freeze /.overlayrootfs/rw; sync");
+			send("ready_to_save\n");
+		} else if (command == "after_save") {
+			system("fsfreeze --unfreeze /.overlayrootfs/rw");
 		} else if (command == "terminal_size_changed") {
 			system(("stty -F /dev/ttyS0 rows " + args_vector[0] + " cols " + args_vector[1]).c_str());
 		} else if (command == "time") {
