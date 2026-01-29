@@ -20,7 +20,7 @@ Factory Automation offers, made available as part of the gameplay progression, d
 
 The game offers full simulation of electronic circuits (based on ngspice) and computer systems (based on QEMU and GNU/Linux). In-game manual (about basics of electronics and programming) is available. Saving the game state, customizing keys and other settings is supported.
 
-## Project Status: Alpha-3
+## Project Status: Alpha-4
 
 * All core gameplay features (like circuit simulation, computer simulation, 3d factory) are in place and works.
 * There are only 3 sample tasks (levels) and a demo level available, but they do not reflect the target task layout.
@@ -32,7 +32,7 @@ The game offers full simulation of electronic circuits (based on ngspice) and co
 1. clone project repository: `git clone https://github.com/dragons-labs/FactoryAutomationGame/`
 2. run `just` command in project root repo directory
 
-**Important:** This version require Godot 4.6-beta2 or higher.
+**Important:** This version require Godot 4.6 or higher.
 
 You can also export project for Linux and Windows platform using `./export.sh` script (do not directly use export option in editor).
 Use `./export.sh` to export amd64 Linux version or `./export.sh Windows` to export amd64 Windows version.
