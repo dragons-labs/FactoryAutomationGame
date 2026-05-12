@@ -27,6 +27,21 @@ func _ready() -> void:
 	LimboConsole.register_command(LimboConsole.BuiltinCommands.cmd_fullscreen, "graphics fullscreen", "toggle fullscreen")
 	LimboConsole.register_command(LimboConsole.BuiltinCommands.cmd_vsync, "graphics vsync", "adjust V-Sync")
 
+func _input(p_event: InputEvent) -> void:
+	# if this script is attached to main scene (ApplicationRoot) subnodes
+	# this will be call before `LimboConsole._input()`
+	if LimboConsole._control.visible and LimboConsole._is_open and p_event is InputEventKey and p_event.is_pressed():
+		if p_event.is_action_pressed("limbo_auto_complete_reverse", false, true):
+			LimboConsole._reverse_autocomplete()
+		elif p_event.is_action_pressed("limbo_auto_complete_forward", false, true):
+			LimboConsole._autocomplete()
+		elif p_event.is_action_pressed("limbo_auto_complete_with_list", false, true):
+			_autocomplete_with_list()
+		else:
+			return
+		get_viewport().set_input_as_handled() # do not call LimboConsole._input() if we handled input here
+
+
 static func cmd_help(p_command_name: String = "") -> Error:
 	if p_command_name.is_empty():
 		LimboConsole.print_line(LimboConsole.format_tip("Type %s to list all available commands." %
@@ -51,3 +66,42 @@ static func _greet() -> void:
 			LimboConsole.info("[b]" + message + "[/b]")
 	cmd_help()
 	LimboConsole.info(LimboConsole.format_tip("-----"))
+
+
+## Auto-completes with propositions list on second pressing TAB and without cycles (bash-like)
+func _autocomplete_with_list() -> void:
+	var matches_count = LimboConsole._autocomplete_matches.size()
+	if matches_count == 0:
+		_autocomplete_counter = 0
+		return
+	elif matches_count == 1:
+		var match_str: String = LimboConsole._autocomplete_matches[0]
+		LimboConsole._fill_entry(match_str + " ")
+		LimboConsole._autocomplete_matches.clear()
+		LimboConsole._update_autocomplete()
+		_autocomplete_counter = 0
+	else:
+		_autocomplete_counter += 1
+		if _autocomplete_counter == 2:
+			_autocomplete_counter = 0
+			var argc = LimboConsole._entry.text.split(" ").size() - 1
+			var sugestions = []
+			for sugestion in LimboConsole._autocomplete_matches:
+				var sugestion_argv = sugestion.split(" ", true, argc)
+				if sugestion_argv.size() > argc:
+					sugestions.append(sugestion_argv[argc])
+			_print_in_columns(sugestions)
+
+## Prints array of string in constant length columns
+func _print_in_columns(strings, separator_size = 3):
+	var column_size = 0
+	for s in strings:
+		if s.length() > column_size:
+			column_size = s.length()
+	column_size += separator_size
+	var string = ""
+	for s in strings:
+		string += s.rpad(column_size)
+	LimboConsole.print_line(string)
+
+var _autocomplete_counter := 0

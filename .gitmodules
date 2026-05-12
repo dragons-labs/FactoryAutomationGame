@@ -9,7 +9,8 @@
 	url = https://github.com/fenix-hub/godot-engine.easy-charts
 [submodule "addons/3rdparty/godot-xterm"]
 	path = addons/3rdparty/godot-xterm
-	url = https://github.com/lihop/godot-xterm
+#	url = https://github.com/lihop/godot-xterm
+	url = https://github.com/rpaciorek/godot-xterm
 [submodule "addons/3rdparty/limbo_console"]
 	path = addons/3rdparty/limbo_console
 	url = https://github.com/limbonaut/limbo_console
