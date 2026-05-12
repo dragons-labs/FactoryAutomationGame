@@ -26,6 +26,19 @@ mkdir -p $TARGET
 
 # if export for Windows then build windows libs first
 if [ "$PLATFORM" = "Windows" ]; then
+	#QEMU_WIN_BIN=ComputerSimulator/OS/bin/mingw64/bin
+	# NOTE: we DO NOT use mingw version of qemu due to lack of virtio-9p (virtfs) support (see https://gitlab.com/qemu-project/qemu/-/issues/2016)
+	#       we need virtio-9p (or virtiofs) for shared data between host and multiple in-game computers
+	#        - we can't use samba, etc due to default non-network in-game computers
+	#        - we can't use `-drive file=fat:rw:/dir/path` due to lack of sync between in-game computers and lack of on-save sync
+	QEMU_WIN_BIN=ComputerSimulator/OS/bin/qemu-win-p9fs
+	if ! [ -e $QEMU_WIN_BIN/qemu-system-x86_64.exe ]; then
+		#sh Utils/msys2_pacman.sh ComputerSimulator/OS/bin mingw-w64-x86_64-qemu
+		echo "No qemu binaries found for Windows platform."
+		echo "1. Download qemu with 9pfs support from https://github.com/arixmkii/qcw/releases"
+		echo "2. Install (or extract) it into ComputerSimulator/OS/bin/qemu-win-p9fs/"
+		exit
+	fi
 	if ! [ -f ElectronicsSimulator/GdSpice/bin/libgdspice.windows.template_debug.x86_64.dll ]; then
 		just build-windows-libs
 	fi
@@ -167,7 +180,7 @@ extract_licence_info ngspice $NGSPICE_LIB $NGSPICE_DATA $NGSPICE_INIT
 
 # add qemu binaries
 
-QEMU_BIN="$(realpath /usr/bin/qemu-system-x86_64 $(ldd /usr/bin/qemu-system-x86_64 | awk '{print $3}'))"
+QEMU_BIN="/usr/bin/qemu-system-x86_64 $(ldd /usr/bin/qemu-system-x86_64 | awk '{print $3}')"
 QEMU_SHARE=$(realpath /usr/share/seabios/{bios-256k.bin,vgabios-stdvga.bin} /usr/share/qemu/{efi-e1000.rom,efi-virtio.rom,kvmvapic.bin,linuxboot_dma.bin})
 QEMU_KEYMAPS=/usr/share/qemu/keymaps/en-us
 
@@ -177,14 +190,29 @@ cp $QEMU_SHARE $TARGET/qemu/share/
 cp $QEMU_KEYMAPS $TARGET/qemu/share/keymaps/
 
 if [ "$PLATFORM" = "Linux" ]; then
-	cp $QEMU_BIN $TARGET/qemu/
+	for f in $QEMU_BIN; do
+		cp $(realpath $f) $TARGET/qemu/$(basename $f)
+	done
 elif [ "$PLATFORM" = "Windows" ]; then
 	mkdir -p $TARGET/qemu/bin $TARGET/qemu/share/keymaps
-	cp ComputerSimulator/OS/bin/mingw64/bin/qemu-system-x86_64.exe $TARGET/qemu/bin
-	cp ComputerSimulator/OS/bin/mingw64/bin/*.dll $TARGET/qemu/bin
+	cp $QEMU_WIN_BIN/qemu-system-x86_64.exe $TARGET/qemu/bin
+	cp $QEMU_WIN_BIN/*.dll $TARGET/qemu/bin
 fi
 
-extract_licence_info qemu $QEMU_BIN $QEMU_SHARE $QEMU_KEYMAPS
+extract_licence_info qemu $(realpath $QEMU_BIN) $QEMU_SHARE $QEMU_KEYMAPS
+
+
+# add virtiofsd binaries
+
+VIRTIOFSD_BIN="/usr/libexec/virtiofsd $(ldd /usr/libexec/virtiofsd | awk '{print $3}')"
+
+if [ "$PLATFORM" = "Linux" ]; then
+	for f in $VIRTIOFSD_BIN; do
+		cp $(realpath $f) $TARGET/qemu/$(basename $f)
+	done
+fi
+
+extract_licence_info virtiofsd $(realpath $VIRTIOFSD_BIN)
 
 
 # Windows specific (.exe, add libstdc++-6.dll)

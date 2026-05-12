@@ -25,6 +25,9 @@ enum Mode {TERMINAL = 1, UI_CODE_EDITOR = 2, GRAPHICAL_VNC = 4}
 ## dictionary of virtfs configuration (mapping tag name to directory path on host system)
 @export var virtfs := {}
 
+enum Virtfs_Mode {VIRTIO_9P, VIRTIO_FS}
+@export var virtfs_mode: Virtfs_Mode = Virtfs_Mode.VIRTIO_FS
+
 ## initial list controller inputs names (factory can also add controller inputs on fly by settings it value)
 @export var computer_input_names := []
 
@@ -194,23 +197,48 @@ func _run_qemu(user_port, msg_port, vnc_port):
 		]
 	]
 	
-	if OS.get_name() != "Windows":
-		args.append("-enable-kvm")
+	if writable_disk_image:
+		args += ["-drive", "file=" + FAG_Utils.globalize_path(writable_disk_image) + ",index=1,media=disk,if=virtio,read-only=off"]
 	
-	if OS.get_name() != "Windows": # TODO / BUG: no virtfs support under windows → https://gitlab.com/qemu-project/qemu/-/issues/2016
+	
+	if OS.get_name() == "Windows":
+		virtfs_mode = Virtfs_Mode.VIRTIO_9P # NOTE: looks like no VIRTIO_FS support under Windows
+	
+	var virtiofsd_path: String
+	if virtfs_mode == Virtfs_Mode.VIRTIO_FS:
+		if OS.get_name() != "Windows":
+			virtiofsd_path = FAG_Utils.globalize_path("qemu/virtiofsd")
+			if not FileAccess.file_exists(virtiofsd_path):
+				virtiofsd_path = "/usr/libexec/virtiofsd"
+			if not FileAccess.file_exists(virtiofsd_path):
+				print("Can't find virtiofsd, switch to virtio_9p mode.")
+				virtfs_mode = Virtfs_Mode.VIRTIO_9P
+	
+	if virtfs_mode == Virtfs_Mode.VIRTIO_FS:
+		args += ["-object", "memory-backend-file,id=mem,size=%s,mem-path=/dev/shm,share=on" % memory_size, "-numa", "node,memdev=mem"]
+		var ii := 0
 		for virtfs_tag in virtfs:
-			args.append("-virtfs")
-			args.append("local,path=%s,mount_tag=%s,security_model=mapped" % [FAG_Utils.globalize_path(virtfs[virtfs_tag]), virtfs_tag])
+			var socket_path := FAG_Utils.globalize_path("user://workdir/virtiofs_%d_%s" % [msg_port, virtfs_tag])
+			
+			var virtiofsd_args := ["--cache=always", "--socket-path=%s" % socket_path, "--shared-dir=%s" % FAG_Utils.globalize_path(virtfs[virtfs_tag])]
+			var virtiofsd_pid := OS.create_process(virtiofsd_path, virtiofsd_args)
+			print("Started virtiofsd pid=", virtiofsd_pid, "path=", virtiofsd_path, "args=", virtiofsd_args)
+			
+			args += ["-chardev", "socket,id=char%d,path=%s" % [ii, socket_path]]
+			args += ["-device", "vhost-user-fs-pci,queue-size=1024,chardev=char%d,tag=%s" % [ii, virtfs_tag]]
+			ii += 1
+	elif virtfs_mode == Virtfs_Mode.VIRTIO_9P:
+		for virtfs_tag in virtfs:
+			args += ["-virtfs", "local,path=%s,mount_tag=%s,security_model=mapped" % [FAG_Utils.globalize_path(virtfs[virtfs_tag]), virtfs_tag]]
+	
 	
 	if vnc_port:
-		args.append("-vnc")
-		args.append("127.0.0.1:%d,reverse=on" % vnc_port)
-	if writable_disk_image:
-		args.append("-drive")
-		args.append("file=" + FAG_Utils.globalize_path(writable_disk_image) + ",index=1,media=disk,if=virtio,read-only=off")
+		args += ["-vnc", "127.0.0.1:%d,reverse=on" % vnc_port]
 	
-	args.append("-L")
-	args.append(FAG_Utils.globalize_path("qemu/share"))
+	if OS.get_name() != "Windows":
+		args += ["-enable-kvm"]
+	
+	args += ["-L", FAG_Utils.globalize_path("qemu/share")]
 	
 	var path: String
 	if OS.get_name() == "Windows":

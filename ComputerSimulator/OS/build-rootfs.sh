@@ -188,10 +188,20 @@ echo "Check and recreate devices"
 mkdir -p "$NEWROOT/dev/factory_control"
 
 
-echo "Mount 9p filesystems"
-
-mount -t 9p -o trans=virtio private_fs $NEWROOT/mnt/local -oversion=9p2000.L
-mount -t 9p -o trans=virtio common_fs $NEWROOT/mnt/global -oversion=9p2000.L
+if ls /sys/bus/virtio/drivers/virtiofs/v* >/dev/null 2>&1; then
+	echo "Mount virtiofs filesystems"
+	
+	mount -t virtiofs private_fs $NEWROOT/mnt/local
+	mount -t virtiofs common_fs $NEWROOT/mnt/global
+elif ls /sys/bus/virtio/drivers/9pnet_virtio/v* >/dev/null 2>&1; then
+	echo "Mount virtio-9p filesystems"
+	
+	mount -t 9p -o trans=virtio private_fs $NEWROOT/mnt/local -oversion=9p2000.L
+	mount -t 9p -o trans=virtio common_fs $NEWROOT/mnt/global -oversion=9p2000.L
+else
+	echo "virtiofs and virtio-9p filesystems are not available :-("
+	rmdir $NEWROOT/mnt/local $NEWROOT/mnt/global
+fi
 
 
 echo "Create in-chroot to overlayrootfs startup files"
@@ -336,7 +346,8 @@ virt-make-fs --format=qcow2 --size=+50M --blocksize=4096 "${INSTALL_PATH}" "$BAS
 if [ ! -f "$BASE_DIR/bin/empty_100MB.img" ]; then
 	mkdir "${TMP_DIR}/empty"
 	virt-make-fs --format=qcow2 --size=+100M --blocksize=4096 "${TMP_DIR}/empty" "$TMP_DIR/empty_100MB.img"
-	cp "$TMP_DIR/empty_100MB.img" "$BASE_DIR/bin/empty_100MB.img"
+	qemu-img convert -O qcow2 -c "$TMP_DIR/empty_100MB.img" "$TMP_DIR/empty_100MB_compresed.img"
+	cp "$TMP_DIR/empty_100MB_compresed.img" "$BASE_DIR/bin/empty_100MB.img"
 fi
 
 

@@ -169,7 +169,7 @@ func async_save(save_dir : String, backup_dir := "") -> void:
 		for id in factory_control.computer_control_blocks:
 			while not factory_control.computer_control_blocks[id].get_child(0).is_ready_to_save():
 				await FAG_Utils.real_time_wait(0.1)
-			DirAccess.copy_absolute("user://workdir/disk_%d.img" % id, save_dir + "/disk_%d.img" % id)
+			FAG_Utils.copy_sparse("user://workdir/disk_%d.img" % id, save_dir + "/disk_%d.img" % id)
 			factory_control.computer_control_blocks[id].get_child(0).after_save()
 	
 	print_rich("[color=cyan][b]Save file written.[/b][/color]")
