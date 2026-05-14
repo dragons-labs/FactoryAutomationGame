@@ -27,18 +27,19 @@ func block_count_updated(block_subtype : String, _block: Node3D, block_subtype_c
 
 
 ## computer system simulator configration
-var computer_systems_configuration := {
-	0: {
-		"virtfs" : {
-			"common_fs": "user://common_fs",
-			"private_fs": "user://workdir/private_fs",
+func computer_systems_configuration(work_dir : String):
+	return {
+		0: {
+			"virtfs" : {
+				"common_fs": "user://common_fs",
+				"private_fs": work_dir + "/private_fs",
+			},
+			"writable_disk_image": true,
+			# "rootfs_image_path" : "res://qemu_img/some_path/"
+			# "kernel_image_path" : "res://qemu_img/some_path/"
+			# "memory_size" : "192M"
 		},
-		"writable_disk_image": true,
-		# "rootfs_image_path" : "res://qemu_img/some_path/"
-		# "kernel_image_path" : "res://qemu_img/some_path/"
-		# "memory_size" : "192M"
 	}
-}
 
 ## factory block settings
 var supported_blocks := [

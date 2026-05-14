@@ -37,6 +37,9 @@ enum Virtfs_Mode {VIRTIO_9P, VIRTIO_FS}
 ## time (in seconds) to waiting for emulator quit after poweroff command, before will be killed
 @export var on_close_timeout := 10
 
+## time (in seconds) to waiting for sockets
+@export var socket_wait_timeout := 5
+
 ## port number for TCP echo service used for create local network for this computer
 ## (all computers in one network should use the same echo service on the same tcp port)
 @export var tcp_echo_service_port := 0
@@ -57,6 +60,9 @@ signal system_crash(computer_system_id: Variant, after_ready: bool)
 enum {IS_NOT_RUNNING=0x10, IS_RUNNING=0x20, IS_STOPPING=0x40, IS_READY=0x01}
 var running_state : int = IS_NOT_RUNNING
 
+
+### configure, start and stop computer system
+
 func configure(system_id, configuration : Dictionary) -> void:
 	computer_system_id = system_id
 	for setting_name in [
@@ -69,20 +75,26 @@ func configure(system_id, configuration : Dictionary) -> void:
 		]:
 		if setting_name in configuration:
 			set(setting_name, configuration[setting_name])
+		if "work_dir" in configuration:
+			_work_dir = configuration["work_dir"]
+		else:
+			_work_dir = DirAccess.create_temp("FAG-qemu")
 
-func start():
+func async_start():
 	if _pid:
 		printerr("Can't start. Simulation already is running.")
 		return
 	
 	running_state = IS_RUNNING
 	
-	_user_console_server.listen(0, "127.0.0.1")
-	_msg_bus_server.listen(0, "127.0.0.1")
+	_user_console.listen(0, "127.0.0.1")
+	_msg_bus.listen(0, "127.0.0.1")
+	_qemu_mon.listen(0, "127.0.0.1")
 	
-	var user_port = _user_console_server.get_local_port()
-	var msg_port = _msg_bus_server.get_local_port()
-	print("Listen on: %d %d for computer system %d" % [user_port, msg_port, computer_system_id])
+	var user_port = _user_console.get_local_port()
+	var msg_port = _msg_bus.get_local_port()
+	var qemu_mon_port = _qemu_mon.get_local_port()
+	print("Listen on: %d %d %d for computer system %d" % [user_port, msg_port, qemu_mon_port, computer_system_id])
 	
 	# configure TabContainer
 	
@@ -131,7 +143,7 @@ func start():
 	
 	# start qemu
 	
-	_pid = _run_qemu(user_port, msg_port, vnc_port)
+	_pid = await _async_run_qemu(user_port, msg_port, qemu_mon_port, vnc_port)
 	if _pid > 0:
 		print("Computer system emulator %d -> pid = %d "  % [computer_system_id, _pid])
 		$CheckAlive.start()
@@ -161,15 +173,11 @@ func async_stop():
 			await FAG_Utils.real_time_wait(0.1)
 		
 		if OS.is_process_running(_pid):
-			printerr("Kill computer system emulator %d (pid=%d)" % [computer_system_id, _pid])
-			if OS.kill(_pid) != OK:
-				printerr("Failed to kill computer system emulator %d (pid=%d)" % [computer_system_id, _pid])
+			_kill()
 		else:
 			print("Computer system %d (%d) is down" % [computer_system_id, _pid])
 		
 	_pid = 0
-	_user_console_stream = null
-	_msg_bus_stream = null
 	running_state = IS_NOT_RUNNING
 
 func async_wait_for_stop():
@@ -180,13 +188,19 @@ func async_wait_for_stop():
 			return
 		await FAG_Utils.real_time_wait(0.1)
 
-func _run_qemu(user_port, msg_port, vnc_port):
+
+### start and kill qemu
+
+func _async_run_qemu(user_port, msg_port, qemu_mon_port, vnc_port):
 	var args = [
 		"-kernel", FAG_Utils.globalize_path(kernel_image_path),
+		"-append", "init=/init root=/dev/vda earlyprintk=hvc0 console=hvc0 panic=-1",
 		"-drive",  "file=" + FAG_Utils.globalize_path(rootfs_image_path) + ",index=0,media=disk,if=virtio,read-only=on",
-		"-append", "init=/init root=/dev/vda console=ttyS0,115200 quiet",
-		"-serial", "tcp:127.0.0.1:%d" % user_port, "-serial", "tcp:127.0.0.1:%d" % msg_port,
-		"-nographic", "-m", memory_size,
+		"-device", "virtio-serial",
+		"-chardev", "socket,id=serial_console,port=%d,host=127.0.0.1" % user_port, "-device", "virtconsole,chardev=serial_console,name=serial_console",
+		"-chardev", "socket,id=serial_control,port=%d,host=127.0.0.1" % msg_port, "-device", "virtserialport,chardev=serial_control,name=serial_control",
+		"-chardev", "socket,id=qemu_mon,port=%d,host=127.0.0.1" % qemu_mon_port, "-mon", "chardev=qemu_mon,mode=control,pretty=off",
+		"-nographic", "-m", memory_size, "-no-reboot",
 		# "-nic", "socket,mcast=[ff01::46:41:47:0:1]:4617,model=virtio,mac=52:54:%02x:%02x:%02x:%02x" % [
 		# "-netdev", "dgram,id=n1,remote.type=inet,remote.host=::1,remote.port=4617", "-device", "model=virtio,netdev=n1,mac=52:54:%02x:%02x:%02x:%02x" % [
 		# NOTE: qemu do not support IPv6 multicast (in socket nor in dgram) and IPv4 mulicast do not provide host-scope address space (like ffx1::/16 in IPv6)
@@ -194,15 +208,15 @@ func _run_qemu(user_port, msg_port, vnc_port):
 		"-nic", "socket,connect=127.0.0.1:%d,model=virtio,mac=52:54:%02x:%02x:%02x:%02x" % [
 			tcp_echo_service_port,
 			(computer_system_id>>24)&0xff, (computer_system_id>>16)&0xff, (computer_system_id>>8)&0xff, (computer_system_id>>0)&0xff
-		]
+		],
 	]
 	
 	if writable_disk_image:
-		args += ["-drive", "file=" + FAG_Utils.globalize_path(writable_disk_image) + ",index=1,media=disk,if=virtio,read-only=off"]
+		args += ["-drive", "id=diskrw0,file=" + FAG_Utils.globalize_path(writable_disk_image) + ",index=1,media=disk,if=virtio,cache=none,read-only=off"]
 	
 	
 	if OS.get_name() == "Windows":
-		virtfs_mode = Virtfs_Mode.VIRTIO_9P # NOTE: looks like no VIRTIO_FS support under Windows
+		virtfs_mode = Virtfs_Mode.VIRTIO_9P # NOTE: no VIRTIO_FS support under Windows
 	
 	var virtiofsd_path: String
 	if virtfs_mode == Virtfs_Mode.VIRTIO_FS:
@@ -214,18 +228,22 @@ func _run_qemu(user_port, msg_port, vnc_port):
 				print("Can't find virtiofsd, switch to virtio_9p mode.")
 				virtfs_mode = Virtfs_Mode.VIRTIO_9P
 	
+	var socket_paths = []
 	if virtfs_mode == Virtfs_Mode.VIRTIO_FS:
 		args += ["-object", "memory-backend-file,id=mem,size=%s,mem-path=/dev/shm,share=on" % memory_size, "-numa", "node,memdev=mem"]
 		var ii := 0
 		for virtfs_tag in virtfs:
-			var socket_path := FAG_Utils.globalize_path("user://workdir/virtiofs_%d_%s" % [msg_port, virtfs_tag])
+			var socket_path := "%s/virtiofs_%d_%s_%d" % [_work_dir.get_current_dir(), computer_system_id, virtfs_tag, msg_port]
 			
 			var virtiofsd_args := ["--cache=always", "--socket-path=%s" % socket_path, "--shared-dir=%s" % FAG_Utils.globalize_path(virtfs[virtfs_tag])]
 			var virtiofsd_pid := OS.create_process(virtiofsd_path, virtiofsd_args)
-			print("Started virtiofsd pid=", virtiofsd_pid, "path=", virtiofsd_path, "args=", virtiofsd_args)
+			print("Started virtiofsd pid=", virtiofsd_pid, " path=", virtiofsd_path, " args=", virtiofsd_args)
+			_others_pids.append(virtiofsd_pid)
 			
 			args += ["-chardev", "socket,id=char%d,path=%s" % [ii, socket_path]]
 			args += ["-device", "vhost-user-fs-pci,queue-size=1024,chardev=char%d,tag=%s" % [ii, virtfs_tag]]
+			
+			socket_paths.append(socket_path)
 			ii += 1
 	elif virtfs_mode == Virtfs_Mode.VIRTIO_9P:
 		for virtfs_tag in virtfs:
@@ -236,9 +254,12 @@ func _run_qemu(user_port, msg_port, vnc_port):
 		args += ["-vnc", "127.0.0.1:%d,reverse=on" % vnc_port]
 	
 	if OS.get_name() != "Windows":
-		args += ["-enable-kvm"]
+		args += ["-enable-kvm", "-cpu", "host"]
+	
+	args += ["-machine", "q35"]
 	
 	args += ["-L", FAG_Utils.globalize_path("qemu/share")]
+	
 	
 	var path: String
 	if OS.get_name() == "Windows":
@@ -252,88 +273,37 @@ func _run_qemu(user_port, msg_port, vnc_port):
 		else:
 			OS.set_environment("LD_LIBRARY_PATH", FAG_Utils.globalize_path("qemu") + ":" +  OS.get_environment("LD_LIBRARY_PATH"))
 	
+	print("Waiting for sockets")
+	for i in range(socket_wait_timeout * 10):
+		var all_sockets_ready = true
+		for p in socket_paths:
+			if not _work_dir.file_exists(p):
+				all_sockets_ready = false
+				break
+		if all_sockets_ready:
+			print("All sockets for qemu (computer system ", str(computer_system_id), ") are ready")
+			break
+		else:
+			await FAG_Utils.real_time_wait(0.1)
+	
+	
 	print("Starting qemu (", path, "), with args: ", args)
 	return OS.create_process(path, args)
 
+func _kill():
+	if OS.is_process_running(_pid):
+		printerr("Kill computer system emulator %d (pid=%d)" % [computer_system_id, _pid])
+		var ret = OS.kill(_pid)
+		if ret != OK and ret != ERR_INVALID_PARAMETER:
+			printerr("Failed to kill computer system emulator %d (pid=%d), error code: %d" % [computer_system_id, _pid, ret])
+	for p in _others_pids:
+		var ret = OS.kill(p)
+		if ret != OK and ret != ERR_INVALID_PARAMETER:
+			printerr("Failed to kill computer system emulator %d (pid=%d) support process %d, error code: %d" % [computer_system_id, _pid, p, ret])
+	_pid = 0
 
-var _user_console_server := TCPServer.new()
-var _user_console_stream : StreamPeerTCP = null
-var _msg_bus_server := TCPServer.new()
-var _msg_bus_stream : StreamPeerTCP = null
-var _msg_buf := ""
-var _pid := 0
-var _output_values = {}
 
-func _ready() -> void:
-	process_physics_priority = -10
-	# do not set focus to tab bar ... it require mouse to switch tabs
-	# (because terminal and VNC windows never return focus via keybord)
-	%TabContainer.get_tab_bar().focus_mode = 0
-
-func _physics_process(_delta):
-	if not _user_console_stream:
-		if _user_console_server.is_connection_available():
-			_user_console_stream = _user_console_server.take_connection()
-			_user_console_server.stop()
-	else:
-		_user_console_stream.poll()
-		if _user_console_stream.get_status() == StreamPeerTCP.STATUS_CONNECTED:
-			var data_len = _user_console_stream.get_available_bytes()
-			if data_len > 0:
-				var data = _user_console_stream.get_data(data_len)
-				if data[0] != OK:
-					printerr("Error in receive console data")
-				terminal.write(data[1])
-	
-	if not _msg_bus_stream:
-		if _msg_bus_server.is_connection_available():
-			_msg_bus_stream = _msg_bus_server.take_connection()
-			_msg_bus_server.stop()
-			_on_size_changed(Vector2i(terminal.get_cols(), terminal.get_rows()))
-	else:
-		_msg_bus_stream.poll()
-		if _msg_bus_stream.get_status() == StreamPeerTCP.STATUS_CONNECTED:
-			var data_len = _msg_bus_stream.get_available_bytes()
-			if data_len > 0:
-				_msg_buf += _msg_bus_stream.get_utf8_string(data_len)
-				var pos = 0
-				while pos < len(_msg_buf):
-					var npos = _msg_buf.find("\n", pos)
-					if npos < 0:
-						break
-					var cmd = _msg_buf.substr(pos, npos-pos)
-					# print_verbose("Computer system ", computer_system_id, " received command: ", cmd)
-					if cmd == "ping":
-						send_message_via_msg_bus("pong")
-					elif cmd == "ready_to_save":
-						_is_ready_to_save = true
-					elif cmd == "controller_ready":
-						send_message_via_msg_bus("terminal_size_changed %d %d" % [terminal.get_rows(), terminal.get_cols()])
-						send_message_via_msg_bus("input_names " + " ".join(computer_input_names))
-						send_message_via_msg_bus("output_names " + " ".join(computer_output_names))
-						send_message_via_msg_bus("configuration_done")
-					elif cmd.begins_with("computer_system_ready"):
-						running_state = IS_RUNNING | IS_READY
-						print("Computer system (id=%d) is ready" % computer_system_id)
-						computer_system_is_run_and_ready.emit()
-					elif cmd.begins_with("set_output_value"):
-						var cmd_split = cmd.split(" ", 2)
-						if cmd_split[2] == "":
-							_output_values.erase(cmd_split[1])
-						else:
-							_output_values[cmd_split[1]] = cmd_split[2]
-					elif cmd != "":
-						msg_bus_command.emit(cmd, self)
-					pos = npos + 1
-				_msg_buf = _msg_buf.substr(pos)
-
-func _on_check_alive_timeout() -> void:
-	if not OS.is_process_running(_pid):
-		printerr("Computer system emulator %d (pid = %d) crashed"  % [computer_system_id, _pid])
-		system_crash.emit(computer_system_id, running_state & IS_READY)
-		$CheckAlive.stop()
-		running_state = IS_NOT_RUNNING
-		_pid = 0
+### utils API
 
 func time_step(time : float) -> void:
 	send_message_via_msg_bus("time " + str(time))
@@ -359,41 +329,131 @@ func get_signal_value(signal_name : String, default_value : Variant = 0) -> Vari
 func set_signal_value(signal_name : String, signal_value : Variant) -> void:
 	send_message_via_msg_bus("set_input_value " + signal_name + " " + str(signal_value))
 
-var _is_ready_to_save := false
-func before_save() -> void:
-	_is_ready_to_save = false
+func async_save(filepath : String) -> void:
+	if not is_running_and_ready():
+		_disk_save_status = SaveStatus.FAIL
+		return
+	if not writable_disk_image:
+		_disk_save_status = SaveStatus.NO_DISK
+		return
+	
+	_disk_save_guest_is_ready = false
+	_disk_save_status = SaveStatus.IN_PROGRESS
+	
 	send_message_via_msg_bus("before_save")
+	while not _disk_save_guest_is_ready:
+		await FAG_Utils.real_time_wait(0.1)
 	
-func is_ready_to_save() -> bool:
-	return _is_ready_to_save
+	# NOTE: we use qemu `drive-backup` function to export disk image because simple copying leads to corruption of compressed images
+	_disk_save_job_id = "diskrw0-backup-%d" % Time.get_ticks_msec()
+	send_qemu_command('{ "execute": "drive-backup", "arguments": { "job-id": "' + _disk_save_job_id + '", "device": "diskrw0", "sync": "full", "format": "qcow2", "compress": true, "target": "' + filepath + '" } }')
+	while not _disk_save_status:
+		await FAG_Utils.real_time_wait(0.1)
 	
-func after_save() -> void:
-	_is_ready_to_save = false
 	send_message_via_msg_bus("after_save")
 
+func get_disk_save_status() -> SaveStatus:
+	return _disk_save_status
+
 func send_message_via_msg_bus(string):
-	if _msg_bus_stream:
-		_msg_bus_stream.put_data(string.to_utf8_buffer())
-		_msg_bus_stream.put_8(0x0a)
+	if _msg_bus.is_client_connected():
+		_msg_bus.put_data(string.to_utf8_buffer())
+		_msg_bus.put_8(0x0a)
+
+func send_qemu_command(command : String):
+	prints("send_qemu_command:", command)
+	_qemu_mon.put_data(command.to_utf8_buffer())
+
+
+### _ready, _process and private variables
+
+static var SSTCPServer = load("res://Utils/SingleStreamTCPServer.gd")
+
+var _work_dir : DirAccess = null
+var _user_console = SSTCPServer.new()
+var _msg_bus = SSTCPServer.new()
+var _qemu_mon = SSTCPServer.new()
+var _pid := 0
+var _others_pids := []
+var _output_values := {}
+
+enum SaveStatus {NONE, NO_DISK, IN_PROGRESS, FAIL, DONE}
+var _disk_save_guest_is_ready := false
+var _disk_save_status : SaveStatus = SaveStatus.NONE
+var _disk_save_job_id := ""
+
+func _ready() -> void:
+	process_physics_priority = -10
+	# do not set focus to tab bar ... it require mouse to switch tabs
+	# (because terminal and VNC windows never return focus via keybord)
+	%TabContainer.get_tab_bar().focus_mode = 0
+
+func _physics_process(_delta):
+	_user_console.process_raw(func (data): terminal.write(data))
+	
+	_qemu_mon.process_by_line(func (cmd):
+		var data = JSON.parse_string(cmd)
+		if data:
+			if "QMP" in data:
+				send_qemu_command('{ "execute": "qmp_capabilities" }')
+			if data.get("event", "") == "JOB_STATUS_CHANGE" and data.data.status == "concluded" and data.data.id == _disk_save_job_id:
+				_disk_save_status = SaveStatus.DONE
+	)
+	
+	_msg_bus.process_by_line(func (cmd):
+		# print_verbose("Computer system ", computer_system_id, " received command: ", cmd)
+		if cmd == "ping":
+			send_message_via_msg_bus("pong")
+		elif cmd == "ready_to_save":
+			_disk_save_guest_is_ready = true
+		elif cmd == "controller_ready":
+			send_message_via_msg_bus("terminal_size_changed %d %d" % [terminal.get_rows(), terminal.get_cols()])
+			send_message_via_msg_bus("input_names " + " ".join(computer_input_names))
+			send_message_via_msg_bus("output_names " + " ".join(computer_output_names))
+			send_message_via_msg_bus("configuration_done")
+		elif cmd.begins_with("computer_system_ready"):
+			running_state = IS_RUNNING | IS_READY
+			print("Computer system (id=%d) is ready" % computer_system_id)
+			computer_system_is_run_and_ready.emit()
+		elif cmd.begins_with("set_output_value"):
+			var cmd_split = cmd.split(" ", 2)
+			if cmd_split[2] == "":
+				_output_values.erase(cmd_split[1])
+			else:
+				_output_values[cmd_split[1]] = cmd_split[2]
+		elif cmd != "":
+			msg_bus_command.emit(cmd, self)
+	)
+
+
+### signal callbacks
 
 func _on_data_sent(data):
-	if _user_console_stream:
-		_user_console_stream.put_data(data)
+	if _user_console.is_client_connected():
+		_user_console.put_data(data)
 
 func _on_size_changed(new_size):
 	print("Terminal size changed: ", new_size)
-	if _msg_bus_stream:
+	if _msg_bus.is_client_connected():
 		send_message_via_msg_bus("terminal_size_changed %d %d" % [new_size.y, new_size.x])
 		# send resize info on auxiliary channel to call `stty -F /dev/ttyS0 rows $ARG1 cols $ARG2`
 
 func _on_gui_mouse_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE and event.pressed:
 		if OS.get_name() == "Linux":
-			_user_console_stream.put_data(DisplayServer.clipboard_get_primary().to_utf8_buffer())
+			_user_console.put_data(DisplayServer.clipboard_get_primary().to_utf8_buffer())
 		else:
-			_user_console_stream.put_data(DisplayServer.clipboard_get().to_utf8_buffer())
+			_user_console.put_data(DisplayServer.clipboard_get().to_utf8_buffer())
 		terminal.grab_focus()
 
 func _on_visibility_changed() -> void:
 	if terminal.visible:
 		terminal.grab_focus()
+
+func _on_check_alive_timeout() -> void:
+	if not OS.is_process_running(_pid):
+		printerr("Computer system emulator %d (pid = %d) crashed"  % [computer_system_id, _pid])
+		system_crash.emit(computer_system_id, running_state & IS_READY)
+		$CheckAlive.stop()
+		running_state = IS_NOT_RUNNING
+		_kill()

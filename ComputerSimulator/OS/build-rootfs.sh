@@ -177,23 +177,28 @@ CHROOT="chroot $NEWROOT"
 
 echo "Check and recreate devices"
 
-[ -c $NEWROOT/dev/null ]    || (rm -f $NEWROOT/dev/null;    mknod $NEWROOT/dev/null c 1 3)
-[ -c $NEWROOT/dev/zero ]    || (rm -f $NEWROOT/dev/zero;    mknod $NEWROOT/dev/zero c 1 5)
-[ -c $NEWROOT/dev/urandom ] || (rm -f $NEWROOT/dev/urandom; mknod $NEWROOT/dev/urandom c 1 9)
-[ -c $NEWROOT/dev/ptmx ]    || (rm -f $NEWROOT/dev/ptmx;    mknod $NEWROOT/dev/ptmx c 5 2)
-[ -c $NEWROOT/dev/ttyS0 ]   || (rm -f $NEWROOT/dev/ttyS0;   mknod $NEWROOT/dev/ttyS0 c 4 64)
-[ -c $NEWROOT/dev/ttyS1 ]   || (rm -f $NEWROOT/dev/ttyS1;   mknod $NEWROOT/dev/ttyS1 c 4 65)
-[ -c $NEWROOT/dev/fuse ]    || (rm -f $NEWROOT/dev/fuse;    mknod $NEWROOT/dev/fuse c 10 229)
+[ -c $NEWROOT/dev/null ]     || (rm -f $NEWROOT/dev/null;     mknod $NEWROOT/dev/null c 1 3)
+[ -c $NEWROOT/dev/zero ]     || (rm -f $NEWROOT/dev/zero;     mknod $NEWROOT/dev/zero c 1 5)
+[ -c $NEWROOT/dev/zero ]     || (rm -f $NEWROOT/dev/zero;     mknod $NEWROOT/dev/zero c 1 5)
+[ -c $NEWROOT/dev/urandom ]  || (rm -f $NEWROOT/dev/urandom;  mknod $NEWROOT/dev/urandom c 1 9)
+[ -c $NEWROOT/dev/ptmx ]     || (rm -f $NEWROOT/dev/ptmx;     mknod $NEWROOT/dev/ptmx c 5 2)
+[ -c $NEWROOT/dev/fuse ]     || (rm -f $NEWROOT/dev/fuse;     mknod $NEWROOT/dev/fuse c 10 229)
+[ -c $NEWROOT/dev/console ]  || (rm -f $NEWROOT/dev/console;  mknod $NEWROOT/dev/console c 5 1)
+[ -c $NEWROOT/dev/hvc0 ]     || (rm -f $NEWROOT/dev/hvc0;     mknod $NEWROOT/dev/hvc0 c 229 0)
+[ -c $NEWROOT/dev/vport0p1 ] || (rm -f $NEWROOT/dev/vport0p1; mknod $NEWROOT/dev/vport0p1 c 254 1)
+[ -c $NEWROOT/dev/vda ]      || (rm -f $NEWROOT/dev/vda;      mknod $NEWROOT/dev/vda b 254 0)
+[ -c $NEWROOT/dev/vdb ]      || (rm -f $NEWROOT/dev/vdb;      mknod $NEWROOT/dev/vdb b 254 16)
 
 mkdir -p "$NEWROOT/dev/factory_control"
+mkdir -p "$NEWROOT/dev/pts"
 
 
-if ls /sys/bus/virtio/drivers/virtiofs/v* >/dev/null 2>&1; then
+if ls $NEWROOT/sys/bus/virtio/drivers/virtiofs/v* >/dev/null 2>&1; then
 	echo "Mount virtiofs filesystems"
 	
 	mount -t virtiofs private_fs $NEWROOT/mnt/local
 	mount -t virtiofs common_fs $NEWROOT/mnt/global
-elif ls /sys/bus/virtio/drivers/9pnet_virtio/v* >/dev/null 2>&1; then
+elif ls $NEWROOT/sys/bus/virtio/drivers/9pnet_virtio/v* >/dev/null 2>&1; then
 	echo "Mount virtio-9p filesystems"
 	
 	mount -t 9p -o trans=virtio private_fs $NEWROOT/mnt/local -oversion=9p2000.L
@@ -246,7 +251,7 @@ cp /usr/local/sbin/computer_system_controller $NEWROOT/tmp/computer_system_contr
 
 echo "Chroot to overlayrootfs"
 
-exec $CHROOT getty -l /tmp/bash.login.sh -n 0 ttyS0
+exec $CHROOT getty -l /tmp/bash.login.sh -n 0 console
 EOF
 
 #

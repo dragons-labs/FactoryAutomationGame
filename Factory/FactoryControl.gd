@@ -403,11 +403,10 @@ func setup_computer_control_blocks(element : Node3D) -> void:
 		computer_systems_configuration[computer_id].tcp_echo_service_port = computer_networks[nedwork_id].get_port()
 		
 		computer_system_simulator.configure(computer_id, computer_systems_configuration[computer_id])
-		computer_system_simulator.start()
 	else:
 		printerr("WARNING: starting computer system ", computer_id, " without configuration info - this system will be stateless.")
 		computer_system_simulator.computer_system_id = computer_id
-		computer_system_simulator.start()
+	@warning_ignore("missing_await") computer_system_simulator.async_start()
 	
 	_update_computer_systems_simulation_ready_state()
 

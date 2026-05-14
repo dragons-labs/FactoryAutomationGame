@@ -31,7 +31,9 @@ bool configured = false;
 void send(const std::string& data);
 
 void execute_command(const std::string& data) {
-	// std::cout << "received command: >>>" << data << "<<<\n";
+	#ifdef DEBUG
+	std::cout << "\nREC CMD: >>" << data << "<<\n";
+	#endif
 	
 	std::string command;
 	std::string all_args;
@@ -54,19 +56,11 @@ void execute_command(const std::string& data) {
 	try {
 		if (command == "pong") {
 			ping_timer = 0;
-		} else if (command == "request_poweroff") {
-			system("sync; poweroff -f");
-		} else if (command == "before_save") {
-			system("fsfreeze --freeze /.overlayrootfs/rw; sync");
-			send("ready_to_save\n");
-		} else if (command == "after_save") {
-			system("fsfreeze --unfreeze /.overlayrootfs/rw");
-		} else if (command == "terminal_size_changed") {
-			system(("stty -F /dev/ttyS0 rows " + args_vector[0] + " cols " + args_vector[1]).c_str());
 		} else if (command == "time") {
 			time_value = args_vector[0];
 		} else if (command == "set_input_value") {
 			input_values[args_vector[0]] = args_vector[1];
+		
 		} else if (command == "input_names") {
 			input_values.clear();
 			for (auto& name : args_vector)
@@ -84,6 +78,18 @@ void execute_command(const std::string& data) {
 		} else if (command == "configuration_done") {
 			configured = true;
 			ready.notify_all();
+		
+		} else if (command == "terminal_size_changed") {
+			system(("stty -F /dev/console rows " + args_vector[0] + " cols " + args_vector[1]).c_str());
+		
+		} else if (command == "before_save") {
+			system("fsfreeze --freeze /.overlayrootfs/rw");
+			send("ready_to_save\n");
+		} else if (command == "after_save") {
+			system("fsfreeze --unfreeze /.overlayrootfs/rw");
+		} else if (command == "request_poweroff") {
+			system("sync; poweroff -f");
+		
 		} else if (command == "execute_command") {
 			system(all_args.c_str());
 		}
@@ -101,44 +107,50 @@ void execute_command(const std::string& data) {
 int serial_port = -1;
 std::mutex write_mutex;
 
-int init_serial_port(const char* device, bool verbose = true) {
+int init_serial_port(const char* device, bool real_serial, bool verbose = true) {
 	serial_port = open(device, O_RDWR);
 	if (serial_port < 0) {
 		if (verbose)
-			perror("Error open serial deviace");
+			perror("Error open serial device");
 		return -10;
 	}
 	
-	struct termios tty;
-	if(tcgetattr(serial_port, &tty) != 0) {
-		if (verbose)
-			perror("tcgetattr");
-		return -11;
-	}
-	
-	cfsetispeed(&tty, B115200); // set input baud rate
-	cfsetospeed(&tty, B115200); // set output baud rate
-	
-	tty.c_oflag = 0; // "raw" output - no output processing (e.g. new line conversion)
-	
-	tty.c_lflag |= ICANON; // input revived by lines
-	tty.c_lflag &= ~ECHO; // disable echo
-	tty.c_lflag &= ~(ECHOE | ECHOK | ECHONL); // disable line editing characters
-	tty.c_lflag &= ~ISIG; // no signals on INTR, QUIT, SUSP, or DSUSP characters
-	tty.c_lflag &= ~ISTRIP; // do not strip off eighth bit
-	tty.c_lflag &= ~(INLCR|IGNCR|ICRNL); // do not new line conversion
-	
-	// apply port settings
-	if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
-		if (verbose)
-			perror("tcsetattr");
-		return -12;
+	if (real_serial) {
+		struct termios tty;
+		if(tcgetattr(serial_port, &tty) != 0) {
+			if (verbose)
+				perror("tcgetattr");
+			return -11;
+		}
+		
+		cfsetispeed(&tty, B921600); // set input baud rate
+		cfsetospeed(&tty, B921600); // set output baud rate
+		
+		tty.c_oflag = 0; // "raw" output - no output processing (e.g. new line conversion)
+		
+		tty.c_lflag |= ICANON; // input revived by lines
+		tty.c_lflag &= ~ECHO; // disable echo
+		tty.c_lflag &= ~(ECHOE | ECHOK | ECHONL); // disable line editing characters
+		tty.c_lflag &= ~ISIG; // no signals on INTR, QUIT, SUSP, or DSUSP characters
+		tty.c_lflag &= ~ISTRIP; // do not strip off eighth bit
+		tty.c_lflag &= ~(INLCR|IGNCR|ICRNL); // do not new line conversion
+		
+		// apply port settings
+		if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
+			if (verbose)
+				perror("tcsetattr");
+			return -12;
+		}
 	}
 	
 	return serial_port;
 }
 
 void send(const std::string& data) {
+	#ifdef DEBUG
+	std::cout << "\nSEND: >>" << data << "<<\n";
+	#endif
+	
 	write_mutex.lock();
 	write(serial_port, data.c_str(), data.length());
 	write_mutex.unlock();
@@ -147,36 +159,44 @@ void send(const std::string& data) {
 void listener() {
 	constexpr const int buf_size = 1024;
 	char data[buf_size];
-	
-	bool collecting_line = false;
 	std::string line;
+	int error_timer = 0;
 	
 	while (true) {
 		int data_count = read(serial_port, data, buf_size);
 		if (data_count < 0) {
-			perror("daemon");
+			perror("read");
+			error_timer++;
 		} else if (data_count == 0) {
 			printf("read return zero");
+			error_timer++;
 		} else {
-			if (collecting_line) {
-				line += std::string(data, data_count);
-			} else {
-				line = std::string(data, data_count);
-			}
+			#ifdef DEBUG
+			std::cout << "\nREC DATA: >>" << std::string_view(data, data_count) << "<<\n";
+			#endif
 			
-			if (line[line.length()-1] != '\n') {
-				collecting_line = true;
-			} else {
-				collecting_line = false;
-				line.pop_back(); // remove new line character
-				
-				#ifdef RUN_COMMAND_IN_BACKGROUND
-				std::thread command_thread(execute_command, line);
-				command_thread.detach();
-				#else
-				execute_command(line);
-				#endif
+			int last = 0;
+			for (int i = 0; i < data_count; i++) {
+				if (data[i] == '\n') {
+					line.append(data + last, i - last);
+					last = i+1;
+					
+					#ifdef RUN_COMMAND_IN_BACKGROUND
+					std::thread command_thread(execute_command, line);
+					command_thread.detach();
+					#else
+					execute_command(line);
+					#endif
+					
+					line.clear();
+				}
 			}
+			line.append(data + last, data_count - last);
+			error_timer = 0;
+		}
+		if (error_timer > 10) {
+			std::cout << "too many errors in read ... probably lost communication with Godot ... call poweroff\n";
+			system("sleep 0.2; sync; poweroff -f");
 		}
 	}
 }
@@ -188,7 +208,9 @@ void pinger() {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		if (ping_timer > 5) {
 			std::cout << "no replay to ping from Godot ... call poweroff\n";
-			system("sleep 0.2; poweroff -f");
+			#ifndef DEBUG
+			system("sleep 0.2; sync; poweroff -f");
+			#endif
 		}
 	}
 }
@@ -343,17 +365,19 @@ void start_fuse(const char* path) {
 int main(int argc, char** argv) {
 	std::cout << "Starting factory controller ... please wait\n";
 	
-	init_serial_port("/dev/ttyS1");
+	init_serial_port("/dev/vport0p1", false);
 	if (serial_port < 0) {
 		return -serial_port;
 	}
 	
+	#ifndef DEBUG
 	if (! (argc > 1 && argv[1] == std::string("no_daemon")) ) {
 		if (daemon(1, 1) != 0) {
 			perror("daemon");
 			return 21;
 		}
 	}
+	#endif
 	
 	std::thread listener_thread(listener);
 	std::thread pinger_thread(pinger);

@@ -40,6 +40,7 @@ signal save_loaded()
 
 
 var level_scene_node : Node3D
+var work_dir : DirAccess
 
 const LEVELS_DIR := "res://Levels/"
 const GAME_PROGRESS_SAVE := "user://game_progress.json"
@@ -55,19 +56,21 @@ func load_level(level_id : String, save_dir := "") -> void:
 	level_scene_node.name = "FactoryLevel"
 	level_scene_node.process_mode = Node.PROCESS_MODE_PAUSABLE
 	
+	work_dir = DirAccess.create_temp("FAG-workdir")
+	var work_dir_path = work_dir.get_current_dir()
+	
 	# set circuit_simulator parameters (other parameters are set via factory_control.start()
 	factory_control.circuit_simulator.current_limit = level_scene_node.circuit_simulation_current_limit
 	factory_control.circuit_simulator.voltage_limit = level_scene_node.circuit_simulation_voltage_limit
 	
 	# set computer system simulator parameters
-	var computer_config = level_scene_node.computer_systems_configuration
+	var computer_config = level_scene_node.computer_systems_configuration(work_dir_path)
 	if computer_config:
 		DirAccess.make_dir_recursive_absolute("user://common_fs")
-		FAG_Utils.remove_dir_recursive("user://workdir/private_fs")
 		var private_fs_created = false
 		for id in computer_config:
 			if computer_config[id].get("writable_disk_image", false):
-				var disk_path = "user://workdir/disk_%d.img" % id
+				var disk_path = work_dir_path + "/disk_%d.img" % id
 				computer_config[id]["writable_disk_image"] = disk_path
 				var saved_img = save_dir + "/disk_%d.img" % id
 				if save_dir and FileAccess.file_exists(saved_img):
@@ -81,9 +84,9 @@ func load_level(level_id : String, save_dir := "") -> void:
 				private_fs_created = true
 				var saved_fs = save_dir + "/private_fs"
 				if save_dir and DirAccess.dir_exists_absolute(saved_fs):
-					FAG_Utils.copy_dir_absolute(saved_fs,  "user://workdir/private_fs")
+					FAG_Utils.copy_dir_absolute(saved_fs, work_dir_path + "/private_fs")
 				else:
-					DirAccess.make_dir_recursive_absolute("user://workdir/private_fs")
+					DirAccess.make_dir_recursive_absolute(work_dir_path + "/private_fs")
 			
 			if not "computer_input_names" in computer_config[id]:
 				computer_config[id]["computer_input_names"] = []
@@ -91,6 +94,8 @@ func load_level(level_id : String, save_dir := "") -> void:
 			if not "computer_output_names" in computer_config:
 				computer_config[id]["computer_output_names"] = []
 			
+			computer_config[id]["work_dir"] = work_dir
+		
 		$FactoryControl.computer_systems_configuration = computer_config
 	
 	level_scene_node.init(self, level_id, save_dir != "")
@@ -136,7 +141,7 @@ func load_level(level_id : String, save_dir := "") -> void:
 	print_rich("[color=cyan][b]Level loaded.[/b][/color]")
 	level_loaded.emit()
 
-func async_save(save_dir : String, backup_dir := "") -> void:
+func async_save(save_dir : String, backup_dir := "") -> int:
 	print_rich("[color=cyan][b]Writing save file " + save_dir + " ...[/b][/color]")
 	
 	if DirAccess.dir_exists_absolute(save_dir):
@@ -162,17 +167,21 @@ func async_save(save_dir : String, backup_dir := "") -> void:
 	FAG_Utils.write_to_json_file(save_dir + "/Factory.json", factory_builder.serialise())
 	FAG_Utils.write_to_json_file(save_dir + "/Circuit.json", factory_control.circuit_simulator.serialise())
 	
+	var ret_code = 0
 	if factory_control.computer_control_blocks:
-		FAG_Utils.copy_dir_absolute("user://workdir/private_fs", save_dir + "/private_fs")
+		FAG_Utils.copy_dir_absolute(work_dir.get_current_dir() + "/private_fs", save_dir + "/private_fs")
 		for id in factory_control.computer_control_blocks:
-			factory_control.computer_control_blocks[id].get_child(0).before_save()
+			factory_control.computer_control_blocks[id].get_child(0).async_save(FAG_Utils.globalize_path(save_dir + "/disk_%d.img" % id))
 		for id in factory_control.computer_control_blocks:
-			while not factory_control.computer_control_blocks[id].get_child(0).is_ready_to_save():
+			var computer = factory_control.computer_control_blocks[id].get_child(0)
+			while computer.get_disk_save_status() == computer.SaveStatus.IN_PROGRESS:
 				await FAG_Utils.real_time_wait(0.1)
-			FAG_Utils.copy_sparse("user://workdir/disk_%d.img" % id, save_dir + "/disk_%d.img" % id)
-			factory_control.computer_control_blocks[id].get_child(0).after_save()
+			if computer.get_disk_save_status() == computer.SaveStatus.FAIL:
+				ret_code = 1
+				printerr("Can't save computer system %d disk because this computer system is down" % id)
 	
 	print_rich("[color=cyan][b]Save file written.[/b][/color]")
+	return ret_code
 
 func restore(save_dir : String) -> void:
 	var save_info = FAG_Utils.load_from_json_file(save_dir + SAVE_INFO_FILE)

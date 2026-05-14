@@ -158,8 +158,14 @@ func _on_overwrite_confirmation_dialog_confirmed() -> void:
 	await _async_save_and_close(_save_path_to_confirm)
 
 func _async_save_and_close(path : String) -> void:
-	await _game_root.async_save(path, SAVE_DIR + AUTOSAVE_PREFIX + "_on_overwrite")
+	var status = await _game_root.async_save(path, SAVE_DIR + AUTOSAVE_PREFIX + "_on_overwrite")
 	_set_mode(Mode.NORMAL)
+	if status == 0:
+		%SavedMessage.text = tr("MAIN_MENU_SAVED_OK_MESSAGE")
+		%SavedMessage.add_theme_color_override("font_color", Color(0, 0.7882353, 0, 1))
+	else:
+		%SavedMessage.text = tr("MAIN_MENU_SAVED_WARNING_MESSAGE")
+		%SavedMessage.add_theme_color_override("font_color", Color(1.0, 0.7882353, 0, 1))
 	%SavedMessage.show()
 
 func _list_saves(skip_autosaves : bool) -> void:

@@ -146,7 +146,9 @@ static func globalize_path(path : String) -> String:
 	if OS.has_feature("editor"):
 		return ProjectSettings.globalize_path(path)
 	else:
-		if path.begins_with("res://"):
+		if path.begins_with("/") or (OS.get_name() == "Windows" and path[1] == ":"):
+			return path
+		elif path.begins_with("res://"):
 			return OS.get_executable_path().get_base_dir().path_join(path.substr(6))
 		elif path.begins_with("user://"):
 			return ProjectSettings.globalize_path(path)
