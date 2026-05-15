@@ -10,7 +10,7 @@
 resource_name = "NetListSettings"
 script/source = "extends LineEdit
 
-func get_netlist_entry(nets_on_element, id):
+func get_netlist_entry(nets_on_element, id, _value_converter):
 	return {
 		\"circuit\" : [
 			\"A%d [ %s ] __output_digital_%d__ XOR\" % [id, nets_on_element[0] + \" \" + nets_on_element[1], id],
@@ -30,7 +30,7 @@ ui_icon = ExtResource("3_kvrh0")
 type = "XOR"
 params = Dictionary[String, Variant]({
 "models": {
-"XOR": ".model XOR d_xor"
+"XOR": ".model XOR d_xor(fall_time = 1e-4, rise_time = 1e-4, rise_delay = 1e-4, fall_delay = 1e-4)"
 }
 })
 metadata/_edit_lock_ = true

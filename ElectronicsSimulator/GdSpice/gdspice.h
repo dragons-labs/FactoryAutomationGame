@@ -5,6 +5,7 @@
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/variant/string.hpp>
 #include <map>
+#include <mutex>
 
 #include "../../Utils/godot_api_utils.h"
 
@@ -146,6 +147,9 @@ private:
 	
 	/// dictionary with voltage/current values for external control voltage/current sources
 	std::map<std::string, double> external_voltages_currents;
+	
+	/// mutex for external_voltages_currents access
+	std::mutex external_voltages_currents_mutex;
 	
 	/// simulation time (from simulation start)
 	double time_simulation;

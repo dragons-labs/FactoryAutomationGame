@@ -94,11 +94,11 @@ func get_terminals_nets_names(netlist) -> Array:
 			not_connected.append(nc_net)
 	return [count, ret, not_connected]
 
-func get_netlist_entry(netlist, id, value_name := "Value"):
+func get_netlist_entry(netlist, id, value_converter : Callable, value_name := "Value"):
 	var nets_on_element = get_terminals_nets_names(netlist)
 	var value_node = get_node(value_name)
 	if nets_on_element[0] > 0 and value_node and "get_netlist_entry" in value_node:
-		var ret = value_node.get_netlist_entry(nets_on_element[1], id)
+		var ret = value_node.get_netlist_entry(nets_on_element[1], id, value_converter)
 		ret["not_connected"] = nets_on_element[2]
 		return ret
 	return null

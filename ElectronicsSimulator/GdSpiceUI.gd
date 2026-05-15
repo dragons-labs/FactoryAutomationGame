@@ -28,8 +28,12 @@ func get_ngspice_netlist(
 		grid : Object,
 		external_nets_input_to_circuit_from_factory : Array,
 		external_nets_outputs_from_circuit_to_factory : Array,
-		external_circuit_entries : Array
+		external_circuit_entries : Array,
+		time_scale := 1.0
 	) -> Array:
+	
+	_time_scale = time_scale
+	_time_scale_inverse = 1.0 / time_scale
 	
 	var circuit := ["factory control"]
 	var errors := []
@@ -96,11 +100,12 @@ func get_ngspice_netlist(
 	
 	# add elements from grid editor and create models list
 	var models = {}
+	var value_converter = ngspice_netlist_value_converter.bind(1.0 / time_scale)
 	for j in range(len(all_elements)):
 		var base_element = all_elements[j]
 		if "models" in base_element.params:
 			models.merge(base_element.params.models)
-		var entry = base_element.get_netlist_entry(netlist, j)
+		var entry = base_element.get_netlist_entry(netlist, j, value_converter)
 		if entry:
 			if "circuit" in entry:
 				circuit.append_array(entry.circuit)
@@ -126,6 +131,12 @@ func get_ngspice_netlist(
 	
 	return [circuit, errors]
 
+func ngspice_netlist_value_converter(type : String, value : String, scale_CL : float) -> String:
+	value = value.replace("M", "MEG").replace("k", "K")
+	if scale_CL != 1.0 and (type == "C" or type == "L"):
+		value = str(FAG_Utils.str_to_float(value) * scale_CL)
+	return value
+
 
 ### measurer graphs (oscilloscopes) system
 
@@ -150,17 +161,22 @@ func _create_chart_properties() -> ChartProperties:
 	chart_properties.max_samples = 300
 	return chart_properties
 
-var oscilloscopes = {}
-var _oscilloscope_id = 0
+var oscilloscopes := {}
+var _oscilloscope_id := 0
 var _last_oscilloscope = null
+var _time_scale := 1.0
+var _time_scale_inverse := 1.0
 
 func _create_graph_function(win : Window, base_element : FAG_2DGrid_BaseElement) -> Function:
 	var value = [0]
 	var time = [0]
 	if get_simulation_state() in [GdSpice.RUNNING, GdSpice.PAUSED]:
-		var data = get_latest_timed_values([measurements[base_element]], _chart_properties.max_samples, 0.01666)
-		time = data[0]
-		value = data[1]
+		var data = get_latest_timed_values([measurements[base_element]], _chart_properties.max_samples, 0.01666 * _time_scale_inverse)
+		time = data[0].map(func(e): return e * _time_scale)
+		if base_element.subtype == "Ammeter":
+			value = data[1].map(func(e): return e * 1000)
+		else:
+			value = data[1]
 		# var index = get_last_index()
 		# var data_step = 1666 # = (1s/60) / 10us number of simulation step in single game frame
 		# time = get_values("time", _chart_properties.max_samples, data_step, index)
@@ -168,8 +184,6 @@ func _create_graph_function(win : Window, base_element : FAG_2DGrid_BaseElement)
 	
 	var title
 	if base_element.subtype == "Ammeter":
-		for i in range(len(value)):
-			value[i] *= 1000
 		title = tr("ELECTRONIC_SIMULATION_CURRENT_%dID_WITH_UNIT") % _oscilloscope_id
 	else:
 		title = tr("ELECTRONIC_SIMULATION_VOLTAGE_%dID_WITH_UNIT") % _oscilloscope_id
@@ -277,13 +291,13 @@ func _on_chart_time_range_changed(win : Window, win_chart : Chart):
 	for function in win_chart.functions:
 		vectors.append(function.get_meta("vector"))
 	
-	var data = get_timed_values_for_time_range(vectors, _chart_properties.max_samples, start_time, end_time)
+	var data = get_timed_values_for_time_range(vectors, _chart_properties.max_samples, start_time * _time_scale_inverse, end_time * _time_scale_inverse)
 	if not data:
 		printerr("No data for chart. Simulation state: %x" % get_simulation_state())
 		_on_win_close(win)
 		return
 	
-	var time = data[0]
+	var time = data[0].map(func(e): return e * _time_scale)
 	data.remove_at(0)
 	
 	for i in range(0, len(data)):

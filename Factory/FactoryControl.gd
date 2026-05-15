@@ -76,7 +76,7 @@ func set_signal_value(signal_name : String, value : float) -> void:
 
 #region   start / tick / stop / close
 
-func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_simulation_max_time) -> bool:
+func async_start(use_circuit_simulation : bool, circuit_simulation_time_step : String, circuit_simulation_max_time : String, circuit_simulator_time_scale := 1.0) -> bool:
 	if _running_state != NOT_RUNNING:
 		printerr("Start aborted - running_state != NOT_RUNNING (running_state == ", _running_state, ")")
 		return false
@@ -84,7 +84,7 @@ func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_s
 	
 	print_rich("[color=dark_cyan][b]Starting factory control system ...[/b][/color]")
 	simulation_time = 0
-	estimated_next_simulation_time = 0.15
+	estimated_next_simulation_time = 0.015
 	simulation_on_time = true
 	internal_signals_values.clear()
 	
@@ -107,13 +107,18 @@ func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_s
 			return false
 		
 		_system_state[CIRCUIT] = NOT_READY
+		
+		_circuit_simulation_time_step = circuit_simulation_time_step
+		_circuit_simulation_max_time = circuit_simulation_max_time
+		_circuit_simulator_time_scale = circuit_simulator_time_scale
+		_circuit_simulator_time_scale_inverse = 1.0 / circuit_simulator_time_scale
+		
 		circuit_simulator.init_circuit(
 			input_to_circuit_from_factory.values(),
 			outputs_from_circuit_to_factory.values(),
-			external_circuit_entries
+			external_circuit_entries,
+			circuit_simulator_time_scale
 		)
-		_circuit_simulation_time_step = circuit_simulation_time_step
-		_circuit_simulation_max_time = circuit_simulation_max_time
 		# NOTE: we ignore value returned by init_circuit (error list) and do not show UI error here
 		#       because NO_GND is not an issue if circuit connect only input/output signals
 		
@@ -129,7 +134,7 @@ func async_start(use_circuit_simulation, circuit_simulation_time_step, circuit_s
 	# if electronic circuit simulation is used need be started
 	if _system_state[CIRCUIT] == READY:
 		circuit_simulator.start( _circuit_simulation_time_step, _circuit_simulation_max_time )
-		circuit_simulator.gdspice.set_time_game(estimated_next_simulation_time)
+		circuit_simulator.gdspice.set_time_game(estimated_next_simulation_time * _circuit_simulator_time_scale_inverse)
 	
 	# NOTE: computer system simulations are running during work in editor
 	# (are start/stop while adding/removing blocks) so no need to start/restart here
@@ -153,7 +158,7 @@ func tick(delta: float, paused : bool) -> void:
 		
 		if circuit_simulation_state == GdSpice.RUNNING:
 			# if electronic circuit simulation is delayed then pause 3d factory processing
-			var current_simulation_time = circuit_simulator.gdspice.get_time_simulation()
+			var current_simulation_time = circuit_simulator.gdspice.get_time_simulation() * _circuit_simulator_time_scale
 			if (current_simulation_time >= min(simulation_time, estimated_next_simulation_time)):
 				# on time
 				if not simulation_on_time:
@@ -169,10 +174,10 @@ func tick(delta: float, paused : bool) -> void:
 					get_tree().paused = true
 					# prints("emergency pause", _pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), current_simulation_time)
 					emergency_pause_on_off.emit(true)
-					circuit_simulator.gdspice.set_time_game(simulation_time)
-				_pause_count += 1
+					circuit_simulator.gdspice.set_time_game(simulation_time * _circuit_simulator_time_scale_inverse)
 				if _pause_count % 30 == 0:
 					prints("on emergency pause", _pause_count, simulation_time, circuit_simulator.gdspice.get_time_game(), current_simulation_time)
+				_pause_count += 1
 				return
 	
 	# do not process factory control logic if game is paused
@@ -186,7 +191,7 @@ func tick(delta: float, paused : bool) -> void:
 	
 	# set estimated frame end time as target for electronic circuit simulation
 	estimated_next_simulation_time = simulation_time + delta * time_frame_estimation_multiplier
-	circuit_simulator.gdspice.set_time_game(estimated_next_simulation_time)
+	circuit_simulator.gdspice.set_time_game(estimated_next_simulation_time * _circuit_simulator_time_scale_inverse)
 	# electronic circuit simulation will be processing in background
 	
 	# emit `factory_tick` signal
@@ -593,8 +598,10 @@ enum { CIRCUIT = 0, COMPUTER = 1, NONE = 65, CONFLICT = 66 } # SystemID / ValueS
 var _running_state := NOT_RUNNING
 var _system_state := [ UNUSED, UNUSED ]
 
-var _circuit_simulation_time_step
-var _circuit_simulation_max_time
+var _circuit_simulation_time_step : String
+var _circuit_simulation_max_time : String
+var _circuit_simulator_time_scale : float
+var _circuit_simulator_time_scale_inverse : float
 
 var simulation_on_time : bool
 var simulation_time

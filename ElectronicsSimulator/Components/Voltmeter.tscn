@@ -10,7 +10,7 @@
 resource_name = "NetListSettings"
 script/source = "extends LineEdit
 
-func get_netlist_entry(nets_on_element, _id):
+func get_netlist_entry(nets_on_element, _id, _value_converter):
 	return {
 		\"meters\" : [nets_on_element[0]]
 	}

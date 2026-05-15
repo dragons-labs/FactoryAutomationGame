@@ -58,7 +58,8 @@ func close() -> void:
 func init_circuit(
 		external_nets_input_to_circuit_from_factory := [],
 		external_nets_outputs_from_circuit_to_factory := [],
-		external_circuit_entries := []
+		external_circuit_entries := [],
+		time_scale := 1.0
 	) -> Array:
 		if gdspice.get_simulation_state() != GdSpice.NOT_STARTED:
 			gdspice.reset()
@@ -77,7 +78,8 @@ func init_circuit(
 			grid_editor.grid,
 			external_nets_input_to_circuit_from_factory,
 			external_nets_outputs_from_circuit_to_factory,
-			external_circuit_entries
+			external_circuit_entries,
+			time_scale
 		)
 		gdspice.load(netlist_info[0])
 		return netlist_info[1]

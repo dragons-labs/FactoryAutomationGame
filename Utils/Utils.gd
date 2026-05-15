@@ -198,6 +198,28 @@ static func copy_sparse(src: String, dst: String) -> void:
 
 
 #
+# numeric
+#
+
+const _to_float_surfixes := {"T": 1e12, "G": 1e9, "M": 1e6, "k": 1e3, "m": 1e-3, "u": 1e-6, "n": 1e-9, "p": 1e-12, "f": 1e-15, "a": 1e-18}
+static var _to_float_regex := RegEx.create_from_string("([0-9]+)(\\.[0-9]*)?([A-Za-z]*)([0-9]*)")
+
+static func str_to_float(text : String):
+	var res = _to_float_regex.search(text)
+	var value = res.strings[1]
+	if res.strings[2]:
+		value += res.strings[2]
+	elif res.strings[4]:
+		value += res.strings[4]
+	return float(value) * _to_float_surfixes.get(res.strings[3], 1.0)
+
+static func abs_max(a : Variant, b : Variant) -> Variant:
+	if abs(a) > abs(b):
+		return a
+	else:
+		return b
+
+#
 # misc
 #
 
@@ -239,11 +261,5 @@ static func real_time_wait(time : float, parent : Node = null) -> void:
 		await parent.get_tree().create_timer(time, true, false, true).timeout
 	else:
 		await Engine.get_main_loop().create_timer(time, true, false, true).timeout
-
-static func abs_max(a : Variant, b : Variant) -> Variant:
-	if abs(a) > abs(b):
-		return a
-	else:
-		return b
 
 static var ConsoleReadSet = load("res://Utils/ConsoleReadSet.gd")

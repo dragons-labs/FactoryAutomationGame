@@ -10,7 +10,7 @@
 resource_name = "NetListSettings"
 script/source = "extends LineEdit
 
-func get_netlist_entry(nets_on_element, id):
+func get_netlist_entry(nets_on_element, id, _value_converter):
 	return {
 		\"circuit\" : [
 			\"A%d %s __output_digital_%d__ NOT\" % [id, nets_on_element[0], id],
@@ -30,7 +30,7 @@ ui_icon = ExtResource("3_kvrh0")
 type = "NOT"
 params = Dictionary[String, Variant]({
 "models": {
-"NOT": ".model NOT d_inverter"
+"NOT": ".model NOT d_inverter(fall_time = 1e-4, rise_time = 1e-4, rise_delay = 1e-4, fall_delay = 1e-4)"
 }
 })
 metadata/_edit_lock_ = true

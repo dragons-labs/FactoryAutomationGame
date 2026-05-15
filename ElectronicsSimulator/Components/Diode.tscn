@@ -10,7 +10,7 @@
 resource_name = "NetListSettings"
 script/source = "extends LineEdit
 
-func get_netlist_entry(nets_on_element, id):
+func get_netlist_entry(nets_on_element, id, _value_converter):
 	return {
 		\"circuit\" : [\"D%d \" % id + \\
 			\" \".join(nets_on_element) + \" \" + \\

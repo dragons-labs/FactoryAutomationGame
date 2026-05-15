@@ -108,7 +108,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "ELECTRONIC_SIMULATION_APPLY"
 
-[connection signal="toggled" from="VBoxContainer/MarginContainer/ManualTime/ManualTimeEnabled/ManualTimeEnabledButton" to="." method="_on_manual_time_enabled_button_toggled"]
+[connection signal="toggled" from="VBoxContainer/MarginContainer/ManualTime/ManualTimeEnabled/ManualTimeEnabledButton" to="." method="_async_on_manual_time_enabled_button_toggled"]
 [connection signal="value_changed" from="VBoxContainer/MarginContainer/ManualTime/Values/StartTime" to="." method="_on_start_slider_value_changed"]
 [connection signal="value_changed" from="VBoxContainer/MarginContainer/ManualTime/Values/EndTime" to="." method="_on_end_slider_value_changed"]
 [connection signal="pressed" from="VBoxContainer/MarginContainer/ManualTime/Values/ApplyButton" to="." method="_on_apply_button_pressed"]

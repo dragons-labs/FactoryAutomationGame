@@ -250,6 +250,7 @@ godot::Array GdSpice::get_timed_values_for_time_step(const godot::PackedStringAr
 }
 
 void GdSpice::set_voltages_currents(const godot::String& point_name, double value) {
+	std::lock_guard<std::mutex> guard(external_voltages_currents_mutex);
 	external_voltages_currents[point_name.utf8().get_data()] = value;
 }
 
@@ -340,14 +341,20 @@ int GdSpice::on_getchar(char* text, int ident, void* userdata) {
 int GdSpice::on_get_voltage_current_value(double* value, double time, char* node_name, int /*ident*/, void* userdata) {
 	auto gd_spice = static_cast<GdSpice*>(userdata);
 	double val = 0;
-	auto val_iter = gd_spice->external_voltages_currents.find(node_name);
-	if (val_iter != gd_spice->external_voltages_currents.end())
-		val = val_iter->second;
+	{
+		std::lock_guard<std::mutex> guard(gd_spice->external_voltages_currents_mutex);
+		auto val_iter = gd_spice->external_voltages_currents.find(node_name);
+		if (val_iter != gd_spice->external_voltages_currents.end())
+			val = val_iter->second;
+	}
 	*value = val;
 	return 0; 
 }
 
-int GdSpice::on_sync(double time, double* /*deltatime*/, double /*olddeltatime*/, int /*redostep*/, int /*ident*/, int /*location*/, void* userdata) {
+int GdSpice::on_sync(double time, double* deltatime, double olddeltatime, int redostep, int ident, int location, void* userdata) {
+	if (location == 0)
+		return 0;
+	
 	auto gd_spice = static_cast<GdSpice*>(userdata);
 	
 	gd_spice->time_simulation = time;
@@ -356,5 +363,11 @@ int GdSpice::on_sync(double time, double* /*deltatime*/, double /*olddeltatime*/
 		if ((gd_spice->simulation_state & WORKING_TYPE_STATE_MASK) == 0x00) // not PAUSED, READY nor RUNNING
 			return 0;
 	}
+
+	if (olddeltatime < 1e-8) {
+		*deltatime = 1e-6;
+		std::cerr << "ERRRRR   " << time * 1000000 << "us " << olddeltatime << " redo:" << redostep << " " << ident << " " << location << "\n";
+	}
+	
 	return 0;
 }

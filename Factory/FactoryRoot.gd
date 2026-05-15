@@ -249,7 +249,8 @@ func run_factory() -> void:
 	@warning_ignore("missing_await") factory_control.async_start(
 		_stats.block_count_per_type.get("ElectronicControlBlock", 0) > 0,
 		level_scene_node.circuit_simulation_time_step,
-		level_scene_node.circuit_simulation_max_time
+		level_scene_node.circuit_simulation_max_time,
+		level_scene_node.circuit_simulator_time_scale
 	)
 	# continue (after control is started) in _async_on_control_running()
 
@@ -282,6 +283,7 @@ func _async_on_control_running() -> void:
 	
 	print_rich("[color=cyan][b]Factory is running.[/b][/color]")
 	factory_started.emit()
+	special_pause_msg.visible = not factory_control.simulation_on_time
 	_start_stop_hud_ui()
 
 func _physics_process(delta):
@@ -306,14 +308,14 @@ func async_stop_factory() -> void:
 	print("Pausing tree ...")
 	get_tree().paused = true
 	
-	await factory_control.async_stop()
-	
 	print("Removing products ...")
 	for node in objects_root.get_children():
 		node.queue_free()
 	
 	print("Sending stop signal to factory block ...")
 	factory_stop.emit()
+	
+	await factory_control.async_stop()
 	
 	await FAG_Utils.real_time_wait(0.2)
 	_factory_state &= ~FactoryState.ON_CHANGE
