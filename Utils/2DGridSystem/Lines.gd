@@ -6,6 +6,7 @@
 var main_node : Node2D = null
 var owner_node : Node2D = null
 var undo_redo : UndoRedo = null
+var _fake_undo_redo : UndoRedo = null
 var grid_size : Vector2
 
 func _init(main_node_ : Node2D, owner_node_ : Node2D = null, undo_redo_ : UndoRedo = null, grid_size_ := Vector2(20, 20)) -> void:
@@ -18,6 +19,7 @@ func _init(main_node_ : Node2D, owner_node_ : Node2D = null, undo_redo_ : UndoRe
 		undo_redo = undo_redo_
 	else:
 		undo_redo = UndoRedo.new()
+	_fake_undo_redo = UndoRedo.new()
 	grid_size = grid_size_
 
 
@@ -245,9 +247,9 @@ func update_segment__finish(start_undo_redo_action = true, finish_undo_redo_acti
 
 ### Remove segments / points of existed lines
 
-func remove_segment(segments : Array, start_undo_redo_action = true, finish_undo_redo_action = true) -> bool:
+func remove_segment(segments : Array, start_undo_redo_action = true, finish_undo_redo_action = true) -> int:
 	if not segments:
-		return false
+		return 0
 	
 	if start_undo_redo_action:
 		undo_redo.create_action("Grid Editor: Remove line segment")
@@ -317,96 +319,126 @@ func remove_segment(segments : Array, start_undo_redo_action = true, finish_undo
 	
 	if finish_undo_redo_action:
 		undo_redo.commit_action()
-	return true
+	return 1
 
 
 ### Rotate and mirror group of lines
-func rotate_segments(segments : Array, angle : float, pivot, start_undo_redo_action = true, finish_undo_redo_action = true) -> bool:
+func rotate_segments(segments : Array, angle : float, pivot, start_undo_redo_action = true, finish_undo_redo_action = true, no_undo = false) -> int:
 	if not segments:
-		return false
+		return 0
 	
-	if start_undo_redo_action:
-		undo_redo.create_action("Grid Editor: Rotate")
+	var local_undo_redo = _fake_undo_redo if no_undo else undo_redo
+	if start_undo_redo_action or no_undo:
+		local_undo_redo.create_action("Grid Editor: Rotate")
+	
 	for segment in segments:
 		var line : Line2D = segment.line
 		var points := line.points
 		for i in segment.indexes:
 			points[i] = FAG_Utils.rotate_around_pivot(points[i], pivot, angle)
-		undo_redo.add_do_property(line, "points", points)
-		undo_redo.add_undo_property(line, "points", line.points)
+		local_undo_redo.add_do_property(line, "points", points)
+		local_undo_redo.add_undo_property(line, "points", line.points)
 	
-	undo_redo.add_do_method(update_connections)
-	undo_redo.add_undo_method(update_connections)
+	local_undo_redo.add_do_method(update_connections)
+	local_undo_redo.add_undo_method(update_connections)
 	
-	if finish_undo_redo_action:
-		undo_redo.commit_action()
-	return true
+	if finish_undo_redo_action or no_undo:
+		local_undo_redo.commit_action()
+	return 1
 
-func mirror_segments(segments : Array, pivot, start_undo_redo_action = true, finish_undo_redo_action = true) -> bool:
+func mirror_segments(segments : Array, pivot, start_undo_redo_action = true, finish_undo_redo_action = true, no_undo = false) -> int:
 	if not segments:
-		return false
+		return 0
 	
-	if start_undo_redo_action:
-		undo_redo.create_action("Grid Editor: Mirror")
+	var local_undo_redo = _fake_undo_redo if no_undo else undo_redo
+	if start_undo_redo_action or no_undo:
+		local_undo_redo.create_action("Grid Editor: Mirror")
 	for segment in segments:
 		var line : Line2D = segment.line
 		var points := line.points
 		for i in segment.indexes:
 			points[i] = FAG_Utils.mirror_y(points[i], pivot)
-		undo_redo.add_do_property(line, "points", points)
-		undo_redo.add_undo_property(line, "points", line.points)
+		local_undo_redo.add_do_property(line, "points", points)
+		local_undo_redo.add_undo_property(line, "points", line.points)
 	
-	undo_redo.add_do_method(update_connections)
-	undo_redo.add_undo_method(update_connections)
+	local_undo_redo.add_do_method(update_connections)
+	local_undo_redo.add_undo_method(update_connections)
 	
-	if finish_undo_redo_action:
-		undo_redo.commit_action()
-	return true
+	if finish_undo_redo_action or no_undo:
+		local_undo_redo.commit_action()
+	return 1
 
 
 ### Duplicate lines
 
-var _new_lines := {}
-var _new_lines_init_point : Vector2
+var _new_segments := []
+var _new_segments_init_point : Vector2
 
 func init_duplicate(segments : Array, point : Vector2, duplicate := true) -> void:
-	_new_lines_init_point = point
+	_new_segments_init_point = point
 	duplicate_cancel()
 	for segment in segments:
-		var _new_line = segment.line.duplicate() if duplicate else segment.line
-		# TODO use only segments matched to segment.indexes (if indexes is available) ... if need (split line) then add new lines
-		_new_lines[_new_line] = []
-		_new_lines[_new_line].resize(_new_line.get_point_count())
-		for i in range(_new_line.get_point_count()):
-			_new_lines[_new_line][i] = segment.line.get_point_position(i)
-		main_node.add_child(_new_line)
+		var _new_segment = {
+			"line": segment.line.duplicate() if duplicate else segment.line,
+			"indexes": range(len(segment.line.points)),
+			# TODO use only segments matched to segment.indexes (if indexes is available) ... if need (split line) then add new lines
+			"org_pos": []
+		}
+		for i in range(segment.line.get_point_count()):
+			_new_segment.org_pos.append(segment.line.get_point_position(i))
+		_new_segments.append(_new_segment)
+		main_node.add_child(_new_segment.line)
 	duplicate_update(point)
 
-func duplicate_finish(point : Vector2) -> void:
-	duplicate_update(point)
+func duplicate_finish(point : Vector2, start_undo_redo_action = true, finish_undo_redo_action = true) -> int:
+	if not _new_segments:
+		return 0
 	
-	undo_redo.create_action("Grid Line(s): Add")
-	for _new_line in _new_lines:
-		var line = _new_line.duplicate() # BUG: https://github.com/godotengine/godot/issues/92880
+	duplicate_update(point)
+	if start_undo_redo_action:
+		undo_redo.create_action("Grid Line(s): Add")
+	
+	for _new_segment in _new_segments:
+		var line = _new_segment.line.duplicate()
 		undo_redo.add_do_reference(line)
 		undo_redo.add_do_method(main_node.add_child.bind(line))
 		undo_redo.add_undo_method(main_node.remove_child.bind(line))
 		undo_redo.add_do_method(update_connections)
 		undo_redo.add_undo_method(update_connections)
-	undo_redo.commit_action()
+	
+	if finish_undo_redo_action:
+		undo_redo.commit_action()
+	return 1
 
 func duplicate_cancel() -> void:
-	for _new_line in _new_lines:
-		main_node.remove_child(_new_line)
-		_new_line.queue_free()
-	_new_lines.clear()
+	for _new_segment in _new_segments:
+		main_node.remove_child(_new_segment.line)
+		_new_segment.line.queue_free()
+	_new_segments.clear()
+
+func duplicate_rotate(angle : float, point : Vector2) -> void:
+	rotate_segments(_new_segments, angle, point, true, true, true)
+	_update_new_segments_positions(point)
+
+func duplicate_mirror(point : Vector2) -> void:
+	mirror_segments(_new_segments, point, true, true, true)
+	_update_new_segments_positions(point)
+
+func _update_new_segments_positions(point : Vector2) -> void:
+	for _new_segment in _new_segments:
+		_new_segment.org_pos = []
+		for i in range(_new_segment.line.get_point_count()):
+			var pos = _new_segment.line.get_point_position(i).snapped(grid_size)
+			_new_segment.line.set_point_position( i, pos )
+			_new_segment.org_pos.append(pos)
+	_new_segments_init_point = point
 
 func duplicate_update(point : Vector2) -> void:
-	var move = point - _new_lines_init_point
-	for _new_line in _new_lines:
-		for i in range(_new_line.get_point_count()):
-			_new_line.set_point_position(
-				i, (_new_lines[_new_line][i] + move).snapped(grid_size)
+	var move = point - _new_segments_init_point
+	for _new_segment in _new_segments:
+		for i in range(_new_segment.line.get_point_count()):
+			_new_segment.line.set_point_position(
+				i, (_new_segment.org_pos[i] + move).snapped(grid_size)
 			)
 
 

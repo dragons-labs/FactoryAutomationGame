@@ -37,7 +37,10 @@ extends Node2D
 
 ## function used for getting editable elements on [param _point],
 ## should be provided by class using WorldEditorUI
-@export var do_raycast : Callable = func(_point : Vector2): return null
+@export var do_raycast : Callable = func(point : Vector2): return null
+
+## function used to check if result of do_raycast call was currently selected object
+@export var is_selected : Callable = func(raycast_result : Variant): return false
 
 ## Name of settings group for this object. This allowing override some properties and input maps.
 ## Set to empty string to disable using settings (hide in settings menu, disallow override properties and key mapping).
@@ -75,10 +78,10 @@ signal mouse_enter_exit_gui_area(enter: bool)
 signal active_ui_tool_changed(mode : int, button_name : String, element : PackedScene)
 
 ## emitted when mouse button pressed on not null results of do_raycast.call(point)
-signal do_on_raycast_result(mode : int, point : Vector2, raycast_result : Variant)
+signal do_on_raycast_result(mode : int, point : Vector2, raycast_result : Variant, multi_select : bool)
 
-## emitted when mouse button pressed on selection box
-signal do_on_selection(mode : int, point : Vector2, selection_box : Variant)
+## emitted when mouse button pressed on already selected object
+signal do_on_selection(mode : int, point : Vector2, raycast_result : Variant, multi_select : bool)
 
 ## emitted (in MOVE mode) when mouse move
 signal do_move_step(point : Vector2)
@@ -87,16 +90,13 @@ signal do_move_step(point : Vector2)
 signal do_move_finish()
 
 ## emitted (in SELECT mode) when the left mouse button is released
-signal do_on_raycast_selection_finish(raycast_result : Variant)
+signal do_on_raycast_selection_finish(raycast_result : Variant, multi_select : bool, _selection_box : Variant)
 
 ## emitted (in SCALE mode) when mouse move
 signal do_scale_step(point : Vector2)
 
 ## emitted (in SCALE mode) when the left mouse button is released
 signal do_scale_finish()
-
-## emitted when selection box has been hidden
-signal selection_box_has_been_hidden()
 
 ## emitted (in LINE mode) when new line is started (with first line point)
 signal line_add_point(point : Vector2)
@@ -138,6 +138,7 @@ func _init() -> void:
 		"EDIT_DELETE": [{"key": KEY_X}],
 		"EDIT_LINE_TOOL": [{"key": KEY_L}],
 		"EDIT_RENAME": [{"key": KEY_N}],
+		"EDIT_MULTISELECT": [{"key": KEY_SHIFT}],
 	})
 	
 	if settings_group_name:
@@ -200,7 +201,7 @@ func reset_editor() -> void:
 
 func set_editor_enabled(value : bool) -> void:
 	_editor_enabled = value
-	clear_selection()
+	_selection_box.clear()
 	if not _editor_enabled:
 		reset_editor()
 	%UI.visible = _editor_enabled
@@ -308,7 +309,7 @@ func _on_ui_tool_selected(force := false) -> void:
 			_ui_set_cursor(add_element_cursor)
 	
 	if _active_ui_tool == LINE or _active_ui_tool == ELEMENT:
-		clear_selection()
+		_selection_box.clear()
 	
 	var element = _elements_dict.get(button_name, null)
 	active_ui_tool_changed.emit(_active_ui_tool, button_name, element[0] if element else null)
@@ -317,6 +318,7 @@ func _on_ui_tool_selected(force := false) -> void:
 ### Input processing
 
 var _raycast_result = null
+var _multi_select = false
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _mouse_in_gui_area or not input_allowed:
@@ -324,7 +326,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	var point := get_local_mouse_position()
 	
-	if _active_ui_tool == LINE:
+	if _active_ui_tool == LINE: # create new line
 		if event is InputEventMouseButton and event.pressed:
 			if event.button_index == MOUSE_BUTTON_LEFT:
 				line_add_point.emit(point)
@@ -333,33 +335,36 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event is InputEventMouseMotion:
 			line_update_last_point.emit(point)
 	
-	elif _active_ui_tool == ELEMENT:
+	elif _active_ui_tool == ELEMENT: # add new element
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			element_add__finish.emit(point)
 		elif event is InputEventMouseMotion:
 			element_add__update.emit(point)
 	
-	else:
-		# selected / edit existed element mode and mouse button
+	else: # selection or operations on already existed element or line
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
-				if _selection_box.hit_in_selection_box(point):
-					if _active_ui_tool == SELECT:
-						_active_ui_tool = MOVE
-						_ui_set_cursor(move_cursor)
-					do_on_selection.emit(_active_ui_tool, point, _selection_box)
+				_raycast_result = do_raycast.call(point)
+				_multi_select = Input.is_action_pressed("EDIT_MULTISELECT")
+				if not _editor_enabled:
+					return
+				if _raycast_result:
+					if is_selected.call(_raycast_result):
+						if not _multi_select and _active_ui_tool == SELECT:
+							_active_ui_tool = MOVE
+							_ui_set_cursor(move_cursor)
+						do_on_selection.emit(_active_ui_tool, point, _raycast_result, _multi_select)
+					else:
+						_selection_box.clear()
+						if _active_ui_tool == SELECT:
+							@warning_ignore("missing_await") _async_set_move_mode()
+						elif _active_ui_tool == SCALE:
+							_active_ui_tool = SCALE_IN_PROGRESS
+						do_on_raycast_result.emit(_active_ui_tool, point, _raycast_result, _multi_select)
 				else:
-					clear_selection()
-					_raycast_result = do_raycast.call(point)
-					if _editor_enabled:
-						if _raycast_result:
-							if _active_ui_tool == SELECT:
-								@warning_ignore("missing_await") _async_set_move_mode()
-							elif _active_ui_tool == SCALE:
-								_active_ui_tool = SCALE_IN_PROGRESS
-							do_on_raycast_result.emit(_active_ui_tool, point, _raycast_result)
-						elif selection_box_enabled:
-							_selection_box.init(point)
+					if selection_box_enabled:
+						_selection_box.init(point)
+					do_on_raycast_result.emit(_active_ui_tool, point, null, _multi_select)
 			else: # mouse button released
 				if _active_ui_tool == MOVE or _active_ui_tool == SELECT_LONG:
 					do_move_finish.emit()
@@ -369,21 +374,20 @@ func _unhandled_input(event: InputEvent) -> void:
 					do_scale_finish.emit()
 					_active_ui_tool = SCALE
 				elif _active_ui_tool == SELECT or _active_ui_tool == DUPLICATE:
-					if _selection_box.visible:
-						_selection_box.is_done = true
 					if _selection_box.is_approx_zero_size():
-						clear_selection()
-					do_on_raycast_selection_finish.emit(_raycast_result)
+						_selection_box.clear()
+					if _selection_box.visible:
+						_selection_box.done()
+					do_on_raycast_selection_finish.emit(_raycast_result, _multi_select, _selection_box)
+				_selection_box.clear()
 				_raycast_result = null
-		
-		# selected / edit existed element mode and mouse move
 		elif event is InputEventMouseMotion:
 			@warning_ignore("missing_await") _async_set_move_mode(true)
 			if _active_ui_tool == MOVE:
 				do_move_step.emit(get_local_mouse_position())
 			elif _active_ui_tool == SCALE_IN_PROGRESS:
 				do_scale_step.emit(get_local_mouse_position())
-			elif _active_ui_tool == SELECT and not _selection_box.is_done:
+			elif _active_ui_tool == SELECT:
 				_selection_box.set_second(get_local_mouse_position())
 
 func _async_set_move_mode(immediately := false):
@@ -401,10 +405,6 @@ func _async_set_move_mode(immediately := false):
 			# used to possibility of emit long click action (via do_move_finish action) while editor is disabled
 			_active_ui_tool = SELECT_LONG
 
-func clear_selection():
-	_selection_box.is_done = false
-	_selection_box.visible = false
-	selection_box_has_been_hidden.emit()
 
 
 ### Helper functions for UI

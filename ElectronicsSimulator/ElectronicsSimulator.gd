@@ -66,7 +66,7 @@ func init_circuit(
 			gdspice.stop()
 		
 		print("Init circuit simulation")
-		grid_editor.ui.set_editor_enabled(false)
+		grid_editor.set_editor_enabled(false)
 		for element in grid_editor.grid.gElements.main_node.get_children():
 			for ui in element.get_child(0).get_children():
 				if ui is LineEdit:
@@ -110,7 +110,7 @@ func stop() -> void:
 	print("Stop circuit simulation")
 	gdspice.stop()
 	gdspice.reset()
-	grid_editor.ui.set_editor_enabled(true)
+	grid_editor.set_editor_enabled(true)
 	for element in grid_editor.grid.gElements.main_node.get_children():
 		for ui in element.get_child(0).get_children():
 			if ui is LineEdit:

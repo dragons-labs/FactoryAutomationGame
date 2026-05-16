@@ -11,6 +11,7 @@ extends Node2D
 @onready var _poly := Polygon2D.new()
 @onready var _squared_zero_size := stroke_width * stroke_width
 var _points := [Vector2(0,0), Vector2(1,0), Vector2(1,1), Vector2(0,1)]
+var _is_done := false
 
 func _ready() -> void:
 	_line.default_color = stroke_color
@@ -24,15 +25,12 @@ func _ready() -> void:
 	add_child(_poly)
 	
 	visible = false
-	is_done = false
-
-var is_done := false
 
 func init(point : Vector2) -> void:
+	_is_done = false
 	set_first(point)
 	set_second(point)
 	visible = true
-	is_done = false
 
 func set_first(point : Vector2) -> void:
 	_points[0] = point
@@ -42,11 +40,23 @@ func set_first(point : Vector2) -> void:
 	_poly.polygon = _points
 
 func set_second(point : Vector2) -> void:
+	if _is_done:
+		return
 	_points[1].x = point.x
 	_points[2] = point
 	_points[3].y = point.y
 	_line.points = _points
 	_poly.polygon = _points
+
+func done() -> void:
+	_is_done = true
+
+func clear() -> void:
+	visible = false
+	_is_done = false
+
+func is_valid() -> bool:
+	return _is_done
 
 func get_first() -> Vector2:
 	return _points[0]
@@ -56,7 +66,7 @@ func get_second() -> Vector2:
 
 func hit_in_selection_box(point : Vector2) -> bool:
 	return \
-		is_done and \
+		_is_done and \
 		((_points[0].x < point.x and point.x < _points[2].x) or (_points[2].x < point.x and point.x < _points[0].x)) and \
 		((_points[0].y < point.y and point.y < _points[2].y) or (_points[2].y < point.y and point.y < _points[0].y))
 

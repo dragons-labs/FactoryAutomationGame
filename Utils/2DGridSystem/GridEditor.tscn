@@ -34,6 +34,5 @@ script = ExtResource("4_fpxj2")
 [connection signal="do_save" from="WorldEditorUI" to="." method="_on_do_save"]
 [connection signal="mouse_enter_exit_gui_area" from="WorldEditorUI" to="." method="_on_mouse_enter_exit_gui_area"]
 [connection signal="redo" from="WorldEditorUI" to="." method="redo"]
-[connection signal="selection_box_has_been_hidden" from="WorldEditorUI" to="." method="_on_selection_box_has_been_hidden"]
 [connection signal="undo" from="WorldEditorUI" to="." method="undo"]
 [connection signal="camera_updated" from="Camera2D" to="VisualGrid" method="queue_redraw"]

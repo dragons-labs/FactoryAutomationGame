@@ -254,7 +254,9 @@ func _add_element(block_name = null) -> void:
 func _rename_element(block_name, element):
 	element.get_block_control().set_block_name(block_name)
 
-func _on_do_on_raycast_result(_mode: int, point: Vector2, raycast_result: Variant) -> void:
+func _on_do_on_raycast_result(_mode: int, point: Vector2, raycast_result: Variant, multi_select : bool) -> void:
+	if not raycast_result:
+		return
 	match ui.get_active_ui_tool_mode():
 		ui.SELECT:
 			_moving_elements[raycast_result] = raycast_result.position
@@ -327,7 +329,7 @@ func _on_do_move_finish() -> void:
 		undo_redo.commit_action()
 	_moving_elements.clear()
 
-func _on_do_on_raycast_selection_finish(raycast_result: Variant) -> void:
+func _on_do_on_raycast_selection_finish(raycast_result: Variant, multi_select : bool, _selection_box : Variant) -> void:
 	if raycast_result: #  <=>  if "on_click" event:
 		if "object_type" in raycast_result:
 			if raycast_result.object_type == "ElectronicControlBlock":
@@ -335,6 +337,7 @@ func _on_do_on_raycast_selection_finish(raycast_result: Variant) -> void:
 			elif raycast_result.object_type == "ComputerControlBlock":
 				var computer_id = raycast_result.get_meta("computer_id")
 				FAG_WindowManager.set_windows_visibility_recursive(factory_control.computer_control_blocks[computer_id], true)
+
 	_moving_elements.clear()
 
 func _on_do_scale_step(point: Vector2) -> void:

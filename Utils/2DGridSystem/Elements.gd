@@ -6,6 +6,7 @@
 var main_node : Node2D = null
 var owner_node : Node2D = null
 var undo_redo : UndoRedo = null
+var _fake_undo_redo : UndoRedo = null
 var grid_size : Vector2
 
 func _init(main_node_ : Node2D, owner_node_ : Node2D = null, undo_redo_ : UndoRedo = null, grid_size_ = Vector2(20, 20)):
@@ -18,6 +19,7 @@ func _init(main_node_ : Node2D, owner_node_ : Node2D = null, undo_redo_ : UndoRe
 		undo_redo = undo_redo_
 	else:
 		undo_redo = UndoRedo.new()
+	_fake_undo_redo = UndoRedo.new()
 	grid_size = grid_size_
 
 
@@ -90,17 +92,24 @@ func add_elements__init(elements : Array, point : Vector2, duplicate := true, at
 		main_node.add_child(new_element)
 	add_element__update(point)
 
-func add_element__finish(point : Vector2) -> void:
-	add_element__update(point)
+func add_element__finish(point : Vector2, start_undo_redo_action = true, finish_undo_redo_action = true) -> int:
+	if not _new_elements:
+		return 0
 	
-	undo_redo.create_action("Grid Element: Add")
+	add_element__update(point)
+	if start_undo_redo_action:
+		undo_redo.create_action("Grid Element: Add")
+	
 	for new_element in _new_elements:
 		var element = new_element.duplicate_element()
 		element.set_active(true)
 		undo_redo.add_do_reference(element)
 		undo_redo.add_do_method(_add_element.bind(element))
 		undo_redo.add_undo_method(_remove_element.bind(element))
-	undo_redo.commit_action()
+	
+	if finish_undo_redo_action:
+		undo_redo.commit_action()
+	return 1
 
 func add_element__cancel() -> void:
 	for new_element in _new_elements:
@@ -113,6 +122,10 @@ func add_element__update(point : Vector2) -> void:
 	for new_element in _new_elements:
 		new_element.position = (_new_elements[new_element] + move).snapped(grid_size)
 
+func update_new_elements_positions(point : Vector2) -> void:
+	for e in _new_elements:
+		_new_elements[e] = e.position
+	_new_elements_init_point = point
 
 ### Move existed element
 
@@ -157,9 +170,9 @@ func move_element__finish(start_undo_redo_action = true, finish_undo_redo_action
 
 ### Rotate / Mirror / Delete existed element
 
-func delete_elements(elements : Array, start_undo_redo_action = true, finish_undo_redo_action = true) -> bool:
+func delete_elements(elements : Array, start_undo_redo_action = true, finish_undo_redo_action = true) -> int:
 	if not elements:
-		return false
+		return 0
 	
 	if start_undo_redo_action:
 		undo_redo.create_action("Grid Editor: Delete")
@@ -170,56 +183,61 @@ func delete_elements(elements : Array, start_undo_redo_action = true, finish_und
 	
 	if finish_undo_redo_action:
 		undo_redo.commit_action()
-	return true
+	return 1
 
-func rotate_elements(elements : Array, angle : float, pivot = null, start_undo_redo_action = true, finish_undo_redo_action = true) -> bool:
+func rotate_elements(elements : Array, angle : float, pivot = null, start_undo_redo_action = true, finish_undo_redo_action = true, no_undo = false) -> int:
 	if not elements:
-		return false
+		return 0
 	
-	if start_undo_redo_action:
-		undo_redo.create_action("Grid Editor: Rotate")
+	var local_undo_redo = _fake_undo_redo if no_undo else undo_redo
+	if start_undo_redo_action or no_undo:
+		local_undo_redo.create_action("Grid Editor: Rotate")
+	
 	for element in elements:
-		undo_redo.add_do_method(element.rotate.bind(angle))
-		undo_redo.add_undo_method(element.rotate.bind(-angle))
+		local_undo_redo.add_do_method(element.rotate.bind(angle))
+		local_undo_redo.add_undo_method(element.rotate.bind(-angle))
 		if pivot != null:
-			undo_redo.add_do_property(element, "position", FAG_Utils.rotate_around_pivot(element.position, pivot, angle))
-			undo_redo.add_undo_property(element, "position", element.position)
-		undo_redo.add_do_method(element.on_transform_updated.bind())
-		undo_redo.add_undo_method(element.on_transform_updated.bind())
+			local_undo_redo.add_do_property(element, "position", FAG_Utils.rotate_around_pivot(element.position, pivot, angle).snapped(grid_size))
+			local_undo_redo.add_undo_property(element, "position", element.position)
+		local_undo_redo.add_do_method(element.on_transform_updated.bind())
+		local_undo_redo.add_undo_method(element.on_transform_updated.bind())
 	
-	if finish_undo_redo_action:
-		undo_redo.commit_action()
-	return true
+	if finish_undo_redo_action or no_undo:
+		local_undo_redo.commit_action()
+	return 1
 
-func mirror_elements(elements : Array, pivot = null, start_undo_redo_action = true, finish_undo_redo_action = true) -> bool:
+func mirror_elements(elements : Array, pivot = null, start_undo_redo_action = true, finish_undo_redo_action = true, no_undo = false) -> int:
 	if not elements:
-		return false
+		return 0
 	
-	if start_undo_redo_action:
-		undo_redo.create_action("Grid Editor: Mirror")
+	var local_undo_redo = _fake_undo_redo if no_undo else undo_redo
+	if start_undo_redo_action or no_undo:
+		local_undo_redo.create_action("Grid Editor: Mirror")
+	
 	for element in elements:
-		undo_redo.add_undo_property(element, "scale", element.scale)
+		local_undo_redo.add_undo_property(element, "scale", element.scale)
 		element.scale.y = -element.scale.y
-		undo_redo.add_do_property(element, "scale", element.scale)
+		local_undo_redo.add_do_property(element, "scale", element.scale)
 		
 		if pivot != null:
-			# in group mirror we only make up-down mirror, so rotated +/- 0.5 PI elements must be rotated 180°
+			# we only make up-down mirror, so in group mirror elements rotated +/- 0.5 PI must be rotated 180°
+			element.rotation = wrapf(element.rotation, -PI, PI)
 			var abs_rotation = abs(element.rotation)
-			if 1.4 < abs_rotation and abs_rotation < 1.6:
-				undo_redo.add_undo_property(element, "rotation", element.rotation)
+			if 1.5 < abs_rotation and abs_rotation < 1.6:
+				local_undo_redo.add_undo_property(element, "rotation", element.rotation)
 				element.rotation = -element.rotation
-				undo_redo.add_do_property(element, "rotation", element.rotation)
+				local_undo_redo.add_do_property(element, "rotation", element.rotation)
 			
-			undo_redo.add_undo_property(element, "position", element.position)
+			local_undo_redo.add_undo_property(element, "position", element.position)
 			element.position = FAG_Utils.mirror_y(element.position, pivot)
-			undo_redo.add_do_property(element, "position", element.position)
+			local_undo_redo.add_do_property(element, "position", element.position)
 		
-		undo_redo.add_do_method(element.on_transform_updated.bind())
-		undo_redo.add_undo_method(element.on_transform_updated.bind())
+		local_undo_redo.add_do_method(element.on_transform_updated.bind())
+		local_undo_redo.add_undo_method(element.on_transform_updated.bind())
 	
-	if finish_undo_redo_action:
-		undo_redo.commit_action()
-	return true
+	if finish_undo_redo_action or no_undo:
+		local_undo_redo.commit_action()
+	return 1
 
 
 ### Utils

@@ -148,13 +148,20 @@ func _ready() -> void:
 	on_transform_updated()
 
 
-# support for temporary disable editing values while placing element
-
+# for temporary disable editing values while placing element
 func set_active(val : bool):
 	var filter = Control.MOUSE_FILTER_STOP if val else Control.MOUSE_FILTER_IGNORE
 	for node in get_children():
 		if node is LineEdit:
 			node.mouse_filter = filter
+
+# for enable/disable UI on element while enable/disable editor
+func set_ui_enabled(value : bool) -> void:
+	for node in get_children():
+		if node is LineEdit:
+			node.editable = value
+		if node is OptionButton:
+			node.disabled = not value
 
 
 ### support for prevent text mirror and 180° rotation
