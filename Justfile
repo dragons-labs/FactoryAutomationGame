@@ -13,7 +13,8 @@ build-windows-libs:
 init-submodules:
 	#!/bin/sh -e
 	echo '{{BOLD + YELLOW}} Init git submodules {{NORMAL}}'
-	git submodule update --init
+	# only init and checkout on empty submodule directory, DO NOT checkout on already checkouted submodule
+	git submodule status | while read a b c; do [ -z "$( ls -A "$b" )" ] && git submodule update --init $b; done || true
 
 build-godot-cpp: init-submodules
 	#!/bin/sh -e
@@ -66,40 +67,41 @@ build-addons-gdcef: build-godot-cpp
 	echo '{{BOLD + YELLOW}} Build gdCef {{NORMAL}}'
 	cd addons/3rdparty/gdcef/
 	
+	if ! LANG=C patch --dry-run -t -p1 < ../gdcef-no-dbus.patch | grep 'Reversed (or previously applied) patch detected' > /dev/null; then
+		patch -t -p1 < ../gdcef-no-dbus.patch
+	fi
+	
 	if [ "$WINDOWS" = "true" ]; then
 		(
-			cd build/
-			if [ -f Windows/GDCEF_VERSION.txt ]; then
+			mkdir -p cef_artifacts
+			cd cef_artifacts/
+			if [ -f windows/libgdcef.dll ]; then
 				exit
 			fi
-			wget https://github.com/Lecrapouille/gdcef/releases/download/v0.17.0-godot4/gdCEF-0.17.0_Godot-4.3_Windows_X64.tar.gz
-			tar -xzf gdCEF-0.17.0_Godot-4.3_Windows_X64.tar.gz
-			rm -fr build/Windows
-			mv cef_artifacts/ Windows
-			rm gdCEF-0.17.0_Godot-4.3_Windows_X64.tar.gz
+			tempdir=`mktemp -d`
+			(
+				cd "$tempdir"
+				wget https://github.com/Lecrapouille/gdcef/releases/download/v0.19.2-godot4/gdcef-0.19.2_godot-4.5.zip
+				unzip gdcef-0.19.2_godot-4.5.zip
+			)
+			mv "$tempdir/gdcef/cef_artifacts/windows" .
+			rm -fr "$tempdir"
+			# use `locales` dir from 0.18.1 - BUG https://github.com/Lecrapouille/gdcef/issues/92
+			tempdir=`mktemp -d`
+			(
+				cd "$tempdir"
+				wget https://github.com/Lecrapouille/gdcef/releases/download/v0.18.1-godot4/gdCEF-0.18.1_Godot-4.5_Windows_X64.tar.gz
+				tar -xzf gdCEF-0.18.1_Godot-4.5_Windows_X64.tar.gz
+			)
+			mv "$tempdir/cef_artifacts/locales" locales-win
+			rm -fr "$tempdir"
 		)
 	else
 		(
-			cd addons/gdcef/
-			
-			if [ ! -d thirdparty/godot-4.3/cpp/ ]; then
-				mkdir -p thirdparty/godot-4.3/
-				ln -s {{justfile_directory()}}/addons/3rdparty/_godot-cpp/ thirdparty/godot-4.3/cpp
-			fi
-			
 			while read p i; do
 				pip3 show $p > /dev/null
 			done < requirements.txt
 			
 			/usr/bin/env python3 build.py
-		)
-		
-		mkdir -p build/
-		rm -fr build/Linux
-		mv cef_artifacts/ build/Linux
-		
-		(
-			cd  build/
-			ln -sf Linux _current_platform_
 		)
 	fi

@@ -1,20 +1,20 @@
 # SPDX-FileCopyrightText: Robert Ryszard Paciorek <rrp@opcode.eu.org>
 # SPDX-License-Identifier: MIT
-# used some code from GDCef gui example
+# used some code from GdCEF gui example
 # (https://github.com/Lecrapouille/gdcef/blob/godot-4.x/addons/gdcef/demos/2D/CEF.gd)
 # SPDX-FileCopyrightText: 2022 Alain Duron <duron.alain@gmail.com>
 # SPDX-FileCopyrightText: 2022 Quentin Quadrat <lecrapouille@gmail.com>
 
 extends Control
 
-enum ModeEnum {Default, GDCEF, GodotWRY}
+enum ModeEnum {Default, GdCEF, GodotWRY}
 @export var backend := ModeEnum.Default :
 	set(new_value):
 		backend = new_value
 		if _display:
 			if backend == ModeEnum.Default:
 				if "create_browser" in _gdcef:
-					backend = ModeEnum.GDCEF
+					backend = ModeEnum.GdCEF
 				elif "visible" in _webview:
 					backend = ModeEnum.GodotWRY
 				else:
@@ -23,10 +23,10 @@ enum ModeEnum {Default, GDCEF, GodotWRY}
 				_browser = _webview
 				_display.visible = false
 				#_browser.connect("ipc_message", _on_ipc_message)
-			elif backend == ModeEnum.GDCEF:
+			elif backend == ModeEnum.GdCEF:
 				if "visible" in _webview:
 					_webview.visible = false
-				_init_GDCef()
+				_init_GdCEF()
 	get():
 		return backend
 
@@ -43,7 +43,7 @@ enum ModeEnum {Default, GDCEF, GodotWRY}
 @onready var _url_status := %URL_Status
 @onready var _display := %DisplayTexture
 @onready var _webview := %WebView
-@onready var _gdcef := %GDCef
+@onready var _gdcef := %GdCEF
 
 var _browser
 
@@ -66,13 +66,13 @@ func _on_reload_pressed() -> void:
 	_browser.reload()
 
 func _on_go_back_pressed() -> void:
-	if backend == ModeEnum.GDCEF:
+	if backend == ModeEnum.GdCEF:
 		_browser.previous_page()
 	else:
 		_browser.eval("history.back()")
 
 func _on_go_next_pressed() -> void:
-	if backend == ModeEnum.GDCEF:
+	if backend == ModeEnum.GdCEF:
 		_browser.next_page()
 	else:
 		_browser.eval("history.forward()")
@@ -81,7 +81,7 @@ func _on_enter_pressed() -> void:
 	open_url(_url_bar.text)
 
 func _on_stop_pressed() -> void:
-	if backend == ModeEnum.GDCEF:
+	if backend == ModeEnum.GdCEF:
 		_browser.stop_loading()
 	else:
 		_browser.eval("window.stop()")
@@ -115,22 +115,24 @@ func _on_page_failed_loading(_aborted, _msg_err, node):
 
 #endregion
 
-#region  GDCef specific
+#region  GdCEF specific
 
-func _init_GDCef():
+func _init_GdCEF():
 	if not _gdcef.initialize({
 			"incognito":true,
 			"locale":"en-US",
 			"enable_media_stream": true,
 			"artifacts": "res://cef_artifacts",
-			"exported_artifacts": FAG_Utils.globalize_path("cef_artifacts")
+			"exported_artifacts": FAG_Utils.globalize_path("cef_artifacts"),
+			"root_cache_path": FAG_Utils.globalize_path("user://cef_cache"),
+			"log_file": FAG_Utils.globalize_path("user://cef.log"),
 	}):
-		printerr("GDCef init error: ", _gdcef.get_error())
+		printerr("GdCEF init error: ", _gdcef.get_error())
 		return
 	
 	_browser = _gdcef.create_browser("", _display, {"javascript":true})
 	if not _browser:
-		printerr("GDCef create error: ", _gdcef.get_error())
+		printerr("GdCEF create error: ", _gdcef.get_error())
 		return
 	_browser.connect("on_page_loaded", _on_page_loaded)
 	_browser.connect("on_page_failed_loading", _on_page_failed_loading)

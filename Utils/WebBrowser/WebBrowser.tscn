@@ -10,7 +10,7 @@ offset_right = 1152.0
 offset_bottom = 648.0
 script = ExtResource("1_dfpua")
 
-[node name="GDCef" type="GDCef" parent="."]
+[node name="GdCEF" type="GdCEF" parent="."]
 unique_name_in_owner = true
 
 [node name="UI" type="MarginContainer" parent="."]

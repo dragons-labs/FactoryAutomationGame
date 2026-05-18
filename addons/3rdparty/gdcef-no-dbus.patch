@@ -1,0 +1,27 @@
+diff --git a/gdcef/browser/src/register_types.cpp b/gdcef/browser/src/register_types.cpp
+index 7577355..414cff6 100644
+--- a/gdcef/browser/src/register_types.cpp
++++ b/gdcef/browser/src/register_types.cpp
+@@ -39,8 +39,22 @@ bool loaded = false;
+ 
+ using namespace godot;
+ 
++std::string dbus_addres;
++
+ void initialize_gdcef_module(ModuleInitializationLevel p_level)
+ {
++	if (p_level == MODULE_INITIALIZATION_LEVEL_SERVERS) {
++		dbus_addres = getenv("DBUS_SESSION_BUS_ADDRESS");
++		setenv("DBUS_SESSION_BUS_ADDRESS", "disabled:", 1);
++		// NOTE: this is used to disable dbus in GdCEF
++		//       via set DBUS_SESSION_BUS_ADDRESS while gdcef (libcef?) loading
++		// TODO: this disable dbus not only for gdcef, do it more selectively (only for libcef)
++	}
++	
++	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
++		setenv("DBUS_SESSION_BUS_ADDRESS", dbus_addres.c_str(), 1);
++	}
++
+     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE)
+         return;
+ 

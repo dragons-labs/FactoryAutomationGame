@@ -8,8 +8,8 @@ set -e
 PLATFORM=${1:-Linux}
 FAST=${2:-false} # if true do not export dependencies
 
-TARGET=$PWD/export/
-CEF_ARTIFACTS=addons/3rdparty/gdcef/build/$PLATFORM
+TARGET=/tmp/FAG-export/
+CEF_ARTIFACTS=addons/3rdparty/gdcef/cef_artifacts/
 INCLUDE='Manual/generated-bbcode/*,*.json,*.circuit,imported/*,addons/limbo_console.cfg'
 EXCLUDE='cef_artifacts/cache/*,cef_artifacts/*.json,tmp/*,mods-unpacked/*,reports/*,tests/*,screenshot.jpg,addons/gdUnit4/*,addons/repl/*,addons/script-ide/*,addons/script_ide-last_script_per_scene_tab/*'
 
@@ -20,9 +20,6 @@ mkdir -p $TARGET
 TARGET=$TARGET/FAG_$PLATFORM
 $FAST || \rm -fr $TARGET
 mkdir -p $TARGET
-
-# fake Windows dll for gdcef ... real file will be added later
-[ -f cef_artifacts/libgdcef.dll ] || :> cef_artifacts/libgdcef.dll
 
 # if export for Windows then build windows libs first
 if [ "$PLATFORM" = "Windows" ]; then
@@ -116,13 +113,18 @@ application/d3d12_agility_sdk_multiarch=true
 ssh_remote_deploy/enabled=false
 EOF
 
-godot --export-debug $PLATFORM $TARGET/FactoryAutomation
+DBUS_SESSION_BUS_ADDRESS=disabled: godot --headless --export-debug $PLATFORM $TARGET/FactoryAutomation
 \rm export_presets.cfg
 
 $FAST && exit
 
 # add readme and licence info
 cp -r README.md LICENSES $TARGET/
+
+# add addons licence info
+mkdir -p $TARGET/LICENSES/addons
+(cd addons/3rdparty/; for d in *; do if [ -d "$d" ]; then cp "$d"/*LICENSE* "$TARGET/LICENSES/addons/$d.LICENSE"; fi; done)
+(cd addons/; for d in *; do if [ -d "$d" ] && ! git ls-files --error-unmatch "$d" >/dev/null 2>&1; then cp "$d"/*LICENSE* "$TARGET/LICENSES/addons/$d.LICENSE"; fi; done)
 
 # export images for qemu (must be outside .pck file)
 mkdir -p $TARGET/qemu_img
@@ -135,13 +137,18 @@ done
 
 # export gdcef assemblies (must be outside .pck file)
 mkdir -p $TARGET/cef_artifacts/
-cp -fr $CEF_ARTIFACTS/* $TARGET/cef_artifacts/
-\rm -rf $TARGET/cef_artifacts/cache $TARGET/cef_artifacts/debug.log $TARGET/cef_artifacts/gdcef.gdextension
-\rm -f $TARGET/libgdcef.so $TARGET/libgdcef.dll
+cp -fr $CEF_ARTIFACTS/$(echo $PLATFORM | tr '[:upper:]' '[:lower:]') $TARGET/cef_artifacts/
+if [ "$PLATFORM" = "Linux" ]; then
+	cp -fr $CEF_ARTIFACTS/locales $TARGET/cef_artifacts/
+elif [ "$PLATFORM" = "Windows" ]; then
+	cp -fr $CEF_ARTIFACTS/locales-win $TARGET/cef_artifacts/locales
+fi
+\rm -rf $TARGET/cef_artifacts/*/cache $TARGET/cef_artifacts/*/debug.log $TARGET/cef_artifacts/gdcef.gdextension
+\rm -f $TARGET/libgdcef.* $TARGET/libcef.*
 
 # add CEF licence info
 mkdir -p $TARGET/LICENSES/cef
-cp addons/3rdparty/gdcef/addons/gdcef/thirdparty/cef_binary/{CREDITS.html,LICENSE.txt} $TARGET/LICENSES/cef/
+cp addons/3rdparty/gdcef/thirdparty/cef_binary/{CREDITS.html,LICENSE.txt} $TARGET/LICENSES/cef/
 
 
 
@@ -221,3 +228,5 @@ if [ "$PLATFORM" = "Windows" ]; then
 	mv $TARGET/FactoryAutomation $TARGET/FactoryAutomation.exe
 	cp /usr/lib/gcc/x86_64-w64-mingw32/*-posix/libstdc++-6.dll $TARGET/
 fi
+
+echo "Project exported into $TARGET"
