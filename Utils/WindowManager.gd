@@ -52,6 +52,11 @@ func _on_focus_entered(win : Window) -> void:
 func _on_window_input(event: InputEvent, win : Window, catch_global_escape : bool, catch_global_break : bool) -> void:
 	if (not catch_global_escape and event.is_action_pressed("GLOBAL_ESCAPE", false, true)) or \
 	   (not catch_global_break and event.is_action_pressed("GLOBAL_BREAK", false, true)):
+		for content in win.get_children():
+			if "_on_esc" in content:
+				if content._on_esc():
+					get_viewport().set_input_as_handled()
+					return
 		set_windows_visibility_recursive(win, false)
 		if not win.get_meta('grab_escape', false):
 			_hideen_by_escape[-1].append(win)

@@ -577,7 +577,7 @@ func _update_circuit_element_count(element: Node2D, val: int) -> void:
 	_stats.status = "not started"
 
 
-### init
+### init and input
 
 func _ready() -> void:
 	process_physics_priority = -5 # NOTE: should be negative (processed factory control before world physics), but grater than ComputerSystemSimulator.process_physics_priority
@@ -615,6 +615,26 @@ func _ready() -> void:
 	LimboConsole.register_command(pause_factory, "pause", "Pause")
 	LimboConsole.register_command(unpause_factory, "unpause", "Unpause")
 
+func _input(event: InputEvent):
+	if event.is_action_pressed("GLOBAL_ESCAPE"):
+		# 1. hide limbo console
+		if LimboConsole.is_open() and event is InputEventKey and event.physical_keycode == KEY_ESCAPE:
+			LimboConsole.close_console()
+			get_viewport().set_input_as_handled()
+			return
+		
+		# 2. switch to defeat tool
+		#   a. circuit editor
+		#      -> is handled in WindowManager._on_window_input() via ElectronicsSimulator._on_esc()
+		#   b. world 3d editor
+		if  factory_builder.ui.active_ui_tool != factory_builder.ui.SELECT:
+			factory_builder.ui.active_ui_tool = factory_builder.ui.SELECT
+			get_viewport().set_input_as_handled()
+			return
+		
+		# 3. switch visibility of main menu
+		hide_show_main_menu.emit()
+
 
 ### console commands
 
@@ -649,3 +669,5 @@ func show_task_info(grab_escape := false) -> void:
 	show_manual.emit(level_scene_node, GAME_PROGRESS_SAVE, grab_escape)
 
 signal show_manual(object : Object, progress_save_path : String, grab_escape : bool)
+
+signal hide_show_main_menu()

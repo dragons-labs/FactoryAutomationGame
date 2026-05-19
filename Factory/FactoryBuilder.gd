@@ -190,7 +190,7 @@ var _operation_init_point2D : Vector2
 var _initial_scale : Vector3
 var _initial_position : Vector3
 
-func _on_active_ui_tool_changed(mode: int, _button_name: String, element: PackedScene) -> void:
+func _on_active_ui_tool_changed(mode: int, element: PackedScene) -> void:
 	if not ui:
 		return
 	
@@ -199,7 +199,7 @@ func _on_active_ui_tool_changed(mode: int, _button_name: String, element: Packed
 		_new_element.queue_free()
 		_new_element = null
 	
-	if mode == ui.ELEMENT:
+	if mode == ui.ELEMENT and element:
 		_new_element_scene = element
 		_new_element = _new_element_scene.instantiate()
 		factory_blocks_main_node.add_child(_new_element)
@@ -257,7 +257,7 @@ func _rename_element(block_name, element):
 func _on_do_on_raycast_result(_mode: int, point: Vector2, raycast_result: Variant, multi_select : bool) -> void:
 	if not raycast_result:
 		return
-	match ui.get_active_ui_tool_mode():
+	match ui.active_ui_tool:
 		ui.SELECT:
 			_moving_elements[raycast_result] = raycast_result.position
 		ui.SCALE_IN_PROGRESS:
@@ -379,7 +379,7 @@ func _input(event: InputEvent) -> void:
 	if not ui.input_allowed:
 		return
 	# override UI buttons shortcuts in some situations
-	if event.is_action_pressed("EDIT_ROTATE", false, true) and ui.get_active_ui_tool_mode() == ui.ELEMENT:
+	if event.is_action_pressed("EDIT_ROTATE", false, true) and ui.active_ui_tool == ui.ELEMENT:
 		_new_element.rotate(Vector3.UP, -PI/2)
 		get_viewport().set_input_as_handled()
 

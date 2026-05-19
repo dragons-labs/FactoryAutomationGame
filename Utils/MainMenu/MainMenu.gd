@@ -197,6 +197,12 @@ func _on_add_save_slot_pressed(text := "") -> void:
 
 ### Show / Hide main menu
 
+func switch_visible():
+	if visible and _current_mode == Mode.NORMAL and _game_root.is_loaded():
+		_hide()
+	else:
+		_show()
+
 func _show(mode := Mode.NORMAL):
 	if %SettingsDialog.visible:
 		FAG_Settings.cancel_settings_changes()
@@ -282,15 +288,6 @@ func _input(event: InputEvent):
 		return
 	if event.is_action_pressed("GLOBAL_BREAK", false, true):
 		_show()
-	elif event.is_action_pressed("GLOBAL_ESCAPE"):
-		if LimboConsole.is_open() and event is InputEventKey and event.physical_keycode == KEY_ESCAPE:
-			LimboConsole.close_console()
-			get_viewport().set_input_as_handled()
-			return
-		if visible and _current_mode == Mode.NORMAL and _game_root.is_loaded():
-			_hide()
-		else:
-			_show()
 
 func _switch_to_normal() -> void:
 	_set_mode(Mode.NORMAL)

@@ -129,7 +129,7 @@ func _mark_segment(segment : Dictionary, color : Color) -> void:
 
 ### UI callbacks
 
-func _on_active_ui_tool_changed(mode : int, _button_name : String, element : PackedScene) -> void:
+func _on_active_ui_tool_changed(mode : int, element : PackedScene) -> void:
 	if not ui:
 		return
 	
@@ -142,7 +142,7 @@ func _on_active_ui_tool_changed(mode : int, _button_name : String, element : Pac
 	if mode != ui.ELEMENT:
 		grid.gElements.add_element__cancel()
 		grid.gLines.duplicate_cancel()
-	else:
+	elif element:
 		grid.gElements.add_element__init(element, get_local_mouse_position())
 
 func _on_do_on_raycast_result(mode : int, point : Vector2, raycast_result : Variant, multi_select : bool) -> void:
@@ -188,7 +188,7 @@ func _on_do_on_selection(mode: int, point: Vector2, raycast_result : Variant, mu
 			grid.gElements.add_elements__init(_selected_elements, point)
 			grid.gLines.init_duplicate(_selected_segmetnts, point)
 			_update_selection([], [])
-			ui._active_ui_tool = ui.ELEMENT
+			ui.active_ui_tool = ui.ELEMENT
 	if action_is_init > 0:
 		undo_redo.commit_action()
 
@@ -243,7 +243,7 @@ func _input(event: InputEvent) -> void:
 	if not ui.input_allowed or ui.mouse_in_gui_area():
 		return
 	# override UI buttons shortcuts in some situations
-	var mode = ui.get_active_ui_tool_mode()
+	var mode = ui.active_ui_tool
 	if FAG_Utils.action_exact_match_pressed("EDIT_ROTATE", event):
 		if mode == ui.ELEMENT:
 			var point = ui.get_local_mouse_position()
@@ -278,7 +278,7 @@ func undo() -> void:
 	# print_verbose("[Grid Editor] Undo: ", undo_redo.get_current_action_name())
 	undo_redo.undo()
 	
-	if ui.get_active_ui_tool_mode() != ui.LINE:
+	if ui.active_ui_tool != ui.LINE:
 		while grid.gLines.need_execute_next_undo_in_object_mode():
 			# print_verbose("[Grid Editor] Undo (auto): ", undo_redo.get_current_action_name())
 			undo_redo.undo()
@@ -290,7 +290,7 @@ func redo() -> void:
 		return
 	# print_verbose("[Grid Editor] Redo: ", undo_redo.get_current_action_name())
 	
-	if ui.get_active_ui_tool_mode() != ui.LINE:
+	if ui.active_ui_tool != ui.LINE:
 		while grid.gLines.need_execute_next_redo_in_object_mode():
 			if not undo_redo.redo():
 				return
@@ -318,4 +318,4 @@ func _on_do_import(path: String) -> void:
 	grid.restore(data, ui._elements_dict, world_position, use_interactive_import)
 	
 	if use_interactive_import:
-		ui._active_ui_tool = ui.ELEMENT
+		ui.active_ui_tool = ui.ELEMENT

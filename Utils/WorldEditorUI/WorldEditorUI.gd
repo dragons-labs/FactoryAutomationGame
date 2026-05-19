@@ -47,8 +47,28 @@ extends Node2D
 @export var settings_group_name := "WORLD_EDITOR_UI_SETTINGS_GROUP_NAME"
 
 enum {NONE, SELECT, SELECT_LONG, DUPLICATE, MOVE, SCALE, SCALE_IN_PROGRESS, ROTATE, MIRROR, RENAME, DELETE, LINE, ELEMENT}
-var _active_ui_tool := NONE
-func get_active_ui_tool_mode(): return _active_ui_tool
+
+var _active_ui_element : PackedScene = null
+var active_ui_tool := NONE :
+	set(value):
+		active_ui_tool = value
+		match active_ui_tool:
+			SELECT: _ui_set_cursor(select_cursor)
+			DUPLICATE: _ui_set_cursor(duplicate_cursor)
+			SCALE: _ui_set_cursor(scale_cursor)
+			ROTATE: _ui_set_cursor(rotate_cursor)
+			MIRROR: _ui_set_cursor(mirror_cursor)
+			RENAME: _ui_set_cursor(rename_cursor)
+			DELETE: _ui_set_cursor(delete_cursor)
+			LINE: 
+				_ui_set_cursor(draw_cursor)
+				_selection_box.clear()
+			ELEMENT:
+				_ui_set_cursor(add_element_cursor)
+				_selection_box.clear()
+		active_ui_tool_changed.emit(active_ui_tool, _active_ui_element)
+	get():
+		return active_ui_tool
 
 # used to blocked input to edited world while operating on Editor GUI
 var _mouse_in_gui_area := false
@@ -75,7 +95,7 @@ signal do_import(path: String)
 signal mouse_enter_exit_gui_area(enter: bool)
 
 ## emitted when input mode (e.g. used tool) was changed
-signal active_ui_tool_changed(mode : int, button_name : String, element : PackedScene)
+signal active_ui_tool_changed(mode : int, element : PackedScene)
 
 ## emitted when mouse button pressed on not null results of do_raycast.call(point)
 signal do_on_raycast_result(mode : int, point : Vector2, raycast_result : Variant, multi_select : bool)
@@ -279,41 +299,18 @@ func _on_ui_tool_selected(force := false) -> void:
 		return
 	
 	var button_name = _ui_tool_button_group.get_pressed_button().name
-	match button_name:
-		"SelectMove":
-			_active_ui_tool = SELECT
-			_ui_set_cursor(select_cursor)
-		"Duplicate":
-			_active_ui_tool = DUPLICATE
-			_ui_set_cursor(duplicate_cursor)
-		"Scale":
-			_active_ui_tool = SCALE
-			_ui_set_cursor(scale_cursor)
-		"Rotate":
-			_active_ui_tool = ROTATE
-			_ui_set_cursor(rotate_cursor)
-		"Mirror":
-			_active_ui_tool = MIRROR
-			_ui_set_cursor(mirror_cursor)
-		"Rename":
-			_active_ui_tool = RENAME
-			_ui_set_cursor(rename_cursor)
-		"Delete":
-			_active_ui_tool = DELETE
-			_ui_set_cursor(delete_cursor)
-		"Line":
-			_active_ui_tool = LINE
-			_ui_set_cursor(draw_cursor)
-		_:
-			_active_ui_tool = ELEMENT
-			_ui_set_cursor(add_element_cursor)
-	
-	if _active_ui_tool == LINE or _active_ui_tool == ELEMENT:
-		_selection_box.clear()
-	
 	var element = _elements_dict.get(button_name, null)
-	active_ui_tool_changed.emit(_active_ui_tool, button_name, element[0] if element else null)
-
+	_active_ui_element = element[0] if element else null
+	match button_name:
+		"SelectMove": active_ui_tool = SELECT
+		"Duplicate": active_ui_tool = DUPLICATE
+		"Scale": active_ui_tool = SCALE
+		"Rotate": active_ui_tool = ROTATE
+		"Mirror": active_ui_tool = MIRROR
+		"Rename": active_ui_tool = RENAME
+		"Delete": active_ui_tool = DELETE
+		"Line": active_ui_tool = LINE
+		_: active_ui_tool = ELEMENT
 
 ### Input processing
 
@@ -326,7 +323,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	var point := get_local_mouse_position()
 	
-	if _active_ui_tool == LINE: # create new line
+	if active_ui_tool == LINE: # create new line
 		if event is InputEventMouseButton and event.pressed:
 			if event.button_index == MOUSE_BUTTON_LEFT:
 				line_add_point.emit(point)
@@ -335,7 +332,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event is InputEventMouseMotion:
 			line_update_last_point.emit(point)
 	
-	elif _active_ui_tool == ELEMENT: # add new element
+	elif active_ui_tool == ELEMENT: # add new element
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			element_add__finish.emit(point)
 		elif event is InputEventMouseMotion:
@@ -350,30 +347,28 @@ func _unhandled_input(event: InputEvent) -> void:
 					return
 				if _raycast_result:
 					if is_selected.call(_raycast_result):
-						if not _multi_select and _active_ui_tool == SELECT:
-							_active_ui_tool = MOVE
-							_ui_set_cursor(move_cursor)
-						do_on_selection.emit(_active_ui_tool, point, _raycast_result, _multi_select)
+						if not _multi_select and active_ui_tool == SELECT:
+							active_ui_tool = MOVE
+						do_on_selection.emit(active_ui_tool, point, _raycast_result, _multi_select)
 					else:
 						_selection_box.clear()
-						if _active_ui_tool == SELECT:
+						if active_ui_tool == SELECT:
 							@warning_ignore("missing_await") _async_set_move_mode()
-						elif _active_ui_tool == SCALE:
-							_active_ui_tool = SCALE_IN_PROGRESS
-						do_on_raycast_result.emit(_active_ui_tool, point, _raycast_result, _multi_select)
+						elif active_ui_tool == SCALE:
+							active_ui_tool = SCALE_IN_PROGRESS
+						do_on_raycast_result.emit(active_ui_tool, point, _raycast_result, _multi_select)
 				else:
 					if selection_box_enabled:
 						_selection_box.init(point)
-					do_on_raycast_result.emit(_active_ui_tool, point, null, _multi_select)
+					do_on_raycast_result.emit(active_ui_tool, point, null, _multi_select)
 			else: # mouse button released
-				if _active_ui_tool == MOVE or _active_ui_tool == SELECT_LONG:
+				if active_ui_tool == MOVE or active_ui_tool == SELECT_LONG:
 					do_move_finish.emit()
-					_active_ui_tool = SELECT
-					_ui_set_cursor(select_cursor)
-				elif _active_ui_tool == SCALE_IN_PROGRESS:
+					active_ui_tool = SELECT
+				elif active_ui_tool == SCALE_IN_PROGRESS:
 					do_scale_finish.emit()
-					_active_ui_tool = SCALE
-				elif _active_ui_tool == SELECT or _active_ui_tool == DUPLICATE:
+					active_ui_tool = SCALE
+				elif active_ui_tool == SELECT or active_ui_tool == DUPLICATE:
 					if _selection_box.is_approx_zero_size():
 						_selection_box.clear()
 					if _selection_box.visible:
@@ -383,11 +378,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				_raycast_result = null
 		elif event is InputEventMouseMotion:
 			@warning_ignore("missing_await") _async_set_move_mode(true)
-			if _active_ui_tool == MOVE:
+			if active_ui_tool == MOVE:
 				do_move_step.emit(get_local_mouse_position())
-			elif _active_ui_tool == SCALE_IN_PROGRESS:
+			elif active_ui_tool == SCALE_IN_PROGRESS:
 				do_scale_step.emit(get_local_mouse_position())
-			elif _active_ui_tool == SELECT:
+			elif active_ui_tool == SELECT:
 				_selection_box.set_second(get_local_mouse_position())
 
 func _async_set_move_mode(immediately := false):
@@ -396,14 +391,13 @@ func _async_set_move_mode(immediately := false):
 	# 1. timers are "processed after all of the nodes in the current frame"
 	# 2. _unhandled_input is processed before at begin of nodes processing
 	# so it should not be a race condition between this code and "mouse button released"
-	# in _unhandled_input where we set _active_ui_tool to SELECT and _current_element/segment to null
-	if _active_ui_tool == SELECT and _raycast_result:
+	# in _unhandled_input where we set active_ui_tool to SELECT and _current_element/segment to null
+	if active_ui_tool == SELECT and _raycast_result:
 		if _editor_enabled:
-			_active_ui_tool = MOVE
-			_ui_set_cursor(move_cursor)
+			active_ui_tool = MOVE
 		else:
 			# used to possibility of emit long click action (via do_move_finish action) while editor is disabled
-			_active_ui_tool = SELECT_LONG
+			active_ui_tool = SELECT_LONG
 
 
 

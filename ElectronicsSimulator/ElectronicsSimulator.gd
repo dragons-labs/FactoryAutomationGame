@@ -146,3 +146,9 @@ func _ready():
 func _on_element_click(element, _long):
 	if element.type == "Meter":
 		gdspice.on_measurer_click(element)
+
+func _on_esc() -> bool:
+	if  grid_editor.ui.active_ui_tool != grid_editor.ui.SELECT:
+		grid_editor.ui.active_ui_tool = grid_editor.ui.SELECT
+		return true
+	return false

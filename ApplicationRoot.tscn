@@ -32,3 +32,4 @@ scaling_3d_scale = 2.0
 visible = false
 
 [connection signal="show_manual" from="FactoryRoot" to="ManualBrowser" method="show_info"]
+[connection signal="hide_show_main_menu" from="FactoryRoot" to="MainMenu" method="switch_visible"]
