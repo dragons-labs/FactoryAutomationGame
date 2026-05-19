@@ -35,7 +35,7 @@ func load_save(save_to_load := default_save_to_load) -> void:
 	print_rich("[color=green][b]LOADED[/b][/color]")
 
 func wait_for_computers_ready() -> void:
-	while factory_control._computer_systems_simulation_ready_state != factory_control.READY:
+	while factory_control._system_state[factory_control.COMPUTER] != factory_control.READY:
 		await FAG_Utils.real_time_wait(0.025)
 
 func start_factory() -> bool:
