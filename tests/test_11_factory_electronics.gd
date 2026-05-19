@@ -5,12 +5,11 @@ extends FAG_TestGame
 
 @warning_ignore_start("redundant_await")
 
-func before():
-	await super()
+func test_circuit_simulation_1(use_signal_cache, _test_parameters := [[false], [true]]):
+	factory_control.use_signal_cache = use_signal_cache
 	if not await start_factory():
 		return
-
-func test_circuit_simulation_1():
+	
 	# diodes-transistors latch
 	
 	# check factory signals value
@@ -21,7 +20,7 @@ func test_circuit_simulation_1():
 	factory_control.set_signal_value("io_expander_1_signal_08_in", 2.5)
 	
 	# check factory signals value - input to circuit simulation
-	await runner.simulate_frames(1)
+	await runner.simulate_frames(2 if use_signal_cache else 1)
 	assert_factory_signal_value("io_expander_1_signal_08_out").is_equal_approx(2.5, 0.01)
 	
 	# check factory signals value - output from circuit simulation
@@ -32,14 +31,20 @@ func test_circuit_simulation_1():
 	factory_control.set_signal_value("io_expander_1_signal_08_in", 0.0)
 	
 	# check factory signals value - input to circuit simulation
-	await runner.simulate_frames(1)
+	await runner.simulate_frames(2 if use_signal_cache else 1)
 	assert_factory_signal_value("io_expander_1_signal_08_out").is_equal_approx(0.0, 0.01)
 	
 	# check factory signals value - output from circuit simulation
 	await runner.simulate_frames(1)
 	assert_factory_signal_value("io_expander_1_signal_09_in").is_equal_approx(3.3, 0.2)
+	
+	await stop_factory()
 
-func test_circuit_simulation_2():
+func _circuit_simulation_2(use_signal_cache, _test_parameters := [[false], [true]]):
+	factory_control.use_signal_cache = use_signal_cache
+	if not await start_factory():
+		return
+	
 	# RC circuit
 	
 	# check factory signals value
@@ -50,7 +55,7 @@ func test_circuit_simulation_2():
 	factory_control.set_signal_value("io_expander_1_signal_10_in", 5.0)
 	
 	# check factory signals value - input to circuit simulation
-	await runner.simulate_frames(1)
+	await runner.simulate_frames(2 if use_signal_cache else 1)
 	assert_factory_signal_value("io_expander_1_signal_10_out").is_equal_approx(5.0, 0.01)
 	
 	# check factory signals value - output from circuit simulation
@@ -65,7 +70,7 @@ func test_circuit_simulation_2():
 	factory_control.set_signal_value("io_expander_1_signal_10_in", 0.0)
 	
 	# check factory signals value - input to circuit simulation
-	await runner.simulate_frames(1)
+	await runner.simulate_frames(2 if use_signal_cache else 1)
 	assert_factory_signal_value("io_expander_1_signal_10_out").is_equal_approx(0.0, 0.01)
 	
 	# check factory signals value - output from circuit simulation
@@ -75,3 +80,5 @@ func test_circuit_simulation_2():
 		assert_factory_signal_value("io_expander_1_signal_11_in").is_less(prev_value)
 		prints("↓", last_signal_value, prev_value)
 		prev_value = last_signal_value
+	
+	await stop_factory()

@@ -55,6 +55,16 @@ func _get_signal_value(signal_name : String, default : Variant = 0) -> Array:
 		return [default, NONE]
 
 func set_signal_value(signal_name : String, value : float) -> void:
+	if use_signal_cache:
+		set_signal_value_cache(signal_name, value)
+	else:
+		set_signal_value_live(signal_name, value)
+
+var _set_signal_value_cache = {}
+func set_signal_value_cache(signal_name : String, value : float) -> void:
+	_set_signal_value_cache[signal_name] = value
+
+func set_signal_value_live(signal_name : String, value : float) -> void:
 	#print("set_signal_value ", signal_name, " → ", value)
 	if signal_name in input_to_circuit_from_factory:
 		circuit_simulator.gdspice.set_voltages_currents(input_to_circuit_from_factory[signal_name][1], value)
@@ -197,6 +207,12 @@ func tick(delta: float, paused : bool) -> void:
 	# emit `factory_tick` signal
 	# NOTE: all factory_tick signal's observers will be called (and processed if they are not async) before this function exit
 	factory_tick.emit(simulation_time, delta)
+	
+	# update "output" signals in cache mode
+	if use_signal_cache:
+		for s in _set_signal_value_cache:
+			set_signal_value_live(s, _set_signal_value_cache[s])
+		_set_signal_value_cache.clear()
 	
 	# update factory time in computer simulation (this can cause finished some factory_sleep)
 	# NOTE: updating computer outputs will be done via _physics_process in ComputerSystemSimulator, called before this function (negative process_physics_priority in ComputerSystemSimulator)
@@ -579,7 +595,8 @@ func _ready() -> void:
 @onready var circuit_simulator := %ElectronicsSimulator
 @onready var circuit_simulator_window := %ElectronicsSimulatorWindow
 
-@export var time_frame_estimation_multiplier = 1.1
+@export var time_frame_estimation_multiplier := 1.1
+@export var use_signal_cache := true
 
 var computer_systems_configuration := {}
 var computer_control_blocks := {}

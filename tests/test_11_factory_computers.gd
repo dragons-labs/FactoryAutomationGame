@@ -5,14 +5,16 @@ extends FAG_TestGame
 
 @warning_ignore_start("redundant_await")
 
-func test_factory_computer_io():
+func test_factory_computer_io(use_signal_cache, _test_parameters := [[false], [true]]):
 	FAG_WindowManager.set_windows_visibility_recursive(factory_control.computer_control_blocks[0], true)
 	
+	factory_control.use_signal_cache = use_signal_cache
 	if not await start_factory():
 		return
 	
 	# set signal value
 	factory_control.set_signal_value("io_expander_1_signal_15_in", 3.131)
+	if use_signal_cache: await runner.simulate_frames(1)
 	assert_factory_signal_value("io_expander_1_signal_15_in").is_equal_approx(3.131, 0.01)
 	
 	await runner.simulate_frames(1)
