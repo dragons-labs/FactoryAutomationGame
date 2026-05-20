@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cq8htt3ij0hwe"]
+
+[ext_resource type="Shader" uid="uid://nyo82u52npqp" path="res://Factory/overlay.gdshader" id="1_h04fk"]
+[ext_resource type="Shader" uid="uid://dypwgrsgo0jg8" path="res://Factory/outline.gdshader" id="2_nu3e2"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_s7b8k"]
+render_priority = 0
+shader = ExtResource("1_h04fk")
+shader_parameter/color = Color(0.9411765, 0.54901963, 0, 0.3)
+
+[resource]
+render_priority = 0
+next_pass = SubResource("ShaderMaterial_s7b8k")
+shader = ExtResource("2_nu3e2")
+shader_parameter/color = Color(2.4602873, 1.4701142, 0, 1)
+shader_parameter/size = 1.05

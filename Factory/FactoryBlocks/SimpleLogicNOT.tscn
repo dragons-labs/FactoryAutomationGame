@@ -17,6 +17,7 @@ albedo_texture = ExtResource("4_qgehy")
 script = ExtResource("1_qgehy")
 gate_type = 2
 ui_name = "FACTORY_BLOCK_NAME_SimpleLogicNOT"
+ui_desc = "FACTORY_BLOCK_DESC_SimpleLogicNOT"
 ui_icon = ExtResource("2_qgehy")
 object_type = "SimpleLogicNOT"
 

@@ -32,10 +32,18 @@ class_name FAG_2DGrid_BaseElement extends Node2D
 		if connections_node:
 			_update_connections()
 
+
 @export_group("Grid Editor UI Settings")
 
+## Name to show in UI tooltip (will be translated if translations is available).
 @export var ui_name : String
+
+# Description to show in UI tooltip (will be translated if translations is available).
+@export var ui_desc : String
+
+## Icon to show in UI.
 @export var ui_icon : Texture2D
+
 
 @export_group("Element Attributes")
 

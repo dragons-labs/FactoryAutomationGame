@@ -5,8 +5,11 @@ class_name FAG_FactoryBlock extends Node3D
 
 #region  External info for WorldEditorUI
 
-## Name to show in UI tooltip (will be translated if translations is available).
+## Name to show in editor button tooltip and in block configuration UI (will be translated if translations is available).
 @export var ui_name : String
+
+# Description to show in UI tooltip (will be translated if translations is available).
+@export var ui_desc : String
 
 ## Icon to show in UI.
 @export var ui_icon : Texture2D
@@ -73,5 +76,18 @@ func get_block_config(default = {}):
 	# we return reference to dictionary in meta
 	# (and this way it will be kept in the results variable)
 	# so we don't need call set_meta() after update dictionary value
+
+func show_block_ui(new_parent):
+	var gui = FAG_Utils.array_get(get("_gui"), 1)
+	var old_parent = gui.get_parent()
+	if not new_parent:
+		if old_parent:
+			old_parent.remove_child(gui)
+		add_child(gui)
+		gui.hide()
+	elif new_parent != old_parent:
+		remove_child(gui)
+		new_parent.add_child(gui)
+		gui.show()
 
 #endregion

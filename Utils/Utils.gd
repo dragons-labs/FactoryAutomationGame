@@ -12,8 +12,15 @@ static func mirror_y(point : Vector2, pivot : Vector2) -> Vector2:
 	point.y = 2 * pivot.y - point.y #  ==  point.y - 2 * offset_in_y  ==  point.y - 2 * (point.y - pivot.y)
 	return point
 
+static func mirror_z(point : Vector3, pivot : Vector3) -> Vector3:
+	point.z = 2 * pivot.z - point.z
+	return point
+
 static func rotate_around_pivot(point : Vector2, pivot : Vector2, angle : float) -> Vector2:
 	return (pivot - point).rotated(-angle) + pivot
+
+static func rotate_around_pivot_3D(point : Vector3, pivot : Vector3, angle : float, axis := Vector3.UP) -> Vector3:
+	return (pivot - point).rotated(axis,-angle) + pivot
 
 #
 # input related
@@ -223,9 +230,9 @@ static func abs_max(a : Variant, b : Variant) -> Variant:
 # misc
 #
 
-static func array_get(array : Array, index : int, default = null) -> Variant:
-	# like Array.get() in Godot 4.5, but without generating error and with settable default value
-	return array[index] if len(array) > index else default
+static func array_get(array : Variant, index : int, default = null) -> Variant:
+	# like Array.get() in Godot 4.5, but without generating error and with settable default value and null-resistant
+	return array[index] if array and len(array) > index else default
 
 static func get_with_fallback(values : Dictionary, key : String, fallback_key : String) -> Variant:
 	var val = values.get(key, null)

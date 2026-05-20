@@ -1,20 +1,18 @@
-[gd_scene load_steps=4 format=3 uid="uid://bjwtrw03sth6x"]
+[gd_scene format=3 uid="uid://bjwtrw03sth6x"]
 
 [ext_resource type="Script" uid="uid://d2cst4c3yga53" path="res://Factory/FactoryBuilder.gd" id="1_51ivo"]
 [ext_resource type="Script" uid="uid://bu8k11vgifi26" path="res://Utils/Camera/Camera3DControl.gd" id="2_2dv8j"]
 [ext_resource type="PackedScene" uid="uid://ccjlqcswjr2vw" path="res://Utils/WorldEditorUI/WorldEditorUI.tscn" id="3_iwf3v"]
 
-[node name="FactoryBuilder" type="Node3D"]
+[node name="FactoryBuilder" type="Node3D" unique_id=2075013768]
 script = ExtResource("1_51ivo")
 
-[node name="WorldEditorUI" parent="." instance=ExtResource("3_iwf3v")]
+[node name="WorldEditorUI" parent="." unique_id=1450749461 instance=ExtResource("3_iwf3v")]
 unique_name_in_owner = true
 selection_box_enabled = false
 import_export_enabled = false
-scale_tool_enabled = true
-rename_tool_enabled = true
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1801353672]
 unique_name_in_owner = true
 transform = Transform3D(0.848048, -0.280814, 0.449397, 0, 0.848048, 0.529919, -0.529919, -0.449397, 0.719186, 0.735, 3.16, 2.47)
 fov = 40.0
@@ -22,7 +20,7 @@ near = 0.01
 far = 400.0
 script = ExtResource("2_2dv8j")
 
-[node name="GetNameDialog" type="PanelContainer" parent="."]
+[node name="GetNameDialog" type="PanelContainer" parent="." unique_id=1453066825]
 unique_name_in_owner = true
 visible = false
 anchors_preset = 15
@@ -32,13 +30,13 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_type_variation = &"FullScreenBlocker"
 
-[node name="PanelContainer" type="PanelContainer" parent="GetNameDialog"]
+[node name="PanelContainer" type="PanelContainer" parent="GetNameDialog" unique_id=348654699]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_type_variation = &"MessageBox"
 
-[node name="MarginContainer" type="MarginContainer" parent="GetNameDialog/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="GetNameDialog/PanelContainer" unique_id=1421386165]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -47,53 +45,147 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="GetNameDialog/PanelContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="GetNameDialog/PanelContainer/MarginContainer" unique_id=1607622478]
 layout_mode = 2
 
-[node name="Message_Title" type="Label" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Message_Title" type="Label" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=1102246166]
 layout_mode = 2
 theme_type_variation = &"HeaderMedium"
 text = "FACTORY_BUILDER_BLOCK_NAME_TITLE"
 horizontal_alignment = 1
 
-[node name="Control" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Control" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=658273560]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="Message_Text" type="Label" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Message_Text" type="Label" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=1984167236]
 custom_minimum_size = Vector2(160, 80)
 layout_mode = 2
 text = "FACTORY_BUILDER_BLOCK_NAME_TEXT"
 horizontal_alignment = 3
 
-[node name="Control2" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Control2" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=1675235504]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="GetNameInput" type="LineEdit" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="GetNameInput" type="LineEdit" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=62485045]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Control3" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Control3" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=1432301525]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=1139342375]
 layout_mode = 2
 
-[node name="Cancel" type="Button" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="Cancel" type="Button" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2035311202]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "FACTORY_BUILDER_BLOCK_NAME_CANCEL"
 
-[node name="Control" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="Control" type="Control" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1839982407]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="OK" type="Button" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="OK" type="Button" parent="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=255228110]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "FACTORY_BUILDER_BLOCK_NAME_OK"
+
+[node name="BlockConfig" type="PanelContainer" parent="." unique_id=2049623464]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(350, 0)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -298.0
+offset_top = -45.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="BlockConfig" unique_id=871837556]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BlockConfig/MarginContainer" unique_id=535666792]
+layout_mode = 2
+
+[node name="InfoUI" type="HBoxContainer" parent="BlockConfig/MarginContainer/VBoxContainer" unique_id=964714237]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TypeIcon" type="TextureRect" parent="BlockConfig/MarginContainer/VBoxContainer/InfoUI" unique_id=1854382469]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="Control" type="Control" parent="BlockConfig/MarginContainer/VBoxContainer/InfoUI" unique_id=1234239725]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TypeName" type="Label" parent="BlockConfig/MarginContainer/VBoxContainer/InfoUI" unique_id=1654547979]
+layout_mode = 2
+
+[node name="Control2" type="Control" parent="BlockConfig/MarginContainer/VBoxContainer/InfoUI" unique_id=1915891668]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NameUI" type="VBoxContainer" parent="BlockConfig/MarginContainer/VBoxContainer" unique_id=2024002568]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Separator" type="MarginContainer" parent="BlockConfig/MarginContainer/VBoxContainer/NameUI" unique_id=414202629]
+layout_mode = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="ColorRect" type="ColorRect" parent="BlockConfig/MarginContainer/VBoxContainer/NameUI/Separator" unique_id=1919293255]
+custom_minimum_size = Vector2(160, 3)
+layout_mode = 2
+size_flags_horizontal = 4
+color = Color(0.23137255, 0.23137255, 0.23137255, 1)
+
+[node name="Block" type="HBoxContainer" parent="BlockConfig/MarginContainer/VBoxContainer/NameUI" unique_id=716822862]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="BlockConfig/MarginContainer/VBoxContainer/NameUI/Block" unique_id=687286290]
+layout_mode = 2
+text = "FACTORY_BUILDER_BLOCK_UI_NAME"
+
+[node name="Name" type="LineEdit" parent="BlockConfig/MarginContainer/VBoxContainer/NameUI/Block" unique_id=1256334922]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="BlockConfig/MarginContainer/VBoxContainer/NameUI/Block" unique_id=1298500266]
+layout_mode = 2
+text = "FACTORY_BUILDER_BLOCK_NAME_OK"
+
+[node name="BlockUI" type="VBoxContainer" parent="BlockConfig/MarginContainer/VBoxContainer" unique_id=1007383529]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Separator" type="MarginContainer" parent="BlockConfig/MarginContainer/VBoxContainer/BlockUI" unique_id=2023353714]
+layout_mode = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="ColorRect" type="ColorRect" parent="BlockConfig/MarginContainer/VBoxContainer/BlockUI/Separator" unique_id=988356139]
+custom_minimum_size = Vector2(160, 3)
+layout_mode = 2
+size_flags_horizontal = 4
+color = Color(0.23137255, 0.23137255, 0.23137255, 1)
+
+[node name="Label" type="Label" parent="BlockConfig/MarginContainer/VBoxContainer/BlockUI" unique_id=909936598]
+layout_mode = 2
+text = "FACTORY_BUILDER_BLOCK_UI_CONFIG"
+
+[node name="BlockUI" type="PanelContainer" parent="BlockConfig/MarginContainer/VBoxContainer/BlockUI" unique_id=680921281]
+layout_mode = 2
 
 [connection signal="active_ui_tool_changed" from="WorldEditorUI" to="." method="_on_active_ui_tool_changed"]
 [connection signal="do_move_finish" from="WorldEditorUI" to="." method="_on_do_move_finish"]
@@ -109,3 +201,4 @@ text = "FACTORY_BUILDER_BLOCK_NAME_OK"
 [connection signal="text_submitted" from="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/GetNameInput" to="." method="_on_get_name_ok" unbinds=1]
 [connection signal="pressed" from="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/Cancel" to="." method="_on_get_name_cancel"]
 [connection signal="pressed" from="GetNameDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/OK" to="." method="_on_get_name_ok"]
+[connection signal="pressed" from="BlockConfig/MarginContainer/VBoxContainer/NameUI/Block/Button" to="." method="_on_block_name_change_ok_button"]

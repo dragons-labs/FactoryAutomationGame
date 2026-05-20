@@ -17,6 +17,7 @@ albedo_texture = ExtResource("4_78jl2")
 script = ExtResource("1_78jl2")
 gate_type = 1
 ui_name = "FACTORY_BLOCK_NAME_SimpleLogicOR"
+ui_desc = "FACTORY_BLOCK_DESC_SimpleLogicOR"
 ui_icon = ExtResource("2_78jl2")
 object_type = "SimpleLogicOR"
 

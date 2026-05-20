@@ -98,7 +98,7 @@
   {
     "block_name": "",
     "position": "Vector3(0, 0, -3)",
-    "rotation": "Vector3(0, 1.5707964, -3.1415927)",
+    "rotation": "Vector3(0, 1.5707964, 0)",
     "scale": "Vector3(-1, -1, -1)",
     "type": "ConveyorFastSplitter"
   },

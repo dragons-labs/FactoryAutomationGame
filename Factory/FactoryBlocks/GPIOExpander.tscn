@@ -16,6 +16,7 @@ albedo_texture = ExtResource("4_lnnks")
 [node name="GPIOExpander" type="Node3D"]
 script = ExtResource("1_lnnks")
 ui_name = "FACTORY_BLOCK_NAME_GPIOExpander"
+ui_desc = "FACTORY_BLOCK_DESC_GPIOExpander"
 ui_icon = ExtResource("2_2wkkg")
 object_type = "GPIOExpander"
 

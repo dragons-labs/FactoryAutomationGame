@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://c5japjfigom8j"]
+[gd_scene format=3 uid="uid://c5japjfigom8j"]
 
 [sub_resource type="GDScript" id="GDScript_rqw2r"]
 script/source = "extends Control
@@ -12,7 +12,7 @@ script/source = "extends Control
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rqw2r"]
 bg_color = Color(0, 0, 0, 1)
 
-[node name="MarginContainer" type="MarginContainer"]
+[node name="MarginContainer" type="MarginContainer" unique_id=134621912]
 offset_right = 300.0
 offset_bottom = 300.0
 theme_override_constants/margin_left = 13
@@ -21,64 +21,65 @@ theme_override_constants/margin_right = 13
 theme_override_constants/margin_bottom = 13
 script = SubResource("GDScript_rqw2r")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=825387470]
 layout_mode = 2
 
-[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer" unique_id=1536077745]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/CenterContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/VBoxContainer" unique_id=1115191997]
 layout_mode = 2
+size_flags_horizontal = 4
 
-[node name="Name" type="Label" parent="VBoxContainer/CenterContainer/VBoxContainer"]
+[node name="Name" type="Label" parent="VBoxContainer/VBoxContainer/HBoxContainer3" unique_id=592358177]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 
-[node name="Control" type="Control" parent="VBoxContainer/CenterContainer/VBoxContainer"]
+[node name="Control" type="Control" parent="VBoxContainer/VBoxContainer" unique_id=1821338274]
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/CenterContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/VBoxContainer" unique_id=124686915]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/VBoxContainer/HBoxContainer" unique_id=613889361]
 layout_mode = 2
 text = "FACTORY_BLOCK_UI_NUMBER_OF_SIGNALS"
 
-[node name="SpinBox" type="SpinBox" parent="VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/VBoxContainer/HBoxContainer" unique_id=1634998137]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 1.0
 max_value = 64.0
 value = 1.0
 
-[node name="Control" type="Control" parent="VBoxContainer"]
+[node name="Control" type="Control" parent="VBoxContainer" unique_id=1712837479]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 3.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1071432780]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="NotAppliedWarning" type="Label" parent="VBoxContainer/HBoxContainer"]
+[node name="NotAppliedWarning" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=150913057]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85490197, 1, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_rqw2r")
 text = "FACTORY_BLOCK_UI_NOT_APPLIED"
 
-[node name="Control2" type="Control" parent="VBoxContainer"]
+[node name="Control2" type="Control" parent="VBoxContainer" unique_id=464058143]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer" unique_id=801190949]
 layout_mode = 2
 size_flags_horizontal = 8
 
-[node name="OK" type="Button" parent="VBoxContainer/HBoxContainer2"]
+[node name="OK" type="Button" parent="VBoxContainer/HBoxContainer2" unique_id=1668588975]
 unique_name_in_owner = true
 layout_mode = 2
 text = "FACTORY_BLOCK_UI_ACCEPT"

@@ -117,3 +117,9 @@ func _set_visible(index: int, value: bool):
 
 func _on_changed() -> void:
 	not_applied_warning.show()
+
+func close_popupmenus() -> void:
+	for i in range(len(outputs)):
+		outputs[i].popupmenu.hide()
+	for i in range(len(inputs)):
+		inputs[i].popupmenu.hide()

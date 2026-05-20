@@ -16,6 +16,7 @@ albedo_texture = ExtResource("4_2r4my")
 [node name="SimpleLogicAND" type="Node3D"]
 script = ExtResource("1_lnnks")
 ui_name = "FACTORY_BLOCK_NAME_SimpleLogicAND"
+ui_desc = "FACTORY_BLOCK_DESC_SimpleLogicAND"
 ui_icon = ExtResource("2_2r4my")
 object_type = "SimpleLogicAND"
 

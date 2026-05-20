@@ -6,7 +6,7 @@ extends FAG_FactoryBlock
 enum GateType {AND, OR, NOT}
 
 @export var gate_type : GateType
-@onready var _gui = $Gui3DNode.gui
+@onready var _gui = [$Gui3DNode.gui, $Gui3DNode.gui_scene.instantiate()]
 
 func init(factory_root, _block_name = null) -> void:
 	_factory_control = factory_root.factory_control
@@ -17,33 +17,38 @@ func init(factory_root, _block_name = null) -> void:
 		_factory_control.factory_tick.connect(_on_factory_process_or)
 	elif gate_type == GateType.NOT:
 		_factory_control.factory_tick.connect(_on_factory_process_not)
-		_gui.min_number_of_inputs = 1
-		_gui.number_of_inputs = 1
+		for gui in _gui:
+			gui.min_number_of_inputs = 1
+			gui.number_of_inputs = 1
 	
 	_block_config = get_block_config()
 	_inputs = _block_config.get("inputs", [])
 	_outputs = _block_config.get("outputs", [])
 	
-	var input_count = mini(len(_inputs), _gui.max_number_of_inputs)
+	var input_count = mini(len(_inputs), _gui[0].max_number_of_inputs)
 	var output_count = mini(len(_outputs), input_count if gate_type == GateType.NOT else 1)
 	
-	_gui.init(
-		factory_root,
-		maxi(1 if gate_type == GateType.NOT else 2, input_count),
-		gate_type == GateType.NOT
-	)
+	show_block_ui(null)
 	
-	for i in range(input_count):
-		_gui.inputs[i].editbbox.text = _inputs[i]
-	for i in range(output_count):
-		_gui.outputs[i].editbbox.text = _outputs[i]
+	for gui in _gui:
+		gui.init(
+			factory_root,
+			maxi(1 if gate_type == GateType.NOT else 2, input_count),
+			gate_type == GateType.NOT
+		)
+		
+		for i in range(input_count):
+			gui.inputs[i].editbbox.text = _inputs[i]
+		for i in range(output_count):
+			gui.outputs[i].editbbox.text = _outputs[i]
 	
-	_gui.ok_button.pressed.connect(_on_ui_accepted)
-	_on_ui_accepted()
+		gui.ok_button.pressed.connect(_on_ui_accepted.bind(gui))
+	_on_ui_accepted(_gui[0])
 	
 	# UI focus control
-	$Gui3DNode.focus_inside.connect(_on_gui_3d_focus_change.unbind(2))
-	_gui.focus_on_popup.connect(_on_gui_3d_focus_change)
+	# (to allow scroll drop down menu with mouse click+move and/or mouse scroll)
+	$Gui3DNode.focus_inside.connect(_on_gui_3d_focus_change.unbind(2).bind(false))
+	_gui[0].focus_on_popup.connect(_on_gui_3d_focus_change.bind(true))
 
 func deinit() -> void:
 	if gate_type == GateType.AND:
@@ -52,21 +57,26 @@ func deinit() -> void:
 		_factory_control.factory_tick.disconnect(_on_factory_process_or)
 	elif gate_type == GateType.NOT:
 		_factory_control.factory_tick.disconnect(_on_factory_process_not)
-	
 
-func _on_ui_accepted() -> void:
-	_outputs = range(0, _gui.number_of_outputs)
-	for i in _outputs:
-		_outputs[i] = _gui.outputs[i].editbbox.text
+func _on_ui_accepted(gui_in : Control) -> void:
+	_outputs = range(0, gui_in.number_of_outputs)
+	_inputs = range(0, gui_in.number_of_inputs)
 	
-	_inputs = range(0, _gui.number_of_inputs)
+	for i in _outputs:
+		_outputs[i] = gui_in.outputs[i].editbbox.text
+		for gui in _gui:
+			if gui != gui_in:
+				gui.outputs[i].editbbox.text = _outputs[i]
 	for i in _inputs:
-		_inputs[i] = _gui.inputs[i].editbbox.text
+		_inputs[i] = gui_in.inputs[i].editbbox.text
+		for gui in _gui:
+			if gui != gui_in:
+				gui.inputs[i].editbbox.text = _inputs[i]
 	
 	_block_config["outputs"] = _outputs
 	_block_config["inputs"] = _inputs
 	
-	_gui.not_applied_warning.hide()
+	gui_in.not_applied_warning.hide()
 
 
 var _inputs
@@ -104,14 +114,15 @@ func _on_factory_process_not(_time : float, _delta_time : float) -> void:
 
 var _factory_builder
 var _last_focus = false
-func _on_gui_3d_focus_change(focus: bool) -> void:
+func _on_gui_3d_focus_change(focus: bool, allow_get : bool) -> void:
 	if _last_focus == focus:
 		return
 	_last_focus = focus
-	if focus:
-		print("INPUT→3D")
+	if focus and allow_get:
+		print("INPUT→GUI")
 		_factory_builder.disable_input()
 		_factory_builder.ui.reset_editor()
 	else:
-		print("INPUT→GUI")
+		print("INPUT→3D")
+		_gui[0].close_popupmenus()
 		_factory_builder.enable_input()

@@ -4,43 +4,51 @@
 extends FAG_FactoryBlock
 
 @onready var _block_control = FAG_FactoryBlockControl.new(self)
+@onready var _gui = [$Gui3DNode.gui, $Gui3DNode.gui_scene.instantiate()]
 
-func init(factory_root, block_name = null):
-	_block_control.init(factory_root, block_name, _gui.name_label)
+func init(factory_root, block_name = null) -> void:
+	show_block_ui(null)
+	_gui[1].name_label.hide()
+	
+	_block_control.init(factory_root, block_name, [_gui[0].name_label, _gui[1].name_label])
 	_block_control._factory_control.factory_tick.connect(_on_factory_process)
-	_gui.ok_button.pressed.connect(_on_ui_accepted)
-	_gui.spin_box.value_changed.connect(_on_spin_box_value_accepted)
+	
+	for gui in _gui:
+		gui.ok_button.pressed.connect(_on_ui_accepted.bind(gui))
+		gui.spin_box.value_changed.connect(_on_spin_box_value_accepted)
 	
 	_block_config = get_block_config()
 	_change_signal_number(_block_config.get("signal_number", 1))
 	
-	_gui.not_applied_warning.visible = false
-	
-@onready var _gui = $Gui3DNode.gui
+	for gui in _gui:
+		gui.not_applied_warning.visible = false
 
-func _on_ui_accepted():
-	_change_signal_number(_gui.spin_box.value)
-	_gui.not_applied_warning.visible = false
+func _on_ui_accepted(gui_in : Control) -> void:
+	_change_signal_number(gui_in.spin_box.value)
+	for gui in _gui:
+		gui.not_applied_warning.visible = false
 
-func _on_spin_box_value_accepted(_value):
-	_gui.not_applied_warning.visible = true
+func _on_spin_box_value_accepted(_value) -> void:
+	for gui in _gui:
+		gui.not_applied_warning.visible = true
 
 var _signals = []
 var _block_config
 
-func _on_factory_process(_time : float, _delta_time : float):
+func _on_factory_process(_time : float, _delta_time : float) -> void:
 	for sname in _signals:
 		var val = _block_control.get_signal_value(sname[0])
 		_block_control.set_signal_value(sname[1], val)
 
-func _create_signal_description(i, block_signals_outputs, block_signals_inputs):
+func _create_signal_description(i : int, block_signals_outputs : Dictionary, block_signals_inputs : Dictionary) -> void:
 	var sname = "signal_" + str(i).pad_zeros(2)
 	_signals[i] = [sname+"_in", sname+"_out"]
 	block_signals_inputs[sname+"_in"] = [sname+"_@out"]
 	block_signals_outputs[sname+"_out"] = [sname+"_@in", "v_"+sname]
 
-func _change_signal_number(new_signal_number):
-	_gui.spin_box.value = new_signal_number
+func _change_signal_number(new_signal_number : int) -> void:
+	for gui in _gui:
+		gui.spin_box.value = new_signal_number
 	_block_config["signal_number"] = new_signal_number
 	var old_signal_number = len(_signals)
 	var block_signals_outputs = {}

@@ -102,6 +102,8 @@ var _last_event_pos2D := Vector2()
 ## The time of the last event in seconds since engine start.
 var _last_event_time := -1.0
 
+var _last_mouse_button_event = null
+
 func _mouse_entered_area() -> void:
 	_is_mouse_inside = true
 	# Notify the viewport that the mouse is now hovering it.
@@ -115,11 +117,18 @@ func _mouse_exited_area() -> void:
 	_node_viewport.notification(NOTIFICATION_VP_MOUSE_EXIT)
 	_is_mouse_inside = false
 	mouse_inside.emit(false)
+
+	# cancel last mouse button pressed (unreleased middle button from camera rotation/move can lock ui)
+	if _last_mouse_button_event and _last_mouse_button_event.pressed == true:
+		_last_mouse_button_event.canceled = true
+		_node_viewport.push_input(_last_mouse_button_event)
+		_last_mouse_button_event = null
+
 	if release_focus:
 		for n in _focus_owners:
 			n.release_focus()
-	else:
-		focus_inside.emit(len(_focus_owners) != 0, _is_mouse_inside, true)
+	
+	focus_inside.emit(len(_focus_owners) != 0, _is_mouse_inside, true)
 
 func _unhandled_input(input_event: InputEvent) -> void:
 	# Check if the event is a non-mouse/non-touch event
@@ -188,6 +197,9 @@ func _mouse_input_event(_camera: Camera3D, input_event: InputEvent, event_positi
 
 	# Update _last_event_time to current time.
 	_last_event_time = now
+
+	if input_event is InputEventMouseButton:
+		_last_mouse_button_event = input_event.duplicate()
 
 	# Finally, send the processed input event to the viewport.
 	_node_viewport.push_input(input_event)

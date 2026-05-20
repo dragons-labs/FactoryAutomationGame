@@ -3,16 +3,20 @@ FACTORY_BLOCK_NAME_SimpleFactoryBlock,Simple Construction Block,Blok konstrukcyj
 FACTORY_BLOCK_NAME_ElectronicControlBlock,Electronic Control Block,Elektroniczny blok kontrolny
 FACTORY_BLOCK_NAME_ConveyorBelt,Conveyor Belt,Pas transmisyjny
 FACTORY_BLOCK_NAME_ComputerControlBlock,Computer Control Block,Komputerowy blok kontrolny
-FACTORY_BLOCK_NAME_GPIOExpander,"GPIO Expander\n(allow to make connection between Electronic and Computer Control Blocks)","Expander GPIO\n(pozwala na przekazywanie sygnałów między elektronicznymi i komputerowymi blokami kontrolnymi)"
+FACTORY_BLOCK_NAME_GPIOExpander,"GPIO Expander","Expander GPIO"
+FACTORY_BLOCK_DESC_GPIOExpander,"allow to make connection between Electronic and Computer Control Blocks","pozwala na przekazywanie sygnałów między elektronicznymi i komputerowymi blokami kontrolnymi"
 FACTORY_BLOCK_NAME_ProducerBlock,Component Producer,Producent
 FACTORY_BLOCK_NAME_Welder,Welder,Spawacz
 FACTORY_BLOCK_NAME_Painter,Painter,Malarz
 FACTORY_BLOCK_NAME_Detector,Detector,Detektor
 FACTORY_BLOCK_NAME_ConveyorSplitter,Conveyor Splitter,Podział pasa transmisyjnego
 FACTORY_BLOCK_NAME_ConveyorFastSplitter,Fast Conveyor Splitter,Szybki podział pasa transmisyjnego
-FACTORY_BLOCK_NAME_SimpleLogicAND,"Auxiliary AND gate (slow, synchronous, sequential)","Pomocnicza bramka AND (wolna, synchroniczna, sekwencyjna)"
-FACTORY_BLOCK_NAME_SimpleLogicNOT,"Auxiliary NOT gate (slow, synchronous, sequential)","Pomocnicza bramka NOT (wolna, synchroniczna, sekwencyjna)"
-FACTORY_BLOCK_NAME_SimpleLogicOR,"Auxiliary OR gate (slow, synchronous, sequential)","Pomocnicza bramka OR (wolna, synchroniczna, sekwencyjna)"
+FACTORY_BLOCK_NAME_SimpleLogicNOT,"Auxiliary NOT gate","Pomocnicza bramka NOT"
+FACTORY_BLOCK_DESC_SimpleLogicNOT,"slow, synchronous, sequential","wolna, synchroniczna, sekwencyjna"
+FACTORY_BLOCK_NAME_SimpleLogicAND,"Auxiliary AND gate","Pomocnicza bramka AND"
+FACTORY_BLOCK_DESC_SimpleLogicAND,"slow, synchronous, sequential","wolna, synchroniczna, sekwencyjna"
+FACTORY_BLOCK_NAME_SimpleLogicOR,"Auxiliary OR gate","Pomocnicza bramka OR"
+FACTORY_BLOCK_DESC_SimpleLogicOR,"slow, synchronous, sequential","wolna, synchroniczna, sekwencyjna"
 FACTORY_START,Run,Start
 FACTORY_STOP,Stop,Stop
 FACTORY_PAUSE,Pause,Pause
@@ -25,6 +29,9 @@ FACTORY_BUILDER_BLOCK_NAME_TITLE,Enter name for block,Wprowadź nazwę bloku
 FACTORY_BUILDER_BLOCK_NAME_TEXT,"This name will be used in name of this block input/output signals.\nThe name should be unique and lowercase.","Nazwa ta będzie używana w sygnałach wejścia / wyjścia związanych z blokiem.\nNazwa powinna być unikalna i zapisywana małymi literami."
 FACTORY_BUILDER_BLOCK_NAME_OK,OK,OK
 FACTORY_BUILDER_BLOCK_NAME_CANCEL,Cancel,Anuluj
+
+FACTORY_BUILDER_BLOCK_UI_NAME,Name:,Nazwa:
+FACTORY_BUILDER_BLOCK_UI_CONFIG,Block configuration:,Konfiguracja bloku:
 
 FACTORY_ERROR_TITLE,"Geneal factory error","Ogólny błąd fabryki"
 FACTORY_ERROR_TEXT,"Something went wrong. And no one knows what :-(","Coś poszło nie tak. I nikt nie wie co :-("

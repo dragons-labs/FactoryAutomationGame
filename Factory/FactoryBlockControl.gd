@@ -8,7 +8,7 @@ class_name FAG_FactoryBlockControl extends Resource
 # called by FactoryBuilder when block name is changed
 # NOTE: Not called by FactoryBuilder as a result of block placement
 #       In this case only [code]init()[/code] on owner object is called
-func set_block_name(new_name):
+func set_block_name(new_name) -> void:
 	_deinit_factory_signals()
 	
 	if new_name != null:
@@ -17,14 +17,21 @@ func set_block_name(new_name):
 		_in_game_name = ""
 	# else: keep old name while call with name == null
 	
-	if _on_name_changed_callback is Callable:
-		_on_name_changed_callback.call(_in_game_name)
-	elif _on_name_changed_callback and "text" in _on_name_changed_callback:
-		_on_name_changed_callback.text = _in_game_name
+	if _on_name_changed_callback is Array:
+		for callback in _on_name_changed_callback:
+			_call_name_callback(callback, _in_game_name)
+	else:
+		_call_name_callback(_on_name_changed_callback, _in_game_name)
 	
 	_init_factory_signals()
 
-func get_block_name():
+func _call_name_callback(callback : Variant, text : String) -> void:
+	if callback is Callable:
+		callback.call(text)
+	elif callback and "text" in callback:
+		callback.text = text
+
+func get_block_name() -> String:
 	return _in_game_name
 
 #endregion
@@ -75,7 +82,7 @@ func _init(owner):
 ## Arguments:
 ##  * factory_root - FactoryRoot node to get FactoryControl
 ##  * name - block name, see [member set_block_name] for details
-##  * callback can be callable (will be called with new name as argument) or any object with text property (text property will be set to new name)
+##  * callback can be callable (will be called with new name as argument) or any object with text property (text property will be set to new name) or an array of such callable or objects
 ##  * block_signals_outputs, block_signals_inputs, circuit_entries - signal description, see FactoryControl.register_factory_signals for details
 func init(factory_root, name = null, callback = null, block_signals_outputs := {}, block_signals_inputs := {}, circuit_entries := []) -> void:
 	_factory_control = factory_root.factory_control

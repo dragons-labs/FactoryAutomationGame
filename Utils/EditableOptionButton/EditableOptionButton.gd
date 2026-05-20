@@ -9,6 +9,12 @@ extends HBoxContainer
 ## if x <= 0 then use viewport size minus abs of this value 
 @export var max_size := Vector2i(0, 0)
 
+## when true auto hide popup menu when mouse exited it area
+@export var auto_hide_popup_on_mouse_exit := true
+
+## when true auto hide popup menu when lost focus
+@export var auto_hide_popup_on_focus_exit := true
+
 ## emit on item selected
 signal value_changed(value: String)
 
@@ -24,7 +30,10 @@ signal popup_active(value: bool)
 func _ready() -> void:
 	popupmenu.visibility_changed.connect(_on_popup_visibility_changed)
 	popupmenu.id_pressed.connect(_on_item_selected)
-	popupmenu.focus_exited.connect(popupmenu.hide)
+	if auto_hide_popup_on_mouse_exit:
+		popupmenu.mouse_exited.connect(popupmenu.hide)
+	if auto_hide_popup_on_focus_exit:
+		popupmenu.focus_exited.connect(popupmenu.hide)
 	if max_size.x <= 0:
 		max_size = get_viewport().size + max_size
 

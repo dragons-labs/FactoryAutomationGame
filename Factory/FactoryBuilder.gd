@@ -29,7 +29,7 @@ signal on_block_remove(block: Node3D)
 @onready var _viewport := camera.get_viewport()
 
 
-### save / restore and close
+#region save / restore and close
 
 func serialise() -> Array:
 	var save_data = []
@@ -69,15 +69,17 @@ func restore(data : Array) -> void:
 func close() -> void:
 	ui.reset_editor()
 	camera.restore_defaults()
-	_moving_elements.clear()
+	_selected_elements.clear()
 	_scaled_element = null
 	_intersection = null
+	_moving_in_progress = false
 	for child in factory_blocks_main_node.get_children():
 		factory_blocks_main_node.remove_child(child)
 		child.queue_free()
 
+#endregion
 
-### Block add / remove callbacks
+#region Block add / remove callbacks
 
 func _on_block_add(element : Node3D, block_name = null) -> void:
 	if "object_type" in element and element.object_type == "ComputerControlBlock":
@@ -93,9 +95,9 @@ func _on_block_remove(element : Node3D) -> void:
 		element.deinit()
 	on_block_remove.emit(element)
 
+#endregion
 
-
-### 3D world raycast
+#region 3D world raycast
 
 var _intersection = null
 var _intersection_grid_position : Vector3
@@ -117,8 +119,9 @@ func _process(_delta) -> void:
 		var exclude = []
 		if _new_element:
 			exclude.append_array(_new_element.get_physics_rids())
-		for element in _moving_elements:
-			exclude.append_array(element.get_physics_rids())
+		if _moving_in_progress:
+			for element in _selected_elements:
+				exclude.append_array(element.get_physics_rids())
 		var ray_query := PhysicsRayQueryParameters3D.create(ray_start, ray_end, attachable_objects_collision_mask, exclude)
 		_intersection = get_world_3d().direct_space_state.intersect_ray(ray_query)
 		
@@ -179,11 +182,148 @@ func enable_input(force := false) -> void:
 	ui.input_allowed = _previous_ui_input_state or force
 	_block_3d_operation = false
 
-### UI callbacks
+#endregion
+
+#region blocks selection
+
+var _selected_elements := {}
+@onready var _selection_material : Material = load("res://Factory/selection.material.tres")
+
+func _select_block(block : FAG_FactoryBlock) -> void:
+	for mesh in block.find_children("*", "MeshInstance3D"):
+		mesh.material_overlay = _selection_material
+	_selected_elements[block] = block.position
+
+func _unselect_block(block : FAG_FactoryBlock, full := true) -> void:
+	for mesh in block.find_children("*", "MeshInstance3D"):
+		mesh.material_overlay = null
+	if full:
+		_selected_elements.erase(block)
+
+func _unselect_all_blocks() -> void:
+	for block in _selected_elements:
+		_unselect_block(block, false)
+	_selected_elements.clear()
+
+#endregion
+
+#region block config UI
+
+var _last_ui_block = null
+
+func _update_block_ui() -> void:
+	# get factory block if only one block is selected
+	var block = _selected_elements.keys()[0] if len(_selected_elements) == 1 else null
+	
+	# deattach block UI on block change
+	if _last_ui_block and block != _last_ui_block:
+		_last_ui_block.show_block_ui(null)
+		_last_ui_block = null
+	
+	# hide menu on no block
+	if not block:
+		%BlockConfig.hide()
+		return
+	
+	var block_config_visible = false
+	
+	# show block UI if available
+	if "_gui" in block:
+		%BlockUI.show()
+		_last_ui_block = block
+		_last_ui_block.show_block_ui(%BlockUI/BlockUI)
+		block_config_visible = true
+	else:
+		%BlockUI.hide()
+	
+	# show block name if available
+	if block.get_block_control():
+		%NameUI.show()
+		%NameUI/Block/Name.text = block.get_block_control().get_block_name()
+		block_config_visible = true
+	else:
+		%NameUI.hide()
+	
+	# show menu if any content is shown
+	%BlockConfig.visible = block_config_visible
+	
+	# set block info if menu is visible
+	if block_config_visible:
+		%InfoUI/TypeName.text = tr(block.ui_name)
+		if block.ui_desc:
+			%InfoUI.tooltip_text = tr(block.ui_desc)
+		%InfoUI/TypeIcon.texture = block.ui_icon
+
+func _on_block_name_change_ok_button() -> void:
+	var block = _selected_elements.keys()[0] if len(_selected_elements) == 1 else null
+	_rename_element(%NameUI/Block/Name.text, block)
+
+#endregion
+
+#region Rotate / Mirror / Delete blocks
+
+func rotate_blocks(blocks : Variant, pivot = null, angle := PI/2, no_undo = false) -> void:
+	var local_undo_redo : UndoRedo = UndoRedo.new() if no_undo else undo_redo
+	
+	local_undo_redo.create_action("3DWorld Element: Rotate")
+	for block in blocks:
+		local_undo_redo.add_do_method(block.rotate.bind(Vector3.UP, angle))
+		local_undo_redo.add_undo_method(block.rotate.bind(Vector3.UP, -angle))
+		local_undo_redo.add_undo_property(block, "position", block.position)
+		if pivot != null:
+			block.position = FAG_Utils.rotate_around_pivot_3D(block.position, pivot, angle).snapped(grid_size)
+		if roundi(block.scale.x) % 2 == 0:
+			block.position.x -= grid_size.x/2
+			block.position.z += grid_size.z/2
+		local_undo_redo.add_do_property(block, "position", block.position)
+		local_undo_redo.add_do_method(_on_element_transform_update.bind(block))
+		local_undo_redo.add_undo_method(_on_element_transform_update.bind(block))
+	local_undo_redo.commit_action()
+	
+	if no_undo:
+		local_undo_redo.free()
+
+func mirror_blocks(blocks : Variant, pivot = null, no_undo = false) -> void:
+	var local_undo_redo : UndoRedo = UndoRedo.new() if no_undo else undo_redo
+	
+	local_undo_redo.create_action("3DWorld Element: Mirror")
+	for block in blocks:
+		local_undo_redo.add_undo_property(block, "scale", block.scale)
+		block.scale.z = -block.scale.z
+		local_undo_redo.add_do_property(block, "scale", block.scale)
+		if pivot != null:
+			block.rotation.y = wrapf(block.rotation.y, -PI, PI)
+			var abs_rotation = abs(block.rotation.y)
+			if 1.5 < abs_rotation and abs_rotation < 1.6:
+				local_undo_redo.add_undo_property(block, "rotation", block.rotation)
+				block.rotation.y = -block.rotation.y
+				local_undo_redo.add_do_property(block, "rotation", block.rotation)
+			local_undo_redo.add_undo_property(block, "position", block.position)
+			block.position = FAG_Utils.mirror_z(block.position, pivot)
+			local_undo_redo.add_do_property(block, "position", block.position)
+		local_undo_redo.add_do_method(_on_element_transform_update.bind(block))
+		local_undo_redo.add_undo_method(_on_element_transform_update.bind(block))
+	local_undo_redo.commit_action()
+	
+	if no_undo:
+		local_undo_redo.free()
+
+func remove_blocks(blocks : Variant) -> void:
+	undo_redo.create_action("3DWorld Element: Remove")
+	for block in blocks:
+		undo_redo.add_do_method(factory_blocks_main_node.remove_child.bind(block))
+		undo_redo.add_do_method(_on_block_remove.bind(block))
+		undo_redo.add_undo_reference(block)
+		undo_redo.add_undo_method(factory_blocks_main_node.add_child.bind(block))
+		undo_redo.add_undo_method(_on_block_add.bind(block))
+	undo_redo.commit_action()
+
+#endregion
+
+#region UI callbacks
 
 var _new_element : Node3D = null
 var _new_element_scene : PackedScene = null
-var _moving_elements := {}
 var _scaled_element : Node3D = null
 var _scaled_side
 var _operation_init_point2D : Vector2
@@ -256,10 +396,20 @@ func _rename_element(block_name, element):
 
 func _on_do_on_raycast_result(_mode: int, point: Vector2, raycast_result: Variant, multi_select : bool) -> void:
 	if not raycast_result:
+		_unselect_all_blocks()
+		_update_block_ui()
 		return
+	
 	match ui.active_ui_tool:
 		ui.SELECT:
-			_moving_elements[raycast_result] = raycast_result.position
+			if raycast_result in _selected_elements:
+				if multi_select:
+					_unselect_block(raycast_result)
+			else:
+				if not multi_select:
+					_unselect_all_blocks()
+				_select_block(raycast_result)
+			_move_init_element = raycast_result
 		ui.SCALE_IN_PROGRESS:
 			if "object_type" in raycast_result and raycast_result.object_type == "ConveyorBelt":
 				var rotated_normal = Quaternion.from_euler(raycast_result.global_rotation) * _intersection.normal
@@ -273,61 +423,48 @@ func _on_do_on_raycast_result(_mode: int, point: Vector2, raycast_result: Varian
 					else:
 						_scaled_side = -1
 		ui.DELETE:
-			undo_redo.create_action("3DWorld Element: Remove")
-			undo_redo.add_do_method(factory_blocks_main_node.remove_child.bind(raycast_result))
-			undo_redo.add_do_method(_on_block_remove.bind(raycast_result))
-			undo_redo.add_undo_reference(raycast_result)
-			undo_redo.add_undo_method(factory_blocks_main_node.add_child.bind(raycast_result))
-			undo_redo.add_undo_method(_on_block_add.bind(raycast_result))
-			undo_redo.commit_action()
+			_unselect_block(raycast_result)
+			remove_blocks([raycast_result])
 		ui.ROTATE:
-			undo_redo.create_action("3DWorld Element: Rotate")
-			undo_redo.add_do_method(raycast_result.rotate.bind(Vector3.UP, PI/2))
-			undo_redo.add_undo_reference(raycast_result)
-			undo_redo.add_undo_method(raycast_result.rotate.bind(Vector3.UP, -PI/2))
-			if roundi(raycast_result.scale.x) % 2 == 0:
-				undo_redo.add_undo_property(raycast_result, "position", raycast_result.position)
-				raycast_result.position.x -= grid_size.x/2
-				raycast_result.position.z += grid_size.z/2
-				undo_redo.add_do_property(raycast_result, "position", raycast_result.position)
-			undo_redo.add_do_method(_on_element_transform_update.bind(raycast_result))
-			undo_redo.add_undo_method(_on_element_transform_update.bind(raycast_result))
-			undo_redo.commit_action()
+			_unselect_block(raycast_result)
+			rotate_blocks([raycast_result])
 		ui.MIRROR:
-			undo_redo.create_action("3DWorld Element: Mirror")
-			undo_redo.add_undo_property(raycast_result, "scale", raycast_result.scale)
-			raycast_result.scale.z = -raycast_result.scale.z
-			undo_redo.add_do_property(raycast_result, "scale", raycast_result.scale)
-			undo_redo.add_do_method(_on_element_transform_update.bind(raycast_result))
-			undo_redo.add_undo_method(_on_element_transform_update.bind(raycast_result))
-			undo_redo.commit_action()
+			_unselect_block(raycast_result)
+			mirror_blocks([raycast_result])
 		ui.RENAME:
 			if raycast_result.get_block_control():
 				_show_name_dialog(_rename_element.bind(raycast_result), raycast_result.get_block_control().get_block_name())
+	
+	_update_block_ui()
+
+var _moving_in_progress := false
+var _move_init_element
 
 func _on_do_move_step(_point) -> void:
-	for element in _moving_elements:
-		var offset = _intersection_grid_position - element.position + grid_size * 0.01
+	_moving_in_progress = true
+	var offset = _intersection_grid_position - _move_init_element.position + grid_size * 0.01
+	for element in _selected_elements:
 		element.position += offset.round()
 		# uses round offset is need for scaled element with scale % 2 == 0
 		# `+ grid_size * 0.01` to avoid object jumping/flickering
 
 func _on_do_move_finish() -> void:
-	if not _moving_elements:
+	if not _selected_elements:
 		return
 	
 	# check (on first element if was moved)
-	var first_element = _moving_elements.keys()[0]
-	if first_element.position != _moving_elements[first_element]:
+	var first_element = _selected_elements.keys()[0]
+	if first_element.position != _selected_elements[first_element]:
 		# create common undo_redo action for all elements
 		undo_redo.create_action("3DWorld Element: Move")
-		for element in _moving_elements:
+		for element in _selected_elements:
 			undo_redo.add_do_property(element, "position", element.position)
-			undo_redo.add_undo_property(element, "position", _moving_elements[element])
+			undo_redo.add_undo_property(element, "position", _selected_elements[element])
 			undo_redo.add_do_method(_on_element_transform_update.bind(element))
 			undo_redo.add_undo_method(_on_element_transform_update.bind(element))
 		undo_redo.commit_action()
-	_moving_elements.clear()
+	
+	_moving_in_progress = false
 
 func _on_do_on_raycast_selection_finish(raycast_result: Variant, multi_select : bool, _selection_box : Variant) -> void:
 	if raycast_result: #  <=>  if "on_click" event:
@@ -337,8 +474,6 @@ func _on_do_on_raycast_selection_finish(raycast_result: Variant, multi_select : 
 			elif raycast_result.object_type == "ComputerControlBlock":
 				var computer_id = raycast_result.get_meta("computer_id")
 				FAG_WindowManager.set_windows_visibility_recursive(factory_control.computer_control_blocks[computer_id], true)
-
-	_moving_elements.clear()
 
 func _on_do_scale_step(point: Vector2) -> void:
 	if _intersection and _scaled_element:
@@ -372,24 +507,44 @@ func _on_ui_focus_lost() -> void:
 	# NOTE: do NOT set `_intersection_need_update = true` here
 	# to avoid update _intersection before update mouse position after get focus again
 
+#endregion
 
-### Input handle
+#region Input handle
 
 func _input(event: InputEvent) -> void:
 	if not ui.input_allowed:
 		return
 	# override UI buttons shortcuts in some situations
-	if event.is_action_pressed("EDIT_ROTATE", false, true) and ui.active_ui_tool == ui.ELEMENT:
-		_new_element.rotate(Vector3.UP, -PI/2)
-		get_viewport().set_input_as_handled()
+	var mode = ui.active_ui_tool
+	if FAG_Utils.action_exact_match_pressed("EDIT_ROTATE", event):
+		if mode == ui.ELEMENT:
+			_new_element.rotate(Vector3.UP, -PI/2)
+			get_viewport().set_input_as_handled()
+		elif mode == ui.SELECT and len(_selected_elements) > 0:
+			rotate_blocks(_selected_elements, _intersection.position)
+			get_viewport().set_input_as_handled()
+	elif FAG_Utils.action_exact_match_pressed("EDIT_MIRROR", event):
+		if mode == ui.ELEMENT:
+			_new_element.scale.z = -_new_element.scale.z
+			get_viewport().set_input_as_handled()
+		elif mode == ui.SELECT and len(_selected_elements) > 0:
+			mirror_blocks(_selected_elements, _intersection.position)
+			get_viewport().set_input_as_handled()
+	elif FAG_Utils.action_exact_match_pressed("EDIT_DELETE", event):
+		if mode == ui.SELECT and len(_selected_elements) > 0:
+			remove_blocks(_selected_elements)
+			get_viewport().set_input_as_handled()
 
 func _on_mouse_enter_exit_gui_area(enter: bool) -> void:
 	camera.use_mouse_control = not enter
 
+#endregion
 
-### Init - configure UI, etc
+#region Init - configure UI, etc
 
 func _ready() -> void:
+	%BlockConfig.hide()
+	
 	ui.do_raycast = _get_block_from_raycast.bind()
 	ui.undo.connect(undo_redo.undo)
 	ui.redo.connect(undo_redo.redo)
@@ -408,8 +563,9 @@ func set_visibility(value : bool) -> void:
 	visible = value
 	ui.call_deferred("set_visibility", value)
 
+#endregion
 
-### Utils
+#region Utils
 
 func _on_element_transform_update(element):
 	if element.has_method("on_transform_update"):
@@ -417,3 +573,5 @@ func _on_element_transform_update(element):
 
 static func get_block_from_collider(element : PhysicsBody3D) -> Node3D:
 	return element.get_parent()
+
+#endregion
