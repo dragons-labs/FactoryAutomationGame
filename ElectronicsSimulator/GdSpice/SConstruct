@@ -82,8 +82,8 @@ Ignore('.', 'compile_commands.json')
 # add godot ignore file to output directory
 env.Textfile('#/bin/.gdignore', [''])
 
-# use dlopen and serach also in `ngspice` dir
-env.Append(CXXFLAGS=['-DUSE_DLOPEN'], RPATH='ngspice')
+# use dlopen and search also in `ngspice` and `libs` dirs
+env.Append(CXXFLAGS=['-DUSE_DLOPEN'], RPATH=Literal("'$$ORIGIN/ngspice:$$ORIGIN/libs'"))
 
 # platform specific settings
 if env['platform'] == "windows":

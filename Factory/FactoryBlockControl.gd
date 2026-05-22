@@ -12,7 +12,7 @@ func set_block_name(new_name) -> void:
 	_deinit_factory_signals()
 	
 	if new_name != null:
-		_in_game_name = new_name
+		_in_game_name = str(new_name)
 	elif _in_game_name != null:
 		_in_game_name = ""
 	# else: keep old name while call with name == null

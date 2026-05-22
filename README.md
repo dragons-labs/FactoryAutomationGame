@@ -27,16 +27,42 @@ The game offers full simulation of electronic circuits (based on ngspice) and co
 * In-game manual (especially English version) requires verification.
 * It's works, but may be bugged or have missing minor features.
 
-## Build Instruction (on Linux platform)
+## How to get?
+
+### Option 1: Download Prebuilt Binaries from GitHub
+
+1. Download the latest release from [GitHub Releases](https://github.com/dragons-labs/FactoryAutomationGame/).
+2. Unpack archive
+3. Run `FactoryAutomation.sh` or `FactoryAutomation.exe` depending on the chosen platform
+
+These archives also contain other programs and libraries required to run the game.
+If you want to use the Linux version using system libraries and programs, you can simply delete their copies located in the unpacked game directory (`ld-linux-x86-64.so.2` - dynamic linker/loader, `libs/` - standard libraries, `cef_artifacts/linux/libs/` - libcef dependencies, `ngspice/` - libngspice, `qemu/` - qemu and virtiofsd).
+
+### Option 2: Build from source
 
 1. clone project repository: `git clone https://github.com/dragons-labs/FactoryAutomationGame/`
 2. run `just` command in project root repo directory
 
-**Important:** This version require Godot 4.6 or higher.
-
 You can also export project for Linux and Windows platform using `./export.sh` script (do not directly use export option in editor).
 Use `./export.sh` to export amd64 Linux version or `./export.sh Windows` to export amd64 Windows version.
-Results will be written to `tmp/export/`.
+Results will be written to `/tmp/FAG-export/`.
+
+**Important:**
+
+* Full building from sources and export is only supported on Debian GNU/Linux (and compatible systems, but tested only on Debian Trixie).
+* System level (not build/installed by `just`) dependencies for:
+  * Building/running from sources:
+    * Godot 4.6 (or higher, but tested only on 4.6)
+    * game run time dependencies:
+      * `libngspice0` and `ngspice` (for shared files)
+      * `qemu-system-x86`, `ipxe-qemu`, `virtiofsd` (optional)
+    * addons and resources build time dependencies (are not necessary when using precompiled binaries from GitHub Releases):
+      * `just`, `scons`, `make`, `bash`, `python3`, `pip3`, `git`, `wget`, `g++`, `gcc`
+      * (build gdspice) `libngspice0-dev`
+      * (create OS image for qemu) `mmdebstrap`, `guestfs-tools` (`virt-make-fs`), `qemu-utils`
+  * Using export script (in addition to the above):
+    * `patchelf`, `dpkg`
+    * (for build Windows libs) `pacman`, `unzip`, `g++-mingw-w64`, `gcc-mingw-w64`
 
 ## License
 

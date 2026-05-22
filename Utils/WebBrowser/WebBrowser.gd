@@ -118,6 +118,13 @@ func _on_page_failed_loading(_aborted, _msg_err, node):
 #region  GdCEF specific
 
 func _init_GdCEF():
+	var use_gpu = true
+	if OS.has_environment("GDCEF_NO_GPU"):
+		print("GdCEF disabling GPU, because GDCEF_NO_GPU env variable is set")
+		use_gpu = false
+	elif OS.get_name() == "Linux" and OS.execute(FAG_Utils.globalize_path("cef_artifacts/linux/check_libGL.sh"), []) != 0:
+		print("GdCEF disabling GPU, because libGL not found")
+		use_gpu = false
 	if not _gdcef.initialize({
 			"incognito":true,
 			"locale":"en-US",
@@ -126,6 +133,7 @@ func _init_GdCEF():
 			"exported_artifacts": FAG_Utils.globalize_path("cef_artifacts"),
 			"root_cache_path": FAG_Utils.globalize_path("user://cef_cache"),
 			"log_file": FAG_Utils.globalize_path("user://cef.log"),
+			"use_gpu": use_gpu,
 	}):
 		printerr("GdCEF init error: ", _gdcef.get_error())
 		return

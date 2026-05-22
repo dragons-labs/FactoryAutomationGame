@@ -118,6 +118,29 @@ DBUS_SESSION_BUS_ADDRESS=disabled: godot --headless --export-debug $PLATFORM $TA
 
 $FAST && exit
 
+# for binary dependencies we are using Debian licences files also for Windows export
+# this is not ideal but I haven't found a way to easily extract this information from msys2
+extract_licence_info() {
+	dst=$1; shift
+	mkdir -p $TARGET/LICENSES/$dst
+	for p in $(for p in $@; do dpkg -S $p; done | cut -f1 -d: | sort | uniq); do
+		cp /usr/share/doc/$p/copyright $TARGET/LICENSES/$dst/$p.copyright;
+	done
+	[ -d $TARGET/LICENSES/common-licenses ] || cp -r /usr/share/common-licenses/ $TARGET/LICENSES/
+}
+
+create_run_via_ld_script() {
+	LD_PATH=${2:-..}
+	mv "$TARGET/$1" "$TARGET/$1.elf"
+	echo 'cd "$(dirname "$(realpath "$0")")"' > "$TARGET/$1"
+	echo '[ -e '$LD_PATH'/ld-linux-x86-64.so.2 ] && echo "using local ld for '$1'" && exec '$LD_PATH'/ld-linux-x86-64.so.2 ./'$(basename $1)'.elf "$@"' >> "$TARGET/$1"
+	echo 'exec ./'$(basename $1)'.elf "$@"' >> "$TARGET/$1"
+	chmod +x "$TARGET/$1"
+}
+
+
+echo "Exporting docs and licences"
+
 # add readme and licence info
 cp -r README.md LICENSES $TARGET/
 
@@ -125,6 +148,9 @@ cp -r README.md LICENSES $TARGET/
 mkdir -p $TARGET/LICENSES/addons
 (cd addons/3rdparty/; for d in *; do if [ -d "$d" ]; then cp "$d"/*LICENSE* "$TARGET/LICENSES/addons/$d.LICENSE"; fi; done)
 (cd addons/; for d in *; do if [ -d "$d" ] && ! git ls-files --error-unmatch "$d" >/dev/null 2>&1; then cp "$d"/*LICENSE* "$TARGET/LICENSES/addons/$d.LICENSE"; fi; done)
+
+
+echo "Exporting qemu images"
 
 # export images for qemu (must be outside .pck file)
 mkdir -p $TARGET/qemu_img
@@ -135,38 +161,48 @@ for d in qemu_img/*.img.copyright qemu_img/*.bzImage.copyright; do
 	cp -r $d $TARGET/LICENSES/$(basename $d .copyright);
 done
 
+
+echo "Exporting gdcef"
+
 # export gdcef assemblies (must be outside .pck file)
-mkdir -p $TARGET/cef_artifacts/
-cp -fr $CEF_ARTIFACTS/$(echo $PLATFORM | tr '[:upper:]' '[:lower:]') $TARGET/cef_artifacts/
+platform=$(echo $PLATFORM | tr '[:upper:]' '[:lower:]')
+mkdir -p $TARGET/cef_artifacts/$platform
+cp -fr $CEF_ARTIFACTS/$platform/* $TARGET/cef_artifacts/$platform/
 if [ "$PLATFORM" = "Linux" ]; then
 	cp -fr $CEF_ARTIFACTS/locales $TARGET/cef_artifacts/
 elif [ "$PLATFORM" = "Windows" ]; then
 	cp -fr $CEF_ARTIFACTS/locales-win $TARGET/cef_artifacts/locales
 fi
-\rm -rf $TARGET/cef_artifacts/*/cache $TARGET/cef_artifacts/*/debug.log $TARGET/cef_artifacts/gdcef.gdextension
-\rm -f $TARGET/libgdcef.* $TARGET/libcef.*
+\rm -rf $TARGET/cef_artifacts/*/cache $TARGET/cef_artifacts/*/debug.log
+\rm -f $TARGET/cef_artifacts/gdcef.gdextension $TARGET/libgdcef.* $TARGET/libcef.*
 
 # add CEF licence info
 mkdir -p $TARGET/LICENSES/cef
 cp addons/3rdparty/gdcef/thirdparty/cef_binary/{CREDITS.html,LICENSE.txt} $TARGET/LICENSES/cef/
 
-
-
-# for binary dependencies we are using Debian licences files also for Windows export
-# this is not ideal but I haven't found a way to easily extract this information from msys2
-extract_licence_info() {
-	dst=$1; shift
-	mkdir $TARGET/LICENSES/$dst
-	for p in $(for p in $@; do dpkg -S $p; done | cut -f1 -d: | sort | uniq); do
-		cp /usr/share/doc/$p/copyright $TARGET/LICENSES/$dst/$p.copyright;
+# add cef and gdcef libs dependencies
+if [ "$PLATFORM" = "Linux" ]; then
+	GDCEF_LIB="$TARGET/cef_artifacts/linux/libcef.so $TARGET/cef_artifacts/linux/libgdcef.so  $TARGET/cef_artifacts/linux/gdCefRenderProcess"
+	GDCEF_LIB2="/usr/lib/x86_64-linux-gnu/libsoftokn3.so /usr/lib/x86_64-linux-gnu/libfreeblpriv3.so"
+	GDCEF_LIB3=$(ldd $GDCEF_LIB $GDCEF_LIB2 | awk '{print $3}' | sort | uniq | grep -v libcef)
+	mkdir $TARGET/cef_artifacts/linux/libs/
+	for f in $GDCEF_LIB2 $GDCEF_LIB3; do
+		patchelf --set-rpath '$ORIGIN' --output "$TARGET/cef_artifacts/linux/libs/$(basename $f)" "$(realpath $f)"
 	done
-	[ -d $TARGET/LICENSES/common-licenses ] || cp -r /usr/share/common-licenses/ $TARGET/LICENSES/
-}
+	for f in $GDCEF_LIB; do
+		patchelf --set-rpath '$ORIGIN:$ORIGIN/libs:$ORIGIN/../../libs' "$f"
+	done
+	create_run_via_ld_script cef_artifacts/linux/gdCefRenderProcess ../..
+	extract_licence_info cef $(realpath $GDCEF_LIB2 $GDCEF_LIB3)
+fi
 
+
+echo "Exporting libngspice"
 
 # add ngspice binaries
 
 NGSPICE_LIB=$(realpath /usr/lib/x86_64-linux-gnu/libngspice.so)
+NGSPICE_LIB2=$(ldd $NGSPICE_LIB | awk '{print $3}' | sort | uniq)
 NGSPICE_DATA=$(realpath /usr/lib/x86_64-linux-gnu/ngspice/*)
 NGSPICE_INIT=$(realpath /usr/share/ngspice/scripts/spinit)
 
@@ -174,7 +210,10 @@ mkdir -p $TARGET/ngspice
 
 if [ "$PLATFORM" = "Linux" ]; then
 	cp $NGSPICE_DATA $TARGET/ngspice
-	cp $NGSPICE_LIB $TARGET/ngspice/libngspice.so
+	patchelf --set-rpath '$ORIGIN' --output "$TARGET/ngspice/libngspice.so" "$NGSPICE_LIB"
+	for f in $NGSPICE_LIB2; do
+		patchelf --set-rpath '$ORIGIN:$ORIGIN/../libs' --output "$TARGET/ngspice/$(basename $f)" "$(realpath $f)"
+	done
 	sed -e 's#/usr/lib/x86_64-linux-gnu/##' $NGSPICE_INIT > $TARGET/ngspice/spinit
 elif [ "$PLATFORM" = "Windows" ]; then
 	cp -r ElectronicsSimulator/GdSpice/bin/mingw64/lib/ngspice $TARGET/
@@ -182,12 +221,15 @@ elif [ "$PLATFORM" = "Windows" ]; then
 	sed -e 's#/mingw64/lib/##' ElectronicsSimulator/GdSpice/bin/mingw64/share/ngspice/scripts/spinit > $TARGET/ngspice/spinit
 fi
 
-extract_licence_info ngspice $NGSPICE_LIB $NGSPICE_DATA $NGSPICE_INIT
+extract_licence_info ngspice $(realpath $NGSPICE_LIB $NGSPICE_LIB2) $NGSPICE_DATA $NGSPICE_INIT
 
+
+echo "Exporting qemu"
 
 # add qemu binaries
 
-QEMU_BIN="/usr/bin/qemu-system-x86_64 $(ldd /usr/bin/qemu-system-x86_64 | awk '{print $3}')"
+QEMU_BIN="/usr/bin/qemu-system-x86_64"
+QEMU_LIB=$(ldd "$QEMU_BIN" | awk '{print $3}' | sort | uniq)
 QEMU_SHARE=$(realpath /usr/share/seabios/{bios-256k.bin,vgabios-stdvga.bin} /usr/share/qemu/{efi-e1000.rom,efi-virtio.rom,kvmvapic.bin,linuxboot_dma.bin})
 QEMU_KEYMAPS=/usr/share/qemu/keymaps/en-us
 
@@ -197,36 +239,69 @@ cp $QEMU_SHARE $TARGET/qemu/share/
 cp $QEMU_KEYMAPS $TARGET/qemu/share/keymaps/
 
 if [ "$PLATFORM" = "Linux" ]; then
-	for f in $QEMU_BIN; do
-		cp $(realpath $f) $TARGET/qemu/$(basename $f)
+	for f in $QEMU_BIN $QEMU_LIB; do
+		patchelf --set-rpath '$ORIGIN:$ORIGIN/../libs' --output "$TARGET/qemu/$(basename $f)" "$(realpath $f)"
 	done
+	create_run_via_ld_script qemu/qemu-system-x86_64
 elif [ "$PLATFORM" = "Windows" ]; then
 	mkdir -p $TARGET/qemu/bin $TARGET/qemu/share/keymaps
 	cp $QEMU_WIN_BIN/qemu-system-x86_64.exe $TARGET/qemu/bin
 	cp $QEMU_WIN_BIN/*.dll $TARGET/qemu/bin
 fi
 
-extract_licence_info qemu $(realpath $QEMU_BIN) $QEMU_SHARE $QEMU_KEYMAPS
+extract_licence_info qemu $(realpath $QEMU_BIN $QEMU_LIB) $QEMU_SHARE $QEMU_KEYMAPS
 
 
 # add virtiofsd binaries
 
-VIRTIOFSD_BIN="/usr/libexec/virtiofsd $(ldd /usr/libexec/virtiofsd | awk '{print $3}')"
-
+VIRTIOFSD_BIN="/usr/libexec/virtiofsd"
+VIRTIOFSD_LIB=$(ldd $VIRTIOFSD_BIN | awk '{print $3}' | sort | uniq)
 if [ "$PLATFORM" = "Linux" ]; then
-	for f in $VIRTIOFSD_BIN; do
-		cp $(realpath $f) $TARGET/qemu/$(basename $f)
+	for f in $VIRTIOFSD_BIN $VIRTIOFSD_LIB; do
+		patchelf --set-rpath '$ORIGIN:$ORIGIN/../libs' --output "$TARGET/qemu/$(basename $f)" "$(realpath $f)"
 	done
+	create_run_via_ld_script qemu/virtiofsd
 fi
 
-extract_licence_info virtiofsd $(realpath $VIRTIOFSD_BIN)
+extract_licence_info virtiofsd $(realpath $VIRTIOFSD_BIN $VIRTIOFSD_LIB)
 
 
-# Windows specific (.exe, add libstdc++-6.dll)
+echo "Finalizing export"
 
-if [ "$PLATFORM" = "Windows" ]; then
+# Platform specific (additional libs for Linux, .exe, libstdc++-6.dll for Windows, ...)
+
+if [ "$PLATFORM" = "Linux" ]; then
+	GODOT_BIN="$TARGET/FactoryAutomation $TARGET/libgodot-xterm.linux.template_debug.x86_64.so"
+	GODOT_LIB=$(ldd $GODOT_BIN | awk '{print $3}' | sort | uniq)
+	for f in $GODOT_BIN; do
+		patchelf --set-rpath '$ORIGIN:$ORIGIN/libs' $f
+	done
+	mkdir $TARGET/libs
+	for f in $GODOT_LIB; do
+		patchelf --set-rpath '$ORIGIN' --output "$TARGET/libs/$(basename $f)" "$(realpath $f)"
+	done
+	(cd $TARGET/libs && for f in *; do rm -f ../cef_artifacts/linux/libs/$f ../qemu/$f ../ngspice/$f; done)
+	
+	LD_LIB="/lib64/ld-linux-x86-64.so.2"
+	cp "$(realpath $LD_LIB)" "$TARGET/$(basename $LD_LIB)"
+	GODOT_LIB="$GODOT_LIB $(realpath $LD_LIB)"
+	(cd $TARGET && ln -s FactoryAutomation.pck ld-linux-x86-64.so.2.pck)
+	
+	sed -n '1,3p' -i "$TARGET/FactoryAutomation.sh"
+	echo 'mkdir -p "$HOME/.local/share/godot/app_userdata/FactoryAutomation/"' >> "$TARGET/FactoryAutomation.sh"
+	echo 'cd "$base_path"' >> "$TARGET/FactoryAutomation.sh"
+	echo 'if [ -e ./ld-linux-x86-64.so.2 ]; then' >> "$TARGET/FactoryAutomation.sh"
+	echo './ld-linux-x86-64.so.2 ./FactoryAutomation "$@" 2>&1 | tee "$HOME/.local/share/godot/app_userdata/FactoryAutomation/godot.stdout.log"' >> "$TARGET/FactoryAutomation.sh"
+	echo 'else' >> "$TARGET/FactoryAutomation.sh"
+	echo './FactoryAutomation "$@" 2>&1 | tee "$HOME/.local/share/godot/app_userdata/FactoryAutomation/godot.stdout.log"' >> "$TARGET/FactoryAutomation.sh"
+	echo 'fi' >> "$TARGET/FactoryAutomation.sh"
+elif [ "$PLATFORM" = "Windows" ]; then
 	mv $TARGET/FactoryAutomation $TARGET/FactoryAutomation.exe
 	cp /usr/lib/gcc/x86_64-w64-mingw32/*-posix/libstdc++-6.dll $TARGET/
 fi
 
+extract_licence_info libs $(realpath $GODOT_LIB)
+cp addons/3rdparty/_godot-cpp/LICENSE.md $TARGET/LICENSES/libs/GODOT.md
+
+echo
 echo "Project exported into $TARGET"

@@ -82,7 +82,7 @@ func configure(system_id, configuration : Dictionary) -> void:
 
 func async_start():
 	if _pid:
-		printerr("Can't start. Simulation already is running.")
+		_logerr("Can't start. Simulation already is running.")
 		return
 	
 	running_state = IS_RUNNING
@@ -94,7 +94,7 @@ func async_start():
 	var user_port = _user_console.get_local_port()
 	var msg_port = _msg_bus.get_local_port()
 	var qemu_mon_port = _qemu_mon.get_local_port()
-	print("Listen on: %d %d %d for computer system %d" % [user_port, msg_port, qemu_mon_port, computer_system_id])
+	_log("Listen on: %d %d %d" % [user_port, msg_port, qemu_mon_port])
 	
 	# configure TabContainer
 	
@@ -145,14 +145,14 @@ func async_start():
 	
 	_pid = await _async_run_qemu(user_port, msg_port, qemu_mon_port, vnc_port)
 	if _pid > 0:
-		print("Computer system emulator %d -> pid = %d "  % [computer_system_id, _pid])
+		_log("QEMU emulator pid = %d "  % _pid)
 		$CheckAlive.start()
 	else:
-		printerr("Computer system emulator %d not started (_run_qemu returned: %d)"  % [computer_system_id, _pid])
+		_logerr("QEMU not started (_run_qemu returned: %d)"  % _pid)
 		system_crash.emit(computer_system_id, false)
 
 func async_stop():
-	print("Stop computer system emulator %d (pid %d)" % [computer_system_id, _pid])
+	_log("Stop computer system emulator pid=%d" % _pid)
 	if _pid > 0:
 		running_state = IS_STOPPING
 		$CheckAlive.stop()
@@ -169,13 +169,13 @@ func async_stop():
 			if not OS.is_process_running(_pid):
 				break
 			if x % 10 == 0:
-				print("Wait for computer system %d (%d) exit ... %d" % [computer_system_id, _pid, x])
+				_log("Wait for QEMU (pid=%d) exit ... %d" % [_pid, x])
 			await FAG_Utils.real_time_wait(0.1)
 		
 		if OS.is_process_running(_pid):
 			_kill()
 		else:
-			print("Computer system %d (%d) is down" % [computer_system_id, _pid])
+			_log("QEMU (pid=%d) is down" % [computer_system_id, _pid])
 		
 	_pid = 0
 	running_state = IS_NOT_RUNNING
@@ -225,27 +225,18 @@ func _async_run_qemu(user_port, msg_port, qemu_mon_port, vnc_port):
 			if not FileAccess.file_exists(virtiofsd_path):
 				virtiofsd_path = "/usr/libexec/virtiofsd"
 			if not FileAccess.file_exists(virtiofsd_path):
-				print("Can't find virtiofsd, switch to virtio_9p mode.")
+				_log("Can't find virtiofsd, switch to virtio_9p mode.")
 				virtfs_mode = Virtfs_Mode.VIRTIO_9P
 	
-	var socket_paths = []
 	if virtfs_mode == Virtfs_Mode.VIRTIO_FS:
-		args += ["-object", "memory-backend-file,id=mem,size=%s,mem-path=/dev/shm,share=on" % memory_size, "-numa", "node,memdev=mem"]
-		var ii := 0
-		for virtfs_tag in virtfs:
-			var socket_path := "%s/virtiofs_%d_%s_%d" % [_work_dir.get_current_dir(), computer_system_id, virtfs_tag, msg_port]
-			
-			var virtiofsd_args := ["--cache=always", "--socket-path=%s" % socket_path, "--shared-dir=%s" % FAG_Utils.globalize_path(virtfs[virtfs_tag])]
-			var virtiofsd_pid := OS.create_process(virtiofsd_path, virtiofsd_args)
-			print("Started virtiofsd pid=", virtiofsd_pid, " path=", virtiofsd_path, " args=", virtiofsd_args)
-			_others_pids.append(virtiofsd_pid)
-			
-			args += ["-chardev", "socket,id=char%d,path=%s" % [ii, socket_path]]
-			args += ["-device", "vhost-user-fs-pci,queue-size=1024,chardev=char%d,tag=%s" % [ii, virtfs_tag]]
-			
-			socket_paths.append(socket_path)
-			ii += 1
-	elif virtfs_mode == Virtfs_Mode.VIRTIO_9P:
+		var virtiofs_args = await _configure_virtiofs(virtiofsd_path, msg_port)
+		if virtiofs_args:
+			args.append_array(virtiofs_args)
+		else:
+			_logerr("Virtiofs setup fail, trying: virtfs (9p)")
+			virtfs_mode = Virtfs_Mode.VIRTIO_9P
+		
+	if virtfs_mode == Virtfs_Mode.VIRTIO_9P:
 		for virtfs_tag in virtfs:
 			args += ["-virtfs", "local,path=%s,mount_tag=%s,security_model=mapped" % [FAG_Utils.globalize_path(virtfs[virtfs_tag]), virtfs_tag]]
 	
@@ -255,7 +246,6 @@ func _async_run_qemu(user_port, msg_port, qemu_mon_port, vnc_port):
 	
 	if OS.get_name() != "Windows":
 		args += ["-enable-kvm", "-cpu", "host"]
-	
 	args += ["-machine", "q35"]
 	
 	args += ["-L", FAG_Utils.globalize_path("qemu/share")]
@@ -270,36 +260,72 @@ func _async_run_qemu(user_port, msg_port, qemu_mon_port, vnc_port):
 		path = FAG_Utils.globalize_path("qemu/qemu-system-x86_64")
 		if not FileAccess.file_exists(path):
 			path = "qemu-system-x86_64"
-		else:
-			OS.set_environment("LD_LIBRARY_PATH", FAG_Utils.globalize_path("qemu") + ":" +  OS.get_environment("LD_LIBRARY_PATH"))
 	
-	print("Waiting for sockets")
+	
+	_log("Starting qemu (%s), with args: %s" % [path, str(args)])
+	var run = OS.execute_with_pipe(path, args, false)
+	_read2log.append(["qemu stdout", run.stdio])
+	_read2log.append(["qemu stderr", run.stderr])
+	return run.pid
+
+func _configure_virtiofs(virtiofsd_path, msg_port) -> Array:
+	var args = ["-object", "memory-backend-file,id=mem,size=%s,mem-path=/dev/shm,share=on" % memory_size, "-numa", "node,memdev=mem"]
+	var socket_paths = []
+	var virtiofsd_pids = []
+	var ii := 0
+	for virtfs_tag in virtfs:
+		var socket_path := "%s/virtiofs_%d_%s_%d" % [_work_dir.get_current_dir(), computer_system_id, virtfs_tag, msg_port]
+		
+		var virtiofsd_args := ["--cache=always", "--socket-path=%s" % socket_path, "--shared-dir=%s" % FAG_Utils.globalize_path(virtfs[virtfs_tag])]
+		var run = OS.execute_with_pipe(virtiofsd_path, virtiofsd_args, false)
+		_log("Started virtiofsd pid=%d path=%s args=%s" % [run.pid, virtiofsd_path, str(virtiofsd_args)])
+		_read2log.append(["virtiofsd %s (%d) stdout" % [virtfs_tag, run.pid], run.stdio])
+		_read2log.append(["virtiofsd %s (%d) stderr" % [virtfs_tag, run.pid], run.stderr])
+		virtiofsd_pids.append(run.pid)
+		_others_pids.append(run.pid)
+		
+		args += ["-chardev", "socket,id=char%d,path=%s" % [ii, socket_path]]
+		args += ["-device", "vhost-user-fs-pci,queue-size=1024,chardev=char%d,tag=%s" % [ii, virtfs_tag]]
+		
+		socket_paths.append(socket_path)
+		ii += 1
+	
+	_log("Waiting for virtiofsd sockets")
+	var all_sockets_ready : bool
 	for i in range(socket_wait_timeout * 10):
-		var all_sockets_ready = true
+		all_sockets_ready = true
 		for p in socket_paths:
 			if not _work_dir.file_exists(p):
 				all_sockets_ready = false
 				break
 		if all_sockets_ready:
-			print("All sockets for qemu (computer system ", str(computer_system_id), ") are ready")
+			_log("All virtiofsd sockets are ready")
 			break
 		else:
 			await FAG_Utils.real_time_wait(0.1)
 	
-	
-	print("Starting qemu (", path, "), with args: ", args)
-	return OS.create_process(path, args)
+	if all_sockets_ready:
+		return args
+	else:
+		_logerr("Some virtiofsd sockets are NOT ready")
+		for pid in virtiofsd_pids:
+			var ret = OS.kill(pid)
+			if ret != OK and ret != ERR_INVALID_PARAMETER:
+				_logerr("Failed to kill support process %d, error code: %d" % [pid, ret])
+			_others_pids.erase(pid)
+		return []
+
 
 func _kill():
 	if OS.is_process_running(_pid):
-		printerr("Kill computer system emulator %d (pid=%d)" % [computer_system_id, _pid])
+		_logerr("Kill QEMU (pid=%d)" % _pid)
 		var ret = OS.kill(_pid)
 		if ret != OK and ret != ERR_INVALID_PARAMETER:
-			printerr("Failed to kill computer system emulator %d (pid=%d), error code: %d" % [computer_system_id, _pid, ret])
+			_logerr("Failed to kill QEMU %d (pid=%d), error code: %d" % [_pid, ret])
 	for p in _others_pids:
 		var ret = OS.kill(p)
 		if ret != OK and ret != ERR_INVALID_PARAMETER:
-			printerr("Failed to kill computer system emulator %d (pid=%d) support process %d, error code: %d" % [computer_system_id, _pid, p, ret])
+			_logerr("Failed to kill support process %d, error code: %d" % [_pid, p, ret])
 	_pid = 0
 
 
@@ -361,7 +387,7 @@ func send_message_via_msg_bus(string):
 		_msg_bus.put_8(0x0a)
 
 func send_qemu_command(command : String):
-	prints("send_qemu_command:", command)
+	_log("send_qemu_command: " + command)
 	_qemu_mon.put_data(command.to_utf8_buffer())
 
 
@@ -413,7 +439,7 @@ func _physics_process(_delta):
 			send_message_via_msg_bus("configuration_done")
 		elif cmd.begins_with("computer_system_ready"):
 			running_state = IS_RUNNING | IS_READY
-			print("Computer system (id=%d) is ready" % computer_system_id)
+			_log("This computer system is ready")
 			computer_system_is_run_and_ready.emit()
 		elif cmd.begins_with("set_output_value"):
 			var cmd_split = cmd.split(" ", 2)
@@ -424,6 +450,14 @@ func _physics_process(_delta):
 		elif cmd != "":
 			msg_bus_command.emit(cmd, self)
 	)
+	
+	for log_in in _read2log:
+		while true:
+			var l = log_in[1].get_line()
+			if l:
+				_log("[" + log_in[0] + "]: " + l)
+			else:
+				break
 
 
 ### signal callbacks
@@ -433,7 +467,7 @@ func _on_data_sent(data):
 		_user_console.put_data(data)
 
 func _on_size_changed(new_size):
-	print("Terminal size changed: ", new_size)
+	_log("Terminal size changed: " + str(new_size))
 	if _msg_bus.is_client_connected():
 		send_message_via_msg_bus("terminal_size_changed %d %d" % [new_size.y, new_size.x])
 		# send resize info on auxiliary channel to call `stty -F /dev/ttyS0 rows $ARG1 cols $ARG2`
@@ -452,8 +486,18 @@ func _on_visibility_changed() -> void:
 
 func _on_check_alive_timeout() -> void:
 	if not OS.is_process_running(_pid):
-		printerr("Computer system emulator %d (pid = %d) crashed"  % [computer_system_id, _pid])
+		_logerr("QEMU (pid = %d) crashed"  % _pid)
 		system_crash.emit(computer_system_id, running_state & IS_READY)
 		$CheckAlive.stop()
 		running_state = IS_NOT_RUNNING
 		_kill()
+
+# log functions
+
+var _read2log := []
+
+func _log(msg):
+	print("[ComputerSystem %d]" %computer_system_id, msg)
+
+func _logerr(msg):
+	printerr("[ComputerSystem %d]" %computer_system_id, msg)

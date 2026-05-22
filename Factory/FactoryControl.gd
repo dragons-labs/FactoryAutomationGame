@@ -114,6 +114,7 @@ func async_start(use_circuit_simulation : bool, circuit_simulation_time_step : S
 		if _system_state[CIRCUIT] == INIT_FAIL:
 			printerr("Start aborted - circuit simulation in INIT_FAIL state")
 			_running_state = START_CANCELED_ACK
+			simulation_error.emit("circuit simulation crash error")
 			return false
 		
 		_system_state[CIRCUIT] = NOT_READY

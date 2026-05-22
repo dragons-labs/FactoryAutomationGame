@@ -51,7 +51,7 @@ bool GdSpice::init(const godot::String& libngspice, int _verbose) {
 	#endif
 	ngSpice_dll = dlopen(libngspice.utf8().get_data(), RTLD_NOW);
 	if (!ngSpice_dll) {
-		godot::UtilityFunctions::printerr(("[GdSpice] ERROR: can't load libngspice: " + libngspice).utf8().get_data());
+		godot::UtilityFunctions::printerr(("[GdSpice] ERROR: can't load libngspice from \"" + libngspice + "\": " + dlerror()).utf8().get_data());
 		return false;
 	}
 	ngSpice_Init = reinterpret_cast<ngSpice_Init_Type>(dlsym(ngSpice_dll, "ngSpice_Init"));
@@ -363,10 +363,11 @@ int GdSpice::on_sync(double time, double* deltatime, double olddeltatime, int re
 		if ((gd_spice->simulation_state & WORKING_TYPE_STATE_MASK) == 0x00) // not PAUSED, READY nor RUNNING
 			return 0;
 	}
-
+	
 	if (olddeltatime < 1e-8) {
 		*deltatime = 1e-6;
-		std::cerr << "ERRRRR   " << time * 1000000 << "us " << olddeltatime << " redo:" << redostep << " " << ident << " " << location << "\n";
+		if (gd_spice->verbose)
+			godot::UtilityFunctions::print("[GdSpice] too small step ", (time * 1000000), "us step:", olddeltatime, " redo:", " ", ident, " ", location);
 	}
 	
 	return 0;

@@ -103,5 +103,8 @@ build-addons-gdcef: build-godot-cpp
 			done < requirements.txt
 			
 			/usr/bin/env python3 build.py
+			
+			echo '/sbin/ldconfig -p | grep libGL.so.1 > /dev/null; exit $?' > cef_artifacts/linux/check_libGL.sh
+			chmod +x cef_artifacts/linux/check_libGL.sh
 		)
 	fi
