@@ -110,7 +110,7 @@ signal do_move_step(point : Vector2)
 signal do_move_finish()
 
 ## emitted (in SELECT mode) when the left mouse button is released
-signal do_on_raycast_selection_finish(raycast_result : Variant, multi_select : bool, _selection_box : Variant)
+signal do_on_raycast_selection_finish(raycast_result : Variant, multi_select_add : bool, multi_select_rem : bool, _selection_box : Variant)
 
 ## emitted (in SCALE mode) when mouse move
 signal do_scale_step(point : Vector2)
@@ -158,7 +158,8 @@ func _init() -> void:
 		"EDIT_DELETE": [{"key": KEY_X}],
 		"EDIT_LINE_TOOL": [{"key": KEY_L}],
 		"EDIT_RENAME": [{"key": KEY_N}],
-		"EDIT_MULTISELECT": [{"key": KEY_SHIFT}],
+		"EDIT_MULTISELECT_ADD": [{"key": KEY_SHIFT}],
+		"EDIT_MULTISELECT_REM": [{"key": KEY_CTRL}],
 	})
 	
 	if settings_group_name:
@@ -323,7 +324,6 @@ func _on_ui_tool_selected(force := false) -> void:
 ### Input processing
 
 var _raycast_result = null
-var _multi_select = false
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _mouse_in_gui_area or not input_allowed:
@@ -350,25 +350,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				_raycast_result = do_raycast.call(point)
-				_multi_select = Input.is_action_pressed("EDIT_MULTISELECT")
+				var multi_select = Input.is_action_pressed("EDIT_MULTISELECT_ADD") or Input.is_action_pressed("EDIT_MULTISELECT_REM")
 				if not _editor_enabled:
 					return
 				if _raycast_result:
 					if is_selected.call(_raycast_result):
-						if not _multi_select and active_ui_tool == SELECT:
+						if not multi_select and active_ui_tool == SELECT:
 							active_ui_tool = MOVE
-						do_on_selection.emit(active_ui_tool, point, _raycast_result, _multi_select)
+						do_on_selection.emit(active_ui_tool, point, _raycast_result, multi_select)
 					else:
 						_selection_box.clear()
 						if active_ui_tool == SELECT:
 							@warning_ignore("missing_await") _async_set_move_mode()
 						elif active_ui_tool == SCALE:
 							active_ui_tool = SCALE_IN_PROGRESS
-						do_on_raycast_result.emit(active_ui_tool, point, _raycast_result, _multi_select)
+						do_on_raycast_result.emit(active_ui_tool, point, _raycast_result, multi_select)
 				else:
 					if selection_box_enabled:
 						_selection_box.init(point)
-					do_on_raycast_result.emit(active_ui_tool, point, null, _multi_select)
+					do_on_raycast_result.emit(active_ui_tool, point, null, multi_select)
 			else: # mouse button released
 				if active_ui_tool == MOVE or active_ui_tool == SELECT_LONG:
 					do_move_finish.emit()
@@ -381,7 +381,9 @@ func _unhandled_input(event: InputEvent) -> void:
 						_selection_box.clear()
 					if _selection_box.visible:
 						_selection_box.done()
-					do_on_raycast_selection_finish.emit(_raycast_result, _multi_select, _selection_box)
+					var multi_select_add = Input.is_action_pressed("EDIT_MULTISELECT_ADD")
+					var multi_select_rem = Input.is_action_pressed("EDIT_MULTISELECT_REM")
+					do_on_raycast_selection_finish.emit(_raycast_result, multi_select_add, multi_select_rem, _selection_box)
 				_selection_box.clear()
 				_raycast_result = null
 		elif event is InputEventMouseMotion:

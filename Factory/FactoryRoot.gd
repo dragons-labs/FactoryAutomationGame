@@ -668,6 +668,9 @@ func _factory_clear():
 func show_task_info(grab_escape := false) -> void:
 	show_manual.emit(level_scene_node, GAME_PROGRESS_SAVE, grab_escape)
 
+func show_main_menu() -> void:
+	hide_show_main_menu.emit()
+
 signal show_manual(object : Object, progress_save_path : String, grab_escape : bool)
 
 signal hide_show_main_menu()

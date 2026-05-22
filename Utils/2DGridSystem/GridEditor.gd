@@ -87,7 +87,7 @@ func _is_selected(raycast_result : Variant) -> bool:
 		return true
 	return false
 
-func _update_selection(new_selected_elements, new_selected_segmetnts) -> void:
+func _update_selection(new_selected_elements : Array, new_selected_segmetnts : Array) -> void:
 	for element in _selected_elements:
 		_mark_element(element, normal_color)
 	for segment in _selected_segmetnts:
@@ -101,21 +101,31 @@ func _update_selection(new_selected_elements, new_selected_segmetnts) -> void:
 	for segment in _selected_segmetnts:
 		_mark_segment(segment, selection_color)
 
-func _add_to_selection(new_element : Variant, new_segment : Dictionary) -> void:
-	if new_element:
-		_mark_element(new_element, selection_color)
-		_selected_elements.append(new_element)
-	if new_segment:
-		_mark_segment(new_segment, selection_color)
-		_selected_segmetnts.append(new_segment)
+func _add_to_selection(new_element : Variant, new_segment : Variant) -> void:
+	if new_element is not Array:
+		new_element = [new_element] if new_element else []
+	if new_segment is not Array:
+		new_segment = [new_segment] if new_segment else []
+	
+	for element in new_element:
+		_mark_element(element, selection_color)
+		_selected_elements.append(element)
+	for segment in new_segment:
+		_mark_segment(segment, selection_color)
+		_selected_segmetnts.append(segment)
 
-func _rem_from_selection(new_element : Node2D, new_segment : Dictionary) -> void:
-	if new_element:
-		_mark_element(new_element, normal_color)
-		_selected_elements.erase(new_element)
-	if new_segment:
-		_mark_segment(new_segment, normal_color)
-		_selected_segmetnts.erase(new_segment)
+func _rem_from_selection(new_element : Variant, new_segment : Variant) -> void:
+	if new_element is not Array:
+		new_element = [new_element] if new_element else []
+	if new_segment is not Array:
+		new_segment = [new_segment] if new_segment else []
+	
+	for element in new_element:
+		_mark_element(element, normal_color)
+		_selected_elements.erase(element)
+	for segment in new_segment:
+		_mark_segment(segment, normal_color)
+		_selected_segmetnts.erase(segment)
 
 func _mark_element(element : Node2D, color : Color) -> void:
 	element.get_node("Image").modulate = color
@@ -217,13 +227,20 @@ func _on_do_move_finish() -> void:
 		# long click
 		on_element_click.emit(_selected_elements[0], true)
 
-func _on_do_on_raycast_selection_finish(raycast_result : Variant, multi_select : bool, selection_box : Variant) -> void:
+func _on_do_on_raycast_selection_finish(raycast_result : Variant, multi_select_add : bool, multi_select_rem : bool, selection_box : Variant) -> void:
 	if raycast_result and raycast_result[0]:
 		on_element_click.emit(raycast_result[0], false)
 	
 	if selection_box.is_valid():
 		var area = ui._selection_box.get_area()
-		_update_selection(grid.gElements.find_elements_on_area(area), grid.gLines.find_segments_on_area(area))
+		var elements_to_select = grid.gElements.find_elements_on_area(area)
+		var lines_to_select = grid.gLines.find_segments_on_area(area)
+		if multi_select_add:
+			_add_to_selection(elements_to_select, lines_to_select)
+		elif multi_select_rem:
+			_rem_from_selection(elements_to_select, lines_to_select)
+		else:
+			_update_selection(elements_to_select, lines_to_select)
 	
 	grid.gLines.move_segment__cancel()
 	grid.gElements.move_element__cancel()

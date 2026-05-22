@@ -100,6 +100,7 @@ func _on_block_remove(element : Node3D) -> void:
 #region 3D world raycast
 
 var _intersection = null
+var _intersection_point = Vector2(0,0)
 var _intersection_grid_position : Vector3
 var _intersection_need_update = true
 
@@ -113,9 +114,9 @@ func _create_collision_sphere():
 
 func _process(_delta) -> void:
 	if _intersection_need_update:
-		var point = _viewport.get_mouse_position()
-		var ray_start = camera.project_ray_origin(point)
-		var ray_end = ray_start + camera.project_ray_normal(point) * ray_length
+		_intersection_point = _viewport.get_mouse_position()
+		var ray_start = camera.project_ray_origin(_intersection_point)
+		var ray_end = ray_start + camera.project_ray_normal(_intersection_point) * ray_length
 		var exclude = []
 		if _new_element:
 			exclude.append_array(_new_element.get_physics_rids())
@@ -466,7 +467,7 @@ func _on_do_move_finish() -> void:
 	
 	_moving_in_progress = false
 
-func _on_do_on_raycast_selection_finish(raycast_result: Variant, multi_select : bool, _selection_box : Variant) -> void:
+func _on_do_on_raycast_selection_finish(raycast_result: Variant, multi_select_add : bool, multi_select_rem : bool, _selection_box : Variant) -> void:
 	if raycast_result: #  <=>  if "on_click" event:
 		if "object_type" in raycast_result:
 			if raycast_result.object_type == "ElectronicControlBlock":
@@ -553,6 +554,9 @@ func _ready() -> void:
 		ui.add_element(element)
 
 func _get_block_from_raycast(_point):
+	if (_intersection_point-_viewport.get_mouse_position()).length_squared() > 4:
+		_intersection = null
+		_intersection_need_update = true
 	if _intersection:
 		var block := get_block_from_collider(_intersection.collider)
 		if block.get_parent() == factory_blocks_main_node:

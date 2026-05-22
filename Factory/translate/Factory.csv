@@ -21,7 +21,10 @@ FACTORY_START,Run,Start
 FACTORY_STOP,Stop,Stop
 FACTORY_PAUSE,Pause,Pause
 FACTORY_UNPAUSE,Unpause,Unpause
-FACTORY_TASK_INFO,Task Info,Informacje
+FACTORY_TASK_INFO,❔,❔
+FACTORY_TASK_INFO_TOOLTIPS,Task Info,Informacje
+FACTORY_MAIN_MENU,≡,≡
+FACTORY_MAIN_MENU_TOOLTIPS,Main Menu,Menu główne
 FACTORY_GAME_TIME,Simulation time:,Czas fabryki:
 FACTORY_SPECIAL_PAUSE_MESSAGE,Factory simulation in progress ... please wait, Symulacja w toku ... proszę czekać
 

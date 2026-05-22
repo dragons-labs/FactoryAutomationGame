@@ -90,12 +90,22 @@ func _on_window_input(event: InputEvent, win : Window, catch_global_escape : boo
 				event.button_index = MOUSE_BUTTON_NONE
 
 func set_windows_visibility_recursive(win : Window, value : bool) -> void:
+	if not value:
+		win.set_meta("pre_hide_position", win.position)
 	win.visible = value
+	
 	for subwin in win.find_children("*", "Window", true, false):
 		if not (subwin is AcceptDialog or subwin is Popup):
+			if not value:
+				subwin.set_meta("pre_hide_position", subwin.position)
 			subwin.visible = value
+			if subwin.visible and subwin.has_meta("pre_hide_position"):
+				subwin.position = subwin.get_meta("pre_hide_position")
+	
 	if win.visible:
 		win.grab_focus()
+		if win.has_meta("pre_hide_position"):
+			win.position = win.get_meta("pre_hide_position")
 
 func hide_all_windows(node : Node = null):
 	if not node:

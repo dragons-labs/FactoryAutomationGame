@@ -20,100 +20,117 @@
 [ext_resource type="PackedScene" uid="uid://khgv770bgcv8" path="res://Factory/FactoryBlocks/SimpleLogicOR.tscn" id="16_mvkar"]
 [ext_resource type="PackedScene" uid="uid://blpck3uwql0tf" path="res://Factory/FactoryBlocks/SimpleLogicNOT.tscn" id="17_m6io6"]
 
-[node name="FactoryRoot" type="Node3D"]
+[node name="FactoryRoot" type="Node3D" unique_id=1936233235]
 script = ExtResource("1_88vxl")
 
-[node name="FactoryBuilder" parent="." node_paths=PackedStringArray("factory_control", "factory_root") instance=ExtResource("2_ncfa0")]
+[node name="FactoryBuilder" parent="." unique_id=1641194050 node_paths=PackedStringArray("factory_control", "factory_root") instance=ExtResource("2_ncfa0")]
 elements = Array[PackedScene]([ExtResource("4_wpvne"), ExtResource("5_u6lyq"), ExtResource("6_a113l"), ExtResource("7_q855b"), ExtResource("8_flw0k"), ExtResource("4_ipc57"), ExtResource("12_oom2c"), ExtResource("10_gofsm"), ExtResource("11_f8ngn"), ExtResource("9_xypg3"), ExtResource("11_aa"), ExtResource("14_3m60o"), ExtResource("15_ixy5m"), ExtResource("16_mvkar"), ExtResource("17_m6io6")])
 factory_control = NodePath("../FactoryControl")
 factory_root = NodePath("..")
 attachable_objects_collision_mask = 4294967295
 blocking_space_objects_collision_mask = 4294967295
 
-[node name="FactoryControl" parent="." instance=ExtResource("2_cmtbq")]
+[node name="FactoryControl" parent="." unique_id=399375001 instance=ExtResource("2_cmtbq")]
 
-[node name="FactoryUI" type="CanvasLayer" parent="."]
+[node name="FactoryUI" type="CanvasLayer" parent="." unique_id=781543158]
 
-[node name="RunAndSpeedControl" type="VBoxContainer" parent="FactoryUI"]
+[node name="RunAndSpeedControl" type="VBoxContainer" parent="FactoryUI" unique_id=1850540984]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -277.0
-offset_bottom = 40.0
+offset_right = -5.0
+offset_bottom = 58.0
 grow_horizontal = 0
+alignment = 2
 
-[node name="GameSpeed" type="HBoxContainer" parent="FactoryUI/RunAndSpeedControl"]
+[node name="GameSpeed" type="HBoxContainer" parent="FactoryUI/RunAndSpeedControl" unique_id=348110403]
 unique_name_in_owner = true
 layout_mode = 2
+alignment = 2
 script = ExtResource("3_g2qw6")
 
-[node name="Value" type="Label" parent="FactoryUI/RunAndSpeedControl/GameSpeed"]
+[node name="Value" type="Label" parent="FactoryUI/RunAndSpeedControl/GameSpeed" unique_id=1667052685]
 layout_mode = 2
 text = "1.0"
 
-[node name="Slider" type="HSlider" parent="FactoryUI/RunAndSpeedControl/GameSpeed"]
-custom_minimum_size = Vector2(250, 0)
+[node name="Slider" type="HSlider" parent="FactoryUI/RunAndSpeedControl/GameSpeed" unique_id=1993820943]
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_vertical = 4
 max_value = 2.0
 step = 0.05
 value = 1.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="FactoryUI/RunAndSpeedControl"]
+[node name="HBoxContainer" type="HBoxContainer" parent="FactoryUI/RunAndSpeedControl" unique_id=1407228581]
 layout_mode = 2
+alignment = 2
 
-[node name="TaskInfo" type="Button" parent="FactoryUI/RunAndSpeedControl/HBoxContainer"]
+[node name="TaskInfo" type="Button" parent="FactoryUI/RunAndSpeedControl/HBoxContainer" unique_id=1914766264]
+custom_minimum_size = Vector2(31, 31)
 layout_mode = 2
+tooltip_text = "FACTORY_TASK_INFO_TOOLTIPS"
 focus_mode = 0
 text = "FACTORY_TASK_INFO"
 
-[node name="Control" type="Control" parent="FactoryUI/RunAndSpeedControl/HBoxContainer"]
+[node name="Control4" type="Control" parent="FactoryUI/RunAndSpeedControl/HBoxContainer" unique_id=1169869173]
+custom_minimum_size = Vector2(5, 0)
+layout_mode = 2
+
+[node name="MainMenu" type="Button" parent="FactoryUI/RunAndSpeedControl/HBoxContainer" unique_id=753977152]
+custom_minimum_size = Vector2(31, 31)
+layout_mode = 2
+tooltip_text = "FACTORY_MAIN_MENU_TOOLTIPS"
+focus_mode = 0
+text = "FACTORY_MAIN_MENU"
+
+[node name="Control" type="Control" parent="FactoryUI/RunAndSpeedControl/HBoxContainer" unique_id=1796917338]
+custom_minimum_size = Vector2(10, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Pause" type="Button" parent="FactoryUI/RunAndSpeedControl/HBoxContainer"]
+[node name="Pause" type="Button" parent="FactoryUI/RunAndSpeedControl/HBoxContainer" unique_id=1307536012]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "FACTORY_PAUSE"
 
-[node name="Control3" type="Control" parent="FactoryUI/RunAndSpeedControl/HBoxContainer"]
-custom_minimum_size = Vector2(10, 0)
+[node name="Control3" type="Control" parent="FactoryUI/RunAndSpeedControl/HBoxContainer" unique_id=839942337]
+custom_minimum_size = Vector2(5, 0)
 layout_mode = 2
 
-[node name="StartStop" type="Button" parent="FactoryUI/RunAndSpeedControl/HBoxContainer"]
+[node name="StartStop" type="Button" parent="FactoryUI/RunAndSpeedControl/HBoxContainer" unique_id=1090965537]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "FACTORY_START"
 
-[node name="Control2" type="Control" parent="FactoryUI/RunAndSpeedControl/HBoxContainer"]
-custom_minimum_size = Vector2(10, 0)
+[node name="Control2" type="Control" parent="FactoryUI/RunAndSpeedControl/HBoxContainer" unique_id=1505465657]
+custom_minimum_size = Vector2(5, 0)
 layout_mode = 2
 
-[node name="RunInfo" type="VBoxContainer" parent="FactoryUI"]
+[node name="RunInfo" type="VBoxContainer" parent="FactoryUI" unique_id=1330452158]
 unique_name_in_owner = true
 offset_left = 4.0
 offset_right = 280.0
 offset_bottom = 50.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="FactoryUI/RunInfo"]
+[node name="HBoxContainer" type="HBoxContainer" parent="FactoryUI/RunInfo" unique_id=988361210]
 layout_mode = 2
 
-[node name="GameTimeInfo" type="Label" parent="FactoryUI/RunInfo/HBoxContainer"]
+[node name="GameTimeInfo" type="Label" parent="FactoryUI/RunInfo/HBoxContainer" unique_id=188238580]
 layout_mode = 2
 text = "FACTORY_GAME_TIME"
 
-[node name="GameTimeValue" type="Label" parent="FactoryUI/RunInfo/HBoxContainer"]
+[node name="GameTimeValue" type="Label" parent="FactoryUI/RunInfo/HBoxContainer" unique_id=474952543]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="SpecialPauseMessage" type="Label" parent="FactoryUI/RunInfo"]
+[node name="SpecialPauseMessage" type="Label" parent="FactoryUI/RunInfo" unique_id=1234640970]
 unique_name_in_owner = true
 layout_mode = 2
 text = "FACTORY_SPECIAL_PAUSE_MESSAGE"
 
-[node name="Message" type="PanelContainer" parent="FactoryUI"]
+[node name="Message" type="PanelContainer" parent="FactoryUI" unique_id=1398037599]
 unique_name_in_owner = true
 visible = false
 anchors_preset = 15
@@ -123,13 +140,13 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_type_variation = &"FullScreenBlocker"
 
-[node name="PanelContainer" type="PanelContainer" parent="FactoryUI/Message"]
+[node name="PanelContainer" type="PanelContainer" parent="FactoryUI/Message" unique_id=1327675661]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_type_variation = &"MessageBox"
 
-[node name="MarginContainer" type="MarginContainer" parent="FactoryUI/Message/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="FactoryUI/Message/PanelContainer" unique_id=501638214]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -138,21 +155,21 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="FactoryUI/Message/PanelContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="FactoryUI/Message/PanelContainer/MarginContainer" unique_id=789506912]
 layout_mode = 2
 
-[node name="Message_Title" type="Label" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Message_Title" type="Label" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer" unique_id=1013786368]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"HeaderLarge"
 text = "Title"
 horizontal_alignment = 1
 
-[node name="Control" type="Control" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Control" type="Control" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer" unique_id=305315066]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="Message_Text" type="Label" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Message_Text" type="Label" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer" unique_id=2072967763]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 80)
 layout_mode = 2
@@ -161,23 +178,24 @@ text = "Text
 horizontal_alignment = 3
 autowrap_mode = 3
 
-[node name="Control2" type="Control" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Control2" type="Control" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer" unique_id=1596251949]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="OK" type="Button" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="OK" type="Button" parent="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer" unique_id=1782730515]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "FACTORY_ERROR_CLOSE_BUTTON"
 
-[node name="ObjectsRoot" type="Node3D" parent="."]
+[node name="ObjectsRoot" type="Node3D" parent="." unique_id=239669409]
 process_mode = 1
 
-[node name="UserBlocksRoot" type="Node3D" parent="."]
+[node name="UserBlocksRoot" type="Node3D" parent="." unique_id=1672143840]
 process_mode = 1
 
 [connection signal="value_changed" from="FactoryUI/RunAndSpeedControl/GameSpeed" to="." method="_on_game_speed_value_changed"]
 [connection signal="pressed" from="FactoryUI/RunAndSpeedControl/HBoxContainer/TaskInfo" to="." method="show_task_info"]
+[connection signal="pressed" from="FactoryUI/RunAndSpeedControl/HBoxContainer/MainMenu" to="." method="show_main_menu"]
 [connection signal="pressed" from="FactoryUI/RunAndSpeedControl/HBoxContainer/Pause" to="." method="_on_pause_pressed"]
 [connection signal="pressed" from="FactoryUI/RunAndSpeedControl/HBoxContainer/StartStop" to="." method="_async_on_start_stop_pressed"]
 [connection signal="pressed" from="FactoryUI/Message/PanelContainer/MarginContainer/VBoxContainer/OK" to="." method="_on_errormsg_ok_pressed"]
