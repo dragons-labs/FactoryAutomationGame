@@ -212,7 +212,8 @@ func _async_run_qemu(user_port, msg_port, qemu_mon_port, vnc_port):
 	]
 	
 	if writable_disk_image:
-		args += ["-drive", "id=diskrw0,file=" + FAG_Utils.globalize_path(writable_disk_image) + ",index=1,media=disk,if=virtio,cache=none,read-only=off"]
+		args += ["-drive", "id=diskrw0,file=" + FAG_Utils.globalize_path(writable_disk_image) + ",index=1,media=disk,if=virtio,cache=" + "none" if OS.get_name() != "Windows" else "writeback" + ",read-only=off"]
+		# NOTE: "cache=none" on Windows causes an error with the message that the image is not in qcow2 format
 	
 	
 	if OS.get_name() == "Windows":

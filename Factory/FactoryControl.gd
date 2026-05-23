@@ -467,9 +467,11 @@ class _Timer:
 			return false
 		_time_left -= delta
 		if _time_left <= 0:
+			var time_left = _time_left
 			timeout.emit(_time_left)
 			if _period:
-				_time_left += _period
+				if time_left == _time_left: # if reset() was not called in callback
+					_time_left += _period
 			else:
 				return true # timer to remove
 		return false # timer to keep
@@ -488,13 +490,13 @@ func create_timer(time : float, one_shot := true):
 
 #region   ready check private callbacks and helpers
 
-func _async_wait_for_ready(subsystem : int, name : String):
+func _async_wait_for_ready(subsystem : int, system_name : String):
 	while true:
 		if _running_state == START_CANCELED:
 			_running_state = START_CANCELED_ACK
 			return false
 		if _system_state[subsystem] == FAIL:
-			printerr("Start aborted - " + name + " system simulation in FAIL state")
+			printerr("Start aborted - " + system_name + " system simulation in FAIL state")
 			_running_state = START_CANCELED_ACK
 			return false
 		if _system_state[subsystem] == READY:
@@ -513,9 +515,9 @@ func _on_circuit_simulation_ready_state() -> void:
 	print("circuit simulation is ready")
 	_system_state[CIRCUIT] = READY
 
-func _on_computer_system_simulator_crash(computer_system_id: Variant, after_ready: bool) -> void:
+func _on_computer_system_simulator_crash(computer_system_id: Variant, _after_ready: bool) -> void:
 	_system_state[COMPUTER] = FAIL
-	simulation_error.emit("computer simulation crash error")
+	simulation_error.emit("computer simulation %d crash error" % computer_system_id)
 
 func  _update_computer_systems_simulation_ready_state() -> void:
 	if len(computer_control_blocks) == 0:

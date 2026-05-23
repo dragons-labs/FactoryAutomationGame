@@ -76,11 +76,12 @@ static func set_default_controls_and_create_actions(tr_prefix : String, actions_
 
 
 var _all_settings := {}
+var _settings_order := {}
 var _custom_values := {}
 var _custom_actions := {}
 var _setters_to_call := {}
 
-func register_settings(object : Object, group_name : String, settings : Dictionary, actions : Dictionary) -> void:
+func register_settings(object : Object, group_name : String, settings : Dictionary, actions : Dictionary, priority := 0x00010000) -> void:
 	if group_name in _all_settings:
 		_all_settings[group_name].objects.append(object)
 		_all_settings[group_name].settings.merge(settings)
@@ -103,6 +104,8 @@ func register_settings(object : Object, group_name : String, settings : Dictiona
 				#   value[0] → default action events info – events_keys_info (Array of Dictionaries, argument of `register_action`)
 				#   value[1] → UI name
 		}
+		_settings_order["%08x %s" % [priority, group_name]] = group_name
+		_settings_order.sort()
 	for setting_name in settings:
 		if settings[setting_name].get("call_setters", false):
 			_setters_to_call[[object, setting_name]] = settings[setting_name].default_value
@@ -178,14 +181,11 @@ func reset_settings_ui(ui_parent : Control) -> void:
 			ui_parent.remove_child(c)
 			c.queue_free()
 
-func reinit_settings_ui(ui_parent : Control, ui_remap_info : Control, ordered := []) -> void:
+func reinit_settings_ui(ui_parent : Control, ui_remap_info : Control) -> void:
 	ui_parent = ui_parent.get_node("%SettingsList")
 	reset_settings_ui(ui_parent)
-	for group_name in ordered:
-		FAG_Settings.generate_settings_ui(group_name, ui_parent, ui_remap_info)
-	for group_name in _all_settings:
-		if not group_name in ordered:
-			generate_settings_ui(group_name, ui_parent, ui_remap_info)
+	for order_key in _settings_order:
+		FAG_Settings.generate_settings_ui(_settings_order[order_key], ui_parent, ui_remap_info)
 
 var action_rempaing = []
 

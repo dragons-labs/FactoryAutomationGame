@@ -52,7 +52,7 @@ func test_error_on_circiut_init():
 	await assert_signal(factory_control.circuit_simulator).is_emitted('simulation_error')
 	await _check_visible("FACTORY_ERROR_TITLE")
 	
-	await assert_signal(factory_root).is_emitted('emergency_stopped') # TODO BUG https://github.com/MikeSchulze/gdUnit4/issues/1002
+	await assert_signal(factory_root).is_emitted('emergency_stopped')
 
 func test_error_short_circuit():
 	# add short circiut

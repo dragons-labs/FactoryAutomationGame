@@ -58,7 +58,7 @@ func _init() -> void:
 	})
 	
 	if settings_group_name:
-		FAG_Settings.register_settings(self, settings_group_name, default_settings, default_controls)
+		FAG_Settings.register_settings(self, settings_group_name, default_settings, default_controls, 0x1110)
 
 func _ready() -> void:
 	if world:

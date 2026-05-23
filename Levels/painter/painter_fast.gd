@@ -10,6 +10,7 @@ var circuit_simulation_max_time := "600s"
 var circuit_simulator_time_scale := 10.0
 var circuit_simulation_current_limit := 5
 var circuit_simulation_voltage_limit := 0
+var circuit_simulation_floating_to_gnd := "10G"
 
 ## circuit components settings
 var supported_circuit_components := [

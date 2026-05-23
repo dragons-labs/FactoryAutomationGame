@@ -10,7 +10,6 @@ enum Mode {NORMAL, LOAD, LOAD_SAVE, WRITE_SAVE, SETTINGS, LOADING}
 var _current_mode : Mode
 
 @export var _game_root : Node3D
-@export var _settings_order : Array[String]
 
 func _set_mode(mode : Mode) -> void:
 	_current_mode = mode
@@ -92,7 +91,7 @@ func _on_settings_pressed() -> void:
 	var relative_size := Vector2(0.55, 0.55)
 	%SettingsDialog.custom_minimum_size = screen_size * relative_size
 	#%SettingsDialog.position = screen_size * (Vector2(1, 1)-relative_size) * 0.5
-	FAG_Settings.reinit_settings_ui(%SettingsDialog, %SettingsKeyReampDialog, _settings_order)
+	FAG_Settings.reinit_settings_ui(%SettingsDialog, %SettingsKeyReampDialog)
 	_set_mode(Mode.SETTINGS)
 
 
@@ -252,7 +251,7 @@ func _init():
 		"GLOBAL_ESCAPE": [{"key": KEY_ESCAPE}],
 		"GLOBAL_BREAK":  [{"key": KEY_PAUSE, "shift": true}, {"key": KEY_PAUSE, "ctrl": true}],
 	})
-	FAG_Settings.register_settings(self, "MAIN_MENU_UI_SETTINGS_GROUP_NAME", {}, default_controls)
+	FAG_Settings.register_settings(self, "MAIN_MENU_UI_SETTINGS_GROUP_NAME", {}, default_controls, 0x2000)
 	
 	LimboConsole.register_command(_unlocked_all_levels, "unlock_all_levels", "Unlock all levels")
 

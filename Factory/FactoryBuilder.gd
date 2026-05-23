@@ -467,7 +467,7 @@ func _on_do_move_finish() -> void:
 	
 	_moving_in_progress = false
 
-func _on_do_on_raycast_selection_finish(raycast_result: Variant, multi_select_add : bool, multi_select_rem : bool, _selection_box : Variant) -> void:
+func _on_do_on_raycast_selection_finish(raycast_result: Variant, _multi_select_add : bool, _multi_select_rem : bool, _selection_box : Variant) -> void:
 	if raycast_result: #  <=>  if "on_click" event:
 		if "object_type" in raycast_result:
 			if raycast_result.object_type == "ElectronicControlBlock":

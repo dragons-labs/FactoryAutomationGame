@@ -99,7 +99,7 @@ func _init() -> void:
 	})
 	
 	if settings_group_name:
-		FAG_Settings.register_settings(self, settings_group_name, default_settings, default_controls)
+		FAG_Settings.register_settings(self, settings_group_name, default_settings, default_controls, 0x100)
 
 func _unhandled_input(_event: InputEvent) -> void:
 	if FAG_Utils.action_exact_match_pressed("GRAPHICS_FULL_SCREEN"):

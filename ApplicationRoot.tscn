@@ -18,7 +18,6 @@ unique_name_in_owner = true
 
 [node name="MainMenu" parent="." node_paths=PackedStringArray("_game_root") instance=ExtResource("4_bwojk")]
 _game_root = NodePath("../FactoryRoot")
-_settings_order = Array[String](["LOCALE_SETTINGS_GROUP_NAME", "GRAPHICS_SETTINGS_GROUP_NAME", "MAIN_MENU_UI_SETTINGS_GROUP_NAME", "CAMERA3D_SETTINGS_GROUP_NAME", "CAMERA2D_SETTINGS_GROUP_NAME"])
 
 [node name="LocaleSettings" type="Node" parent="MainMenu"]
 script = ExtResource("3_vwh6e")

@@ -4,6 +4,13 @@
 
 extends Node
 
+## Use temporary dir for workdir (default false on Windows, otherwise true)
+@export var workdir_in_tmp := OS.get_name() != "Windows"
+
+## Name of settings group for this object. This allowing override some properties and input maps.
+## Set to empty string to disable using settings (hide in settings menu, disallow override properties and key mapping).
+@export var settings_group_name := "FACTORY_ADVANCED_SETTINGS_GROUP_NAME"
+
 @onready var game_speed := %GameSpeed
 @onready var factory_builder := $FactoryBuilder
 @onready var factory_control := $FactoryControl
@@ -47,6 +54,14 @@ const GAME_PROGRESS_SAVE := "user://game_progress.json"
 const SAVE_INFO_FILE := "/save_info.json"
 var AUTOSAVE_PATH_PREFIX : String
 
+func _init() -> void:
+	var default_settings = FAG_Settings.set_default_setting_from_object(self, "FACTORY_ADVANCED_SETTINGS_", [
+		"workdir_in_tmp"
+	])
+	
+	if settings_group_name:
+		FAG_Settings.register_settings(self, settings_group_name, default_settings, {}, 0x80000000)
+
 ### load / save / restore
 
 func load_level(level_id : String, save_dir := "") -> void:
@@ -56,12 +71,18 @@ func load_level(level_id : String, save_dir := "") -> void:
 	level_scene_node.name = "FactoryLevel"
 	level_scene_node.process_mode = Node.PROCESS_MODE_PAUSABLE
 	
-	work_dir = DirAccess.create_temp("FAG-workdir")
+	if workdir_in_tmp:
+		work_dir = DirAccess.create_temp("FAG-workdir")
+	else:
+		FAG_Utils.remove_dir_recursive("user://workdir")
+		DirAccess.make_dir_recursive_absolute("user://workdir")
+		DirAccess.open("user://workdir")
 	var work_dir_path = work_dir.get_current_dir()
 	
 	# set circuit_simulator parameters (other parameters are set via factory_control.start()
 	factory_control.circuit_simulator.current_limit = level_scene_node.circuit_simulation_current_limit
 	factory_control.circuit_simulator.voltage_limit = level_scene_node.circuit_simulation_voltage_limit
+	factory_control.circuit_simulator.floating_to_gnd = level_scene_node.circuit_simulation_floating_to_gnd
 	
 	# set computer system simulator parameters
 	var computer_config = level_scene_node.computer_systems_configuration(work_dir_path)
@@ -472,7 +493,8 @@ func _on_conflict_error(info : Array) -> void:
 func emergency_stop(title : String, message : String):
 	if _factory_state & FactoryState.EMERGENCY_STOP:
 		return
-	_factory_state = FactoryState.RUNNING | FactoryState.EMERGENCY_STOP
+	if _factory_state != FactoryState.STOP:
+		_factory_state = FactoryState.RUNNING | FactoryState.EMERGENCY_STOP
 	_factory_paused = true
 	_start_canceled = true
 	get_tree().paused = true

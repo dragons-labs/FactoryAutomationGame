@@ -37,10 +37,10 @@ extends Node2D
 
 ## function used for getting editable elements on [param _point],
 ## should be provided by class using WorldEditorUI
-@export var do_raycast : Callable = func(point : Vector2): return null
+@export var do_raycast : Callable = func(__point : Vector2): return null
 
 ## function used to check if result of do_raycast call was currently selected object
-@export var is_selected : Callable = func(raycast_result : Variant): return false
+@export var is_selected : Callable = func(__raycast_result : Variant): return false
 
 ## Name of settings group for this object. This allowing override some properties and input maps.
 ## Set to empty string to disable using settings (hide in settings menu, disallow override properties and key mapping).
@@ -163,7 +163,7 @@ func _init() -> void:
 	})
 	
 	if settings_group_name:
-		FAG_Settings.register_settings(self, settings_group_name, {}, default_controls)
+		FAG_Settings.register_settings(self, settings_group_name, {}, default_controls, 0x8000)
 		FAG_Settings.keymap_update.connect(_on_keymap_update)
 
 func _ready() -> void:
@@ -240,19 +240,19 @@ func add_element(element : PackedScene) -> void:
 	print("Add element to editor UI: ", button.name)
 	# iterate over properties of first child of root node
 	# (node index == 0 => first (root) node in packed scene)
-	var name := ""
-	var desc := ""
+	var ui_name := ""
+	var ui_desc := ""
 	for i in range(state.get_node_property_count(0)):
 		if state.get_node_property_name(0, i) == "ui_name":
-			name = state.get_node_property_value(0, i)
+			ui_name = state.get_node_property_value(0, i)
 		if state.get_node_property_name(0, i) == "ui_desc":
-			desc = state.get_node_property_value(0, i)
+			ui_desc = state.get_node_property_value(0, i)
 		if state.get_node_property_name(0, i) == "ui_icon":
 			button.icon = state.get_node_property_value(0, i)
-	if name and desc:
-		button.tooltip_text = tr(name) + "\n" + tr(desc)
-	elif name:
-		button.tooltip_text = tr(name)
+	if ui_name and ui_desc:
+		button.tooltip_text = tr(ui_name) + "\n" + tr(ui_desc)
+	elif ui_name:
+		button.tooltip_text = tr(ui_name)
 	_ui_add_elements_container.add_child(button)
 	_set_no_input_transparent_ui(button)
 	_elements_dict[button.name] = [element, button]

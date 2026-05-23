@@ -10,6 +10,10 @@ extends Node2D
 ## Voltage value to trigger over voltage protection (0 to disable voltage checking)
 @export var voltage_limit = 0
 
+## Resistance value of the floating networks and terminals connection to ground
+## (empty string to disable auto connect floating inputs to gnd)
+@export var floating_to_gnd := "10G"
+
 signal overcurrent_protection(fuse : String, value : float)
 signal overvoltage_protection(net : String, value : float)
 signal simulation_error()
@@ -79,6 +83,7 @@ func init_circuit(
 			external_nets_input_to_circuit_from_factory,
 			external_nets_outputs_from_circuit_to_factory,
 			external_circuit_entries,
+			floating_to_gnd,
 			time_scale
 		)
 		gdspice.load(netlist_info[0])

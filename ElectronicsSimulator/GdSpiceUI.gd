@@ -29,7 +29,8 @@ func get_ngspice_netlist(
 		external_nets_input_to_circuit_from_factory : Array,
 		external_nets_outputs_from_circuit_to_factory : Array,
 		external_circuit_entries : Array,
-		time_scale := 1.0
+		floating_to_gnd,
+		time_scale
 	) -> Array:
 	
 	_time_scale = time_scale
@@ -83,10 +84,10 @@ func get_ngspice_netlist(
 	# connect (floating) nets via high impedance to GND
 	var rzgnd_number = 0
 	for x in nets:
-		if x.terminals: # TODO use settings to enable / disable this feature
-			circuit.append("RZGND%d %s %s 10G" % [rzgnd_number, x.name, gnd_net.name])
-			floating_nets.append_array(x.names)
+		if floating_to_gnd and x.terminals:
+			circuit.append("RZGND%d %s %s %s" % [rzgnd_number, x.name, gnd_net.name, floating_to_gnd])
 			rzgnd_number += 1
+			floating_nets.append_array(x.names)
 	
 	# generate warning if we have floating nets
 	if len(floating_nets) > 0:
@@ -113,9 +114,9 @@ func get_ngspice_netlist(
 				measurements[base_element] = entry.meters[0]
 			if "fuses" in entry:
 				fuses.append_array(entry.fuses)
-			if "not_connected" in entry: # TODO use settings to enable / disable this feature
+			if floating_to_gnd and "not_connected" in entry:
 				for netname in entry.not_connected:
-					circuit.append("RZGND%d %s %s 10G" % [rzgnd_number, netname, gnd_net.name])
+					circuit.append("RZGND%d %s %s %s" % [rzgnd_number, netname, gnd_net.name, floating_to_gnd])
 					rzgnd_number += 1
 	
 	# add models to circuit

@@ -42,4 +42,4 @@ func _init() -> void:
 			"possible_values": supported_locales
 		}
 	}
-	FAG_Settings.register_settings(self, settings_group_name, default_settings, {})
+	FAG_Settings.register_settings(self, settings_group_name, default_settings, {}, 0x10)

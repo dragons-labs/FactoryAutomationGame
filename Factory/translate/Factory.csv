@@ -57,3 +57,6 @@ FACTORY_BLOCK_UI_NOT_APPLIED,WARNING: Changes not applied!,UWAGA: Zmiany nie zat
 FACTORY_BLOCK_UI_NUMBER_OF_SIGNALS,Number of signals:,Ilość sygnałów:
 FACTORY_BLOCK_UI_OUTPUT,Output:,Wyjście:
 FACTORY_BLOCK_UI_INPUTS,Inputs:,Wejścia:
+
+FACTORY_ADVANCED_SETTINGS_GROUP_NAME,Advanced settings,Ustawienia zaawansowane
+FACTORY_ADVANCED_SETTINGS_workdir_in_tmp,Use temporary dir to place factory workdir,Umieść katalog roboczy fabryki w katalogu tymczasowym
