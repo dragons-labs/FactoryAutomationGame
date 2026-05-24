@@ -76,6 +76,7 @@ func recursive_add_line_to_net(net : Net, line : Line2D, all_lines : Object) -> 
 	# line can connect to other line only on own endpoints, so check both endpoints
 	for i in [0, line.get_point_count() - 1]:
 		# in non-orthogonal mode can connect to more that one line so "find all" 
+		# (this is also useful for not merged orthogonal lines)
 		for nextline in all_lines.find_all_lines_by_point(line.get_point_position(i), squared_radius):
 			var nextlinenet = find_net_by_line(nextline)
 			if not nextlinenet:

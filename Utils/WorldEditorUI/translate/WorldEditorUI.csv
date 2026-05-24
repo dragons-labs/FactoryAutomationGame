@@ -15,7 +15,11 @@ EDITOR_LINE_TOOL_TOOLTIP,"Line\n - LMB to start drawing / finish segment\n - RMB
 WORLD_EDITOR_UI_SETTINGS_GROUP_NAME,World Editor
 
 WORLD_EDITOR_SETTINGS_orthogonal_lines,"Disallow drawing non orthogonal lines in grid editor (require game restart)"
+WORLD_EDITOR_SETTINGS_keep_line_connected,"Keep partially selected line connected while operating on group"
 WORLD_EDITOR_SETTINGS_use_interactive_import,"Use paste (duplicate) mode while importing part of schematic to grid editor"
+
+EDITOR_KEEP_LINE_CONNECTED_ON_TOOLTIP,"Keep partially selected line connected while operating on group (click to disable)"
+EDITOR_KEEP_LINE_CONNECTED_OFF_TOOLTIP,"Don't keep partially selected line connected while operating on group (click to enable)"
 
 ACTION_EDIT_UNDO,"Undo (in editors)"
 ACTION_EDIT_REDO,"Redo (in editors)"

@@ -127,6 +127,7 @@ func update_new_elements_positions(point : Vector2) -> void:
 		_new_elements[e] = e.position
 	_new_elements_init_point = point
 
+
 ### Move existed element
 
 var _moving_elements := {}
@@ -145,13 +146,13 @@ func move_element__step(point : Vector2) -> void:
 	for element in _moving_elements:
 		element.position = (_moving_elements[element] + move).snapped(grid_size)
 
-func move_element__finish(start_undo_redo_action = true, finish_undo_redo_action = true) -> bool:
+func move_element__finish(start_undo_redo_action = true, finish_undo_redo_action = true) -> int:
 	if not _moving_elements:
-		return false
+		return 0
 	
 	# check (on first element if was moved)
 	var first_element = _moving_elements.keys()[0]
-	var ret = false
+	var ret = 0
 	if first_element.position != _moving_elements[first_element]:
 		# create common undo_redo action for all elements
 		if start_undo_redo_action:
@@ -163,7 +164,7 @@ func move_element__finish(start_undo_redo_action = true, finish_undo_redo_action
 		
 		if finish_undo_redo_action:
 			undo_redo.commit_action()
-		ret = true
+		ret = 1
 	_moving_elements.clear()
 	return ret
 
@@ -197,7 +198,8 @@ func rotate_elements(elements : Array, angle : float, pivot = null, start_undo_r
 		local_undo_redo.add_do_method(element.rotate.bind(angle))
 		local_undo_redo.add_undo_method(element.rotate.bind(-angle))
 		if pivot != null:
-			local_undo_redo.add_do_property(element, "position", FAG_Utils.rotate_around_pivot(element.position, pivot, angle).snapped(grid_size))
+			pivot = pivot.snapped(grid_size)
+			local_undo_redo.add_do_property(element, "position", FAG_Utils.rotate_around_pivot(element.position, pivot, angle))
 			local_undo_redo.add_undo_property(element, "position", element.position)
 		local_undo_redo.add_do_method(element.on_transform_updated.bind())
 		local_undo_redo.add_undo_method(element.on_transform_updated.bind())
@@ -220,17 +222,16 @@ func mirror_elements(elements : Array, pivot = null, start_undo_redo_action = tr
 		local_undo_redo.add_do_property(element, "scale", element.scale)
 		
 		if pivot != null:
+			pivot = pivot.snapped(grid_size)
 			# we only make up-down mirror, so in group mirror elements rotated +/- 0.5 PI must be rotated 180°
 			element.rotation = wrapf(element.rotation, -PI, PI)
 			var abs_rotation = abs(element.rotation)
 			if 1.5 < abs_rotation and abs_rotation < 1.6:
 				local_undo_redo.add_undo_property(element, "rotation", element.rotation)
-				element.rotation = -element.rotation
-				local_undo_redo.add_do_property(element, "rotation", element.rotation)
+				local_undo_redo.add_do_property(element, "rotation", -element.rotation)
 			
 			local_undo_redo.add_undo_property(element, "position", element.position)
-			element.position = FAG_Utils.mirror_y(element.position, pivot)
-			local_undo_redo.add_do_property(element, "position", element.position)
+			local_undo_redo.add_do_property(element, "position", FAG_Utils.mirror_y(element.position, pivot))
 		
 		local_undo_redo.add_do_method(element.on_transform_updated.bind())
 		local_undo_redo.add_undo_method(element.on_transform_updated.bind())
