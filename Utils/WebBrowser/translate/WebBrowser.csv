@@ -13,3 +13,5 @@ URL_STATUS_OK,✔
 URL_STATUS_OK_TOOLTIP,loaded successful
 URL_STATUS_ERROR,❌
 URL_STATUS_ERROR_TOOLTIP,an error occurred while loading
+URL_STATUS_LOADING,⏳
+URL_STATUS_LOADING_TOOLTIP,page is loading

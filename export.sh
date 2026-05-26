@@ -168,12 +168,6 @@ echo "Exporting gdcef"
 platform=$(echo $PLATFORM | tr '[:upper:]' '[:lower:]')
 mkdir -p $TARGET/cef_artifacts/$platform
 cp -fr $CEF_ARTIFACTS/$platform/* $TARGET/cef_artifacts/$platform/
-if [ "$PLATFORM" = "Linux" ]; then
-	cp -fr $CEF_ARTIFACTS/locales $TARGET/cef_artifacts/
-elif [ "$PLATFORM" = "Windows" ]; then
-	cp -fr $CEF_ARTIFACTS/locales-win $TARGET/cef_artifacts/locales
-fi
-\rm -rf $TARGET/cef_artifacts/*/cache $TARGET/cef_artifacts/*/debug.log
 \rm -f $TARGET/cef_artifacts/gdcef.gdextension $TARGET/libgdcef.* $TARGET/libcef.*
 
 # add CEF licence info

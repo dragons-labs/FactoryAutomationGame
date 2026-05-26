@@ -23,6 +23,8 @@ enum ModeEnum {Default, GdCEF, GodotWRY}
 				_browser = _webview
 				_display.visible = false
 				#_browser.connect("ipc_message", _on_ipc_message)
+				_browser.connect("page_load_started", _on_page_start_loading_wry)
+				_browser.connect("page_load_finished", _on_page_loaded_wry)
 			elif backend == ModeEnum.GdCEF:
 				if "visible" in _webview:
 					_webview.visible = false
@@ -95,23 +97,49 @@ func _on_url_text_changed(_new_text: String) -> void:
 
 #region  WebBrowser loading state callbacks
 
-func _on_page_loaded(node):
-	_url_bar.text = node.get_url()
-	_url_status.text = tr("URL_STATUS_OK")
-	_url_status.tooltip_text = tr("URL_STATUS_OK_TOOLTIP")
-	_url_status.add_theme_color_override("font_disabled_color", Color.GREEN)
+enum {START, DONE_OK, DONE_ERROR}
+
+var curr_state
+func _set_ui_loading_state(state, url) -> void:
+	_url_bar.text = url
 	_url_status.disabled = true
+	
+	match state:
+		START:
+			_url_status.text = tr("URL_STATUS_LOADING")
+			_url_status.tooltip_text = tr("URL_STATUS_LOADING_TOOLTIP")
+			_url_status.add_theme_color_override("font_disabled_color", Color.YELLOW)
+		DONE_OK:
+			if curr_state == DONE_ERROR:
+				return
+			_url_status.text = tr("URL_STATUS_OK")
+			_url_status.tooltip_text = tr("URL_STATUS_OK_TOOLTIP")
+			_url_status.add_theme_color_override("font_disabled_color", Color.GREEN)
+		DONE_ERROR:
+			_url_status.text = tr("URL_STATUS_ERROR")
+			_url_status.tooltip_text = tr("URL_STATUS_ERROR_TOOLTIP")
+			_url_status.add_theme_color_override("font_disabled_color", Color.RED)
+	curr_state = state
 
-func _on_page_failed_loading(_aborted, _msg_err, node):
-	_url_bar.text = node.get_url()
-	_url_status.text = tr("URL_STATUS_ERROR")
-	_url_status.tooltip_text = tr("URL_STATUS_ERROR_TOOLTIP")
-	_url_status.add_theme_color_override("font_disabled_color", Color.RED)
-	_url_status.disabled = true
+func _on_page_start_loading_gdcef(node):
+	_set_ui_loading_state(START, node.get_url())
 
-# TODO on start loading
+func _on_page_start_loading_wry(url: String) -> void:
+	_set_ui_loading_state(START, url)
 
-# TODO support on Webview  after merge https://github.com/doceazedo/godot_wry/pull/64
+func _on_page_loaded_gdcef(http_code, node):
+	if http_code >= 400:
+		prints("GdCEF loading error http code:", http_code)
+		_set_ui_loading_state(DONE_ERROR, node.get_url())
+	else:
+		_set_ui_loading_state(DONE_OK, node.get_url())
+
+func _on_page_loaded_wry(url: String) -> void:
+	_set_ui_loading_state(DONE_OK, url)
+
+func _on_page_failed_loading_gdcef(aborted, msg_err, node):
+	prints("GdCEF loading error:", aborted, msg_err)
+	_set_ui_loading_state(DONE_ERROR, node.get_url())
 
 #endregion
 
@@ -142,8 +170,9 @@ func _init_GdCEF():
 	if not _browser:
 		printerr("GdCEF create error: ", _gdcef.get_error())
 		return
-	_browser.connect("on_page_loaded", _on_page_loaded)
-	_browser.connect("on_page_failed_loading", _on_page_failed_loading)
+	_browser.connect("on_page_start_loading", _on_page_start_loading_gdcef)
+	_browser.connect("on_page_loaded", _on_page_loaded_gdcef)
+	_browser.connect("on_page_failed_loading", _on_page_failed_loading_gdcef)
 	
 	_display.resized.connect(_display_on_resize)
 	_display.gui_input.connect(_display_on_input)

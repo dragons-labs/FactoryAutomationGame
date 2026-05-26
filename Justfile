@@ -81,19 +81,10 @@ build-addons-gdcef: build-godot-cpp
 			tempdir=`mktemp -d`
 			(
 				cd "$tempdir"
-				wget https://github.com/Lecrapouille/gdcef/releases/download/v0.19.2-godot4/gdcef-0.19.2_godot-4.5.zip
-				unzip gdcef-0.19.2_godot-4.5.zip
+				wget https://github.com/Lecrapouille/gdcef/releases/download/v0.19.3-godot4/gdcef-0.19.3_godot-4.5.zip
+				unzip gdcef-0.19.3_godot-4.5.zip
 			)
 			mv "$tempdir/gdcef/cef_artifacts/windows" .
-			rm -fr "$tempdir"
-			# use `locales` dir from 0.18.1 - BUG https://github.com/Lecrapouille/gdcef/issues/92
-			tempdir=`mktemp -d`
-			(
-				cd "$tempdir"
-				wget https://github.com/Lecrapouille/gdcef/releases/download/v0.18.1-godot4/gdCEF-0.18.1_Godot-4.5_Windows_X64.tar.gz
-				tar -xzf gdCEF-0.18.1_Godot-4.5_Windows_X64.tar.gz
-			)
-			mv "$tempdir/cef_artifacts/locales" locales-win
 			rm -fr "$tempdir"
 		)
 	else
@@ -108,3 +99,16 @@ build-addons-gdcef: build-godot-cpp
 			chmod +x cef_artifacts/linux/check_libGL.sh
 		)
 	fi
+
+build-addons-godot_wry:
+	#!/bin/sh -e
+	tempdir=`mktemp -d`
+	(
+		cd "$tempdir"
+		wget https://github.com/doceazedo/godot_wry/releases/download/v1.0.2/godot_wry.zip  # TODO update or build from source due to BUG https://github.com/doceazedo/godot_wry/pull/79   DO NOT use last git version due to BUG https://github.com/doceazedo/godot_wry/issues/92
+		unzip godot_wry.zip
+		mv godot_wry/addons/godot_wry/examples .
+	)
+	rm -fr addons/godot_wry
+	mv "$tempdir/godot_wry/addons/godot_wry" addons/
+	rm -fr "$tempdir"
