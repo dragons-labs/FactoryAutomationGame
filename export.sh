@@ -270,16 +270,16 @@ if [ "$PLATFORM" = "Linux" ]; then
 	for f in $GODOT_BIN; do
 		patchelf --set-rpath '$ORIGIN:$ORIGIN/libs' $f
 	done
-	mkdir $TARGET/libs
+	mkdir "$TARGET/libs"
 	for f in $GODOT_LIB; do
 		patchelf --set-rpath '$ORIGIN' --output "$TARGET/libs/$(basename $f)" "$(realpath $f)"
 	done
-	(cd $TARGET/libs && for f in *; do rm -f ../cef_artifacts/linux/libs/$f ../qemu/$f ../ngspice/$f; done)
+	(cd "$TARGET/libs" && for f in *; do rm -f ../cef_artifacts/linux/libs/$f ../qemu/$f ../ngspice/$f; done)
 	
 	LD_LIB="/lib64/ld-linux-x86-64.so.2"
 	cp "$(realpath $LD_LIB)" "$TARGET/$(basename $LD_LIB)"
 	GODOT_LIB="$GODOT_LIB $(realpath $LD_LIB)"
-	(cd $TARGET && ln -s FactoryAutomation.pck ld-linux-x86-64.so.2.pck)
+	(cd "$TARGET" && ln -s FactoryAutomation.pck ld-linux-x86-64.so.2.pck)
 	
 	sed -n '1,3p' -i "$TARGET/FactoryAutomation.sh"
 	echo 'mkdir -p "$HOME/.local/share/godot/app_userdata/FactoryAutomation/"' >> "$TARGET/FactoryAutomation.sh"
@@ -289,13 +289,15 @@ if [ "$PLATFORM" = "Linux" ]; then
 	echo 'else' >> "$TARGET/FactoryAutomation.sh"
 	echo './FactoryAutomation "$@" 2>&1 | tee "$HOME/.local/share/godot/app_userdata/FactoryAutomation/godot.stdout.log"' >> "$TARGET/FactoryAutomation.sh"
 	echo 'fi' >> "$TARGET/FactoryAutomation.sh"
+	
+	extract_licence_info libs $(realpath $GODOT_LIB)
 elif [ "$PLATFORM" = "Windows" ]; then
-	mv $TARGET/FactoryAutomation $TARGET/FactoryAutomation.exe
-	cp /usr/lib/gcc/x86_64-w64-mingw32/*-posix/libstdc++-6.dll $TARGET/
+	mv "$TARGET/FactoryAutomation" "$TARGET/FactoryAutomation.exe"
+	cp /usr/lib/gcc/x86_64-w64-mingw32/*-posix/libstdc++-6.dll "$TARGET/"
+	mkdir -p "$TARGET/LICENSES/libs"
 fi
 
-extract_licence_info libs $(realpath $GODOT_LIB)
-cp addons/3rdparty/_godot-cpp/LICENSE.md $TARGET/LICENSES/libs/GODOT.md
+cp addons/3rdparty/_godot-cpp/LICENSE.md "$TARGET/LICENSES/libs/GODOT.md"
 
 echo
 echo "Project exported into $TARGET"

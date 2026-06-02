@@ -76,7 +76,7 @@ func load_level(level_id : String, save_dir := "") -> void:
 	else:
 		FAG_Utils.remove_dir_recursive("user://workdir")
 		DirAccess.make_dir_recursive_absolute("user://workdir")
-		DirAccess.open("user://workdir")
+		work_dir = DirAccess.open("user://workdir")
 	var work_dir_path = work_dir.get_current_dir()
 	
 	# set circuit_simulator parameters (other parameters are set via factory_control.start()
